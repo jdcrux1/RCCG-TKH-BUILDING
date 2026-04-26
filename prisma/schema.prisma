@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Donor {
+  id              String         @id @default(uuid())
+  phone           String         @unique
+  pin             String         // Hashed PIN
+  name            String
+  spouseName      String?
+  email           String?
+  birthday        String?        // MM-DD
+  tier            String         // Automatically assigned
+  monthlyPledge   Float
+  totalPledged    Float          // 24 * monthlyPledge
+  startDate       DateTime       @default(now())
+  status          String         @default("ACTIVE")
+  role            String         @default("DONOR") // ADMIN or DONOR
+  contributions   Contribution[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model Contribution {
+  id          String   @id @default(uuid())
+  amount      Float
+  date        DateTime @default(now())
+  reference   String?
+  narrative   String?
+  donorId     String
+  donor       Donor    @relation(fields: [donorId], references: [id])
+}
+
+model Milestone {
+  id           String @id @default(uuid())
+  title        String
+  targetAmount Float
+  currentAmount Float  @default(0)
+  status       String // FUNDED, IN_PROGRESS, PENDING
+  order        Int
+}
+
+model NewsUpdate {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  imageUrl  String?
+  videoUrl  String?
+  createdAt DateTime @default(now())
+}
