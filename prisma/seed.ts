@@ -25,6 +25,28 @@ async function main() {
 
   console.log({ admin });
 
+  // Seed Sample Donor
+  const donorPhone = '09012345678';
+  const donorPin = '1111';
+  const donorHashedPin = await bcrypt.hash(donorPin, 10);
+
+  await prisma.donor.upsert({
+    where: { phone: donorPhone },
+    update: {},
+    create: {
+      phone: donorPhone,
+      pin: donorHashedPin,
+      name: 'John Doe',
+      tier: 'Nehemiah Builder',
+      monthlyPledge: 100000,
+      totalPledged: 2400000,
+      role: 'DONOR',
+      status: 'ACTIVE',
+    },
+  });
+
+  console.log('Sample donor seeded');
+
   // Seed Milestones
   const milestones = [
     { title: 'Basement Phase', targetAmount: 150000000, currentAmount: 150000000, status: 'FUNDED', order: 1 },

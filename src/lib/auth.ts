@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 
-const secretKey = 'kingdom-builders-secret-key'; // In prod, use process.env.JWT_SECRET
+const secretKey = process.env.JWT_SECRET || 'kingdom-builders-secret-key'; 
 const key = new TextEncoder().encode(secretKey);
 
 export async function hashPin(pin: string) {

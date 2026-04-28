@@ -25,10 +25,15 @@ async function getDonorData() {
   const target = 650000000;
   const globalProgress = (totalRaised / target) * 100;
 
+  // Milestones from DB
+  const milestones = await prisma.milestone.findMany({
+    orderBy: { order: 'asc' }
+  });
+
   // Personal contribution vs Global Target
   const personalToGlobalRate = (totalContributed / target) * 100;
 
-  return { donor, totalContributed, fulfillmentRate, totalRaised, target, globalProgress, personalToGlobalRate };
+  return { donor, totalContributed, fulfillmentRate, totalRaised, target, globalProgress, personalToGlobalRate, milestones };
 }
 
 export default async function DonorDashboard() {
@@ -126,20 +131,16 @@ export default async function DonorDashboard() {
         <div className="glass-card">
           <h3 style={{ marginBottom: 'var(--space-md)' }}>Construction Milestones</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {[
-              { name: 'Basement Phase', status: 'FUNDED', target: '₦150M' },
-              { name: 'Ground Floor', status: 'IN PROGRESS', target: '₦200M' },
-              { name: 'First Floor', status: 'PENDING', target: '₦300M' },
-            ].map((m, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <CheckCircle2 size={24} color={m.status === 'FUNDED' ? 'var(--success)' : m.status === 'IN PROGRESS' ? 'var(--accent)' : 'rgba(255,255,255,0.2)'} />
+            {milestones.map((m, i) => (
+              <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <CheckCircle2 size={24} color={m.status === 'FUNDED' ? 'var(--success)' : m.status === 'IN_PROGRESS' ? 'var(--accent)' : 'rgba(255,255,255,0.2)'} />
                 <div style={{ flex: 1 }}>
-                  <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>{m.name}</p>
-                  <p style={{ fontSize: '0.75rem', opacity: 0.5 }}>Target: {m.target}</p>
+                  <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>{m.title}</p>
+                  <p style={{ fontSize: '0.75rem', opacity: 0.5 }}>Target: ₦{(m.targetAmount / 1000000).toFixed(0)}M</p>
                 </div>
                 <span style={{ 
                   fontSize: '0.7rem', 
-                  padding: '2px 8px', 
+                  padding: '4px 10px', 
                   borderRadius: 'var(--radius-full)', 
                   background: 'var(--glass-hover)',
                   opacity: 0.8
