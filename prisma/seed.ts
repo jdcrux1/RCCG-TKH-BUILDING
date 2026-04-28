@@ -4,13 +4,18 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  const adminPhone = '08000000000'; // Initial admin phone
-  const adminPin = '1234'; // Initial admin PIN
+  // CLEAN SLATE: Only one admin account as requested
+  const adminPhone = '08000000000'; 
+  const adminPin = '1234'; 
   const hashedPin = await bcrypt.hash(adminPin, 10);
 
   const admin = await prisma.donor.upsert({
     where: { phone: adminPhone },
-    update: {},
+    update: {
+      pin: hashedPin,
+      role: 'ADMIN',
+      status: 'ACTIVE',
+    },
     create: {
       phone: adminPhone,
       pin: hashedPin,
@@ -23,34 +28,12 @@ async function main() {
     },
   });
 
-  console.log({ admin });
+  console.log('Database cleaned. Admin account created:', adminPhone);
 
-  // Seed Sample Donor
-  const donorPhone = '09012345678';
-  const donorPin = '1111';
-  const donorHashedPin = await bcrypt.hash(donorPin, 10);
-
-  await prisma.donor.upsert({
-    where: { phone: donorPhone },
-    update: {},
-    create: {
-      phone: donorPhone,
-      pin: donorHashedPin,
-      name: 'John Doe',
-      tier: 'Nehemiah Builder',
-      monthlyPledge: 100000,
-      totalPledged: 2400000,
-      role: 'DONOR',
-      status: 'ACTIVE',
-    },
-  });
-
-  console.log('Sample donor seeded');
-
-  // Seed Milestones
+  // Keep milestones but reset their progress for a fresh start
   const milestones = [
-    { title: 'Basement Phase', targetAmount: 150000000, currentAmount: 150000000, status: 'FUNDED', order: 1 },
-    { title: 'Ground Floor Phase', targetAmount: 200000000, currentAmount: 50000000, status: 'IN_PROGRESS', order: 2 },
+    { title: 'Basement Phase', targetAmount: 150000000, currentAmount: 0, status: 'PENDING', order: 1 },
+    { title: 'Ground Floor Phase', targetAmount: 200000000, currentAmount: 0, status: 'PENDING', order: 2 },
     { title: 'First Floor Phase', targetAmount: 300000000, currentAmount: 0, status: 'PENDING', order: 3 },
   ];
 
@@ -65,7 +48,7 @@ async function main() {
     });
   }
 
-  console.log('Milestones seeded');
+  console.log('System milestones reset.');
 }
 
 main()

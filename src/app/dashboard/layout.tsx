@@ -1,6 +1,6 @@
 'use client';
 
-import { LogOut, Home, User } from 'lucide-react';
+import { LogOut, Home, User, CreditCard } from 'lucide-react';
 import { logout } from '@/app/admin/actions';
 
 export default function DonorLayout({ children }: { children: React.ReactNode }) {
