@@ -37,7 +37,7 @@ async function getDonorData() {
 }
 
 export default async function DonorDashboard() {
-  const { donor, totalContributed, fulfillmentRate, totalRaised, target, globalProgress, personalToGlobalRate } = await getDonorData();
+  const { donor, totalContributed, fulfillmentRate, totalRaised, target, globalProgress, personalToGlobalRate, milestones } = await getDonorData();
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
