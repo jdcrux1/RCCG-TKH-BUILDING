@@ -1,5 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { Users, TrendingUp, Target, CreditCard } from 'lucide-react';
+import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
+import GrowthChart from '@/components/GrowthChart';
 
 async function getStats() {
   const totalDonors = await prisma.donor.count({ where: { role: 'DONOR' } });
@@ -10,6 +12,35 @@ async function getStats() {
   const target = 650000000;
   const progressPercent = (totalRaised / target) * 100;
 
+  // Monthly Trends (Last 6 Months)
+  const monthlyData = [];
+  for (let i = 5; i >= 0; i--) {
+    const date = subMonths(new Date(), i);
+    const start = startOfMonth(date);
+    const end = endOfMonth(date);
+    
+    const monthlySum = await prisma.contribution.aggregate({
+      where: {
+        date: {
+          gte: start,
+          lte: end
+        }
+      },
+      _sum: { amount: true }
+    });
+    
+    monthlyData.push({
+      month: format(date, 'MMM'),
+      amount: monthlySum._sum.amount || 0
+    });
+  }
+
+  // Projection
+  const last3Months = monthlyData.slice(-3);
+  const avgMonthly = last3Months.reduce((sum, m) => sum + m.amount, 0) / 3;
+  const remaining = target - totalRaised;
+  const monthsToGoal = avgMonthly > 0 ? Math.ceil(remaining / avgMonthly) : Infinity;
+
   // Tier breakdown
   const donors = await prisma.donor.findMany({ where: { role: 'DONOR' } });
   const tierCounts: Record<string, number> = {};
@@ -17,7 +48,7 @@ async function getStats() {
     tierCounts[d.tier] = (tierCounts[d.tier] || 0) + 1;
   });
 
-  return { totalDonors, totalRaised, progressPercent, tierCounts, target };
+  return { totalDonors, totalRaised, progressPercent, tierCounts, target, monthlyData, monthsToGoal };
 }
 
 export default async function AdminDashboard() {
@@ -27,7 +58,7 @@ export default async function AdminDashboard() {
     { title: 'Total Donors', value: stats.totalDonors, icon: Users, color: 'var(--secondary)' },
     { title: 'Total Raised', value: `₦${stats.totalRaised.toLocaleString()}`, icon: TrendingUp, color: 'var(--success)' },
     { title: 'Goal Progress', value: `${stats.progressPercent.toFixed(1)}%`, icon: Target, color: 'var(--accent)' },
-    { title: 'Target', value: `₦${stats.target.toLocaleString()}`, icon: CreditCard, color: 'var(--primary-light)' },
+    { title: 'Est. Completion', value: stats.monthsToGoal === Infinity ? 'TBD' : `${stats.monthsToGoal} Months`, icon: CreditCard, color: 'var(--primary-light)' },
   ];
 
   return (
@@ -70,24 +101,8 @@ export default async function AdminDashboard() {
         {/* Progress Chart Placeholder */}
         <div className="glass-card" style={{ minHeight: '300px' }}>
           <h3 style={{ marginBottom: 'var(--space-md)' }}>Fulfillment Growth</h3>
-          <div style={{ 
-            height: '200px', 
-            display: 'flex', 
-            alignItems: 'flex-end', 
-            gap: '10px', 
-            padding: '20px 0' 
-          }}>
-            {/* Mock chart bars */}
-            {[40, 60, 45, 80, 55, 90, 75].map((h, i) => (
-              <div key={i} style={{ 
-                flex: 1, 
-                height: `${h}%`, 
-                background: 'linear-gradient(to top, var(--secondary), transparent)', 
-                borderRadius: '4px 4px 0 0' 
-              }} />
-            ))}
-          </div>
-          <p style={{ textAlign: 'center', fontSize: '0.8rem', opacity: 0.5 }}>Monthly Contribution Trends</p>
+          <GrowthChart data={stats.monthlyData} />
+          <p style={{ textAlign: 'center', fontSize: '0.8rem', opacity: 0.5, marginTop: '12px' }}>Monthly Contribution Trends</p>
         </div>
 
         {/* Tier Distribution */}
