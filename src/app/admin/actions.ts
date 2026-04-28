@@ -7,6 +7,7 @@ import { revalidatePath } from 'next/cache';
 import { triggerNotification } from '@/lib/comm-engine';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { logActivity } from '@/lib/logger';
 
 export async function logout() {
   (await cookies()).set('session', '', { expires: new Date(0) });
@@ -40,6 +41,9 @@ export async function addDonor(formData: FormData) {
   // Trigger Notification
   await triggerNotification('PLEDGE_CONFIRMATION', donor.id, {});
 
+  // Log Activity
+  await logActivity('CREATE_DONOR', { donorId: donor.id, name: donor.name, phone: donor.phone });
+
   revalidatePath('/admin/donors');
 }
 
@@ -68,6 +72,9 @@ export async function logContribution(formData: FormData) {
     fulfillmentRate
   });
 
+  // Log Activity
+  await logActivity('LOG_CONTRIBUTION', { donorId, amount, reference });
+
   revalidatePath('/admin/ledger');
   revalidatePath('/admin/dashboard');
 }
@@ -81,6 +88,9 @@ export async function updateMilestone(formData: FormData) {
     where: { id },
     data: { status, currentAmount }
   });
+
+  // Log Activity
+  await logActivity('UPDATE_MILESTONE', { milestoneId: id, status, currentAmount });
 
   revalidatePath('/admin/milestones');
   revalidatePath('/dashboard');

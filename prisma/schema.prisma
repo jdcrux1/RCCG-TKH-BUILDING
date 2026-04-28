@@ -57,3 +57,12 @@ model NewsUpdate {
   videoUrl  String?
   createdAt DateTime @default(now())
 }
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  action    String   // e.g., "CREATE_DONOR", "UPDATE_CONTRIBUTION"
+  details   String   // JSON string of details
+  userId    String?  // ID of admin who performed the action
+  userName  String?  // Name of admin
+  createdAt DateTime @default(now())
+}
