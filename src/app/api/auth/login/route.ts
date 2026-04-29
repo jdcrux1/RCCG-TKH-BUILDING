@@ -5,7 +5,13 @@ import { cookies } from 'next/headers';
 import { logActivity } from '@/lib/logger';
 
 export async function POST(request: Request) {
-  const { phone, pin, role } = await request.json();
+  const { phone: rawPhone, pin: rawPin, role } = await request.json();
+  const phone = rawPhone?.trim();
+  const pin = rawPin?.trim();
+
+  if (!phone || !pin) {
+    return NextResponse.json({ error: 'Phone and PIN are required' }, { status: 400 });
+  }
 
   const user = await prisma.donor.findUnique({
     where: { phone },

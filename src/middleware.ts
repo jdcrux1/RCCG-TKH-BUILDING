@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { decrypt } from '@/lib/auth';
 
-export async function middleware(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
   const session = request.cookies.get('session')?.value;
   const path = request.nextUrl.pathname;
 
   // Define public routes
-  const isPublicRoute = path === '/' || path === '/login' || path === '/admin/login';
+  const isPublicRoute = path === '/' || path === '/login' || path === '/admin/login' || path === '/api/auth/login';
 
   if (isPublicRoute) {
     if (session) {
@@ -50,5 +50,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };

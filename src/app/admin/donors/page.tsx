@@ -184,27 +184,7 @@ export default async function DonorManagement() {
         </div>
       )}
 
-      <style jsx>{`
-        @media (max-width: 768px) {
-          .hide-mobile {
-            display: none !important;
-          }
-          .mobile-only-list {
-            display: flex !important;
-          }
-          .responsive-header {
-            flex-direction: column;
-            align-items: flex-start !important;
-          }
-          .header-actions {
-            width: 100% !important;
-          }
-          .header-actions > :global(button) {
-            flex: 1;
-          }
-        }
-      `}</style>
-    </div>
+
     </div>
   );
 }

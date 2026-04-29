@@ -55,7 +55,7 @@ export default function GrowthChart({ data }: GrowthChartProps) {
               color: 'white'
             }}
             itemStyle={{ color: 'var(--accent)' }}
-            formatter={(value: number) => [`₦${value.toLocaleString()}`, 'Amount']}
+            formatter={(value: any) => [`₦${Number(value).toLocaleString()}`, 'Amount']}
           />
           <Area 
             type="monotone" 
