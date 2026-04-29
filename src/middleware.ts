@@ -7,40 +7,44 @@ export default async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   // Define public routes
-  const isPublicRoute = path === '/' || path === '/login' || path === '/admin/login' || path === '/api/auth/login';
+  const isPublicRoute = ['/', '/login', '/admin/login', '/api/auth/login'].includes(path);
 
-  if (isPublicRoute) {
-    if (session) {
-      try {
-        const payload = await decrypt(session);
-        if (payload.role === 'ADMIN') {
-          return NextResponse.redirect(new URL('/admin/dashboard', request.nextUrl.origin));
-        }
-        if (payload.role === 'ONBOARDER') {
-          return NextResponse.redirect(new URL('/admin/onboard', request.nextUrl.origin));
-        }
-        if (payload.role === 'DONOR') {
-          return NextResponse.redirect(new URL('/dashboard', request.nextUrl.origin));
-        }
-      } catch (e) {
-        // Invalid session, let them stay on public route
-      }
+  let payload = null;
+  if (session) {
+    try {
+      payload = await decrypt(session);
+    } catch (e) {
+      // Invalid session, clear it
+      const response = NextResponse.next();
+      response.cookies.delete('session');
+      return response;
     }
-    return NextResponse.next();
   }
 
-  // Protected routes
-  if (!session) {
+  // 1. If user is on a public route and has a valid session, redirect to their home
+  if (isPublicRoute && payload) {
+    if (payload.role === 'ADMIN') {
+      return NextResponse.redirect(new URL('/admin/dashboard', request.nextUrl.origin));
+    }
+    if (payload.role === 'ONBOARDER') {
+      return NextResponse.redirect(new URL('/admin/onboard', request.nextUrl.origin));
+    }
+    if (payload.role === 'DONOR') {
+      return NextResponse.redirect(new URL('/dashboard', request.nextUrl.origin));
+    }
+  }
+
+  // 2. If user is NOT on a public route and HAS NO session, redirect to login
+  if (!isPublicRoute && !payload) {
     if (path.startsWith('/admin')) {
       return NextResponse.redirect(new URL('/admin/login', request.nextUrl.origin));
     }
     return NextResponse.redirect(new URL('/login', request.nextUrl.origin));
   }
 
-  try {
-    const payload = await decrypt(session);
-
-    // RBAC check
+  // 3. RBAC checks for authenticated users on protected routes
+  if (payload) {
+    // Admin routes
     if (path.startsWith('/admin')) {
       if (payload.role === 'ADMIN') {
         return NextResponse.next();
@@ -51,17 +55,28 @@ export default async function middleware(request: NextRequest) {
         }
         return NextResponse.redirect(new URL('/admin/onboard', request.nextUrl.origin));
       }
-      return NextResponse.redirect(new URL('/login', request.nextUrl.origin));
-    }
-    
-    if (path.startsWith('/dashboard') && payload.role !== 'DONOR') {
-      return NextResponse.redirect(new URL('/admin/login', request.nextUrl.origin));
+      // If not admin or onboarder, kick to donor dashboard if they are a donor
+      if (payload.role === 'DONOR') {
+        return NextResponse.redirect(new URL('/dashboard', request.nextUrl.origin));
+      }
     }
 
-    return NextResponse.next();
-  } catch (e) {
-    return NextResponse.redirect(new URL('/login', request.nextUrl.origin));
+    // Donor routes
+    if (path.startsWith('/dashboard')) {
+      if (payload.role === 'DONOR') {
+        return NextResponse.next();
+      }
+      // If not donor, kick to their respective home
+      if (payload.role === 'ADMIN') {
+        return NextResponse.redirect(new URL('/admin/dashboard', request.nextUrl.origin));
+      }
+      if (payload.role === 'ONBOARDER') {
+        return NextResponse.redirect(new URL('/admin/onboard', request.nextUrl.origin));
+      }
+    }
   }
+
+  return NextResponse.next();
 }
 
 export const config = {

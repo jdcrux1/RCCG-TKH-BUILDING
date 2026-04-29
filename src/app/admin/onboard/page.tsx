@@ -6,9 +6,7 @@ import { redirect } from 'next/navigation';
 
 export default async function OnboardPage() {
   const session = await getSession();
-  if (!session || (session.role !== 'ADMIN' && session.role !== 'ONBOARDER')) {
-    redirect('/admin/login');
-  }
+  // Middleware handles protection, but we still need session for the logout action etc.
 
   const tiers = [
     { name: 'Cornerstone Partner', amount: 1000000 },
