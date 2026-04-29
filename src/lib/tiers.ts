@@ -9,3 +9,19 @@ export function getTier(monthlyPledge: number): string {
   if (monthlyPledge === 5000) return 'Willing Heart';
   return 'Supporter';
 }
+
+export const TIER_COLORS: Record<string, string> = {
+  'Cornerstone Partner': '#D4AF37',
+  'Pillar Builder': '#E5E4E2',
+  'Foundation Stone': '#CD7F32',
+  'Nehemiah Builder': '#50C878',
+  'Covenant Partners': '#0F52BA',
+  'Faithful Hand': '#008080',
+  'Open-Heart': '#FF7F50',
+  'Willing Heart': '#B57EDC',
+  'Supporter': '#C0C0C0'
+};
+
+export function getTierColor(tier: string): string {
+  return TIER_COLORS[tier] || '#C0C0C0';
+}

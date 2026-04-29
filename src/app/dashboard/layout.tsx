@@ -1,16 +1,35 @@
-'use client';
+import { Home, User, CreditCard } from 'lucide-react';
+import LogoutButton from '@/components/LogoutButton';
+import { getSession } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { getTierColor } from '@/lib/tiers';
+import { redirect } from 'next/navigation';
 
-import { LogOut, Home, User, CreditCard } from 'lucide-react';
-import { logout } from '@/app/admin/actions';
+export default async function DonorLayout({ children }: { children: React.ReactNode }) {
+  const session = await getSession();
+  if (!session) redirect('/login');
 
-export default function DonorLayout({ children }: { children: React.ReactNode }) {
+  const donor = await prisma.donor.findUnique({
+    where: { id: session.userId }
+  });
 
-  const handleLogout = async () => {
-    await logout();
-  };
+  if (!donor) redirect('/login');
+
+  const tierColor = getTierColor(donor.tier);
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--primary)', display: 'flex', flexDirection: 'column' }}>
+    <div 
+      style={{ 
+        minHeight: '100vh', 
+        background: 'var(--primary)', 
+        display: 'flex', 
+        flexDirection: 'column',
+        // Inject Tier CSS Variables
+        '--tier-primary': tierColor,
+        '--tier-glow': `${tierColor}40`, // 25% opacity for glows
+        '--tier-accent': tierColor,
+      } as React.CSSProperties}
+    >
       {/* Top Nav */}
       <header style={{
         padding: '1rem var(--space-md)',
@@ -26,12 +45,13 @@ export default function DonorLayout({ children }: { children: React.ReactNode })
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{ 
-            background: 'var(--accent)', 
+            background: 'var(--tier-primary)', 
             padding: '8px', 
             borderRadius: '8px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            boxShadow: '0 0 15px var(--tier-glow)'
           }} className="hide-mobile">
             <Home size={20} color="var(--primary)" />
           </div>
@@ -39,19 +59,7 @@ export default function DonorLayout({ children }: { children: React.ReactNode })
         </div>
 
         <div style={{ display: 'flex', gap: 'var(--space-md)', alignItems: 'center' }}>
-          <button 
-            onClick={handleLogout}
-            style={{
-              background: 'transparent',
-              color: 'var(--danger)',
-              fontSize: '0.9rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            <LogOut size={16} /> <span className="hide-mobile">Logout</span>
-          </button>
+          <LogoutButton />
         </div>
       </header>
 
@@ -101,19 +109,7 @@ export default function DonorLayout({ children }: { children: React.ReactNode })
         })}
       </nav>
 
-      <style jsx global>{`
-        @media (max-width: 768px) {
-          .hide-mobile {
-            display: none !important;
-          }
-          .mobile-only {
-            display: flex !important;
-          }
-          .main-content {
-            padding-bottom: 80px !important;
-          }
-        }
-      `}</style>
+
     </div>
   );
 }

@@ -93,16 +93,17 @@ button {
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   padding: var(--space-md);
-  transition: transform 0.3s ease, border-color 0.3s ease;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .glass-card:hover {
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: var(--tier-primary, rgba(255, 255, 255, 0.2));
+  box-shadow: 0 4px 20px var(--tier-glow, transparent);
   transform: translateY(-2px);
 }
 
 .btn-primary {
-  background: var(--accent);
+  background: var(--tier-primary, var(--accent));
   color: var(--primary);
   padding: 0.75rem 1.5rem;
   border-radius: var(--radius-sm);
@@ -110,11 +111,13 @@ button {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  transition: all 0.2s ease;
 }
 
 .btn-primary:hover {
-  background: var(--accent-hover);
-  box-shadow: var(--shadow-gold);
+  background: var(--tier-primary, var(--accent-hover));
+  box-shadow: 0 0 15px var(--tier-glow, var(--shadow-gold));
+  filter: brightness(1.1);
 }
 
 .text-gold {
