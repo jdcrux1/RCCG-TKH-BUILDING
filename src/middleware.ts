@@ -16,7 +16,12 @@ export default async function middleware(request: NextRequest) {
         if (payload.role === 'ADMIN') {
           return NextResponse.redirect(new URL('/admin/dashboard', request.nextUrl.origin));
         }
-        return NextResponse.redirect(new URL('/dashboard', request.nextUrl.origin));
+        if (payload.role === 'ONBOARDER') {
+          return NextResponse.redirect(new URL('/admin/onboard', request.nextUrl.origin));
+        }
+        if (payload.role === 'DONOR') {
+          return NextResponse.redirect(new URL('/dashboard', request.nextUrl.origin));
+        }
       } catch (e) {
         // Invalid session, let them stay on public route
       }
