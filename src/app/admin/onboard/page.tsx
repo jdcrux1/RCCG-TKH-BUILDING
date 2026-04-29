@@ -17,7 +17,6 @@ export default async function OnboardPage() {
     { name: 'Faithful Hand', amount: 20000 },
     { name: 'Open-Heart', amount: 10000 },
     { name: 'Willing Heart', amount: 5000 },
-    { name: 'Supporter', amount: 1000 },
   ];
 
   return (
@@ -107,7 +106,7 @@ export default async function OnboardPage() {
 
             <div style={{ marginTop: 'var(--space-md)', padding: 'var(--space-sm)', background: 'rgba(245, 158, 11, 0.05)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(245, 158, 11, 0.1)' }}>
               <p style={{ fontSize: '0.8rem', color: 'var(--accent)', textAlign: 'center' }}>
-                The donor will receive a SMS/Notification with their login PIN once added.
+                Note: Real-time SMS integration is pending. The system will log the notification, but you should manually provide the donor with their login PIN (sent to Admin logs).
               </p>
             </div>
 
