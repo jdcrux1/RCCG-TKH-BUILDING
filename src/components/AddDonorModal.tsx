@@ -95,12 +95,11 @@ export default function AddDonorModal() {
 
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.8rem', opacity: 0.7 }}>Monthly Pledge (₦)</label>
-                <input 
+                <label style={{ fontSize: '0.8rem', opacity: 0.7 }}>Monthly Pledge Tier</label>
+                <select 
                   name="monthlyPledge" 
-                  type="number"
                   required 
-                  placeholder="e.g. 50000"
+                  defaultValue=""
                   style={{
                     padding: '0.75rem',
                     background: 'rgba(255,255,255,0.05)',
@@ -109,7 +108,18 @@ export default function AddDonorModal() {
                     color: 'white',
                     outline: 'none'
                   }}
-                />
+                >
+                  <option value="" disabled style={{ color: 'black' }}>Select a pledge tier</option>
+                  <option value="1000000" style={{ color: 'black' }}>Cornerstone Partner (₦1,000,000)</option>
+                  <option value="500000" style={{ color: 'black' }}>Pillar Builder (₦500,000)</option>
+                  <option value="200000" style={{ color: 'black' }}>Foundation Stone (₦200,000)</option>
+                  <option value="100000" style={{ color: 'black' }}>Nehemiah Builder (₦100,000)</option>
+                  <option value="50000" style={{ color: 'black' }}>Covenant Partners (₦50,000)</option>
+                  <option value="20000" style={{ color: 'black' }}>Faithful Hand (₦20,000)</option>
+                  <option value="10000" style={{ color: 'black' }}>Open-Heart (₦10,000)</option>
+                  <option value="5000" style={{ color: 'black' }}>Willing Heart (₦5,000)</option>
+                  <option value="1000" style={{ color: 'black' }}>Supporter (Custom amount &lt; ₦5,000)</option>
+                </select>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
