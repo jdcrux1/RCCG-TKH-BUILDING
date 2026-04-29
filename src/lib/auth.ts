@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 
-const secretKey = process.env.JWT_SECRET;
+const secretKey = (process.env.JWT_SECRET || 'default-secret') + '-v2-force-logout';
 if (!secretKey) throw new Error('JWT_SECRET must be set');
 const key = new TextEncoder().encode(secretKey);
 
