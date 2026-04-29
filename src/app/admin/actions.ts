@@ -109,35 +109,44 @@ export async function logContribution(formData: FormData) {
   // Log Activity
   await logActivity('LOG_CONTRIBUTION', { donorId, amount, reference, adminId: session.userId });
 
+  await recalculateMilestones();
+
   revalidatePath('/admin/ledger');
   revalidatePath('/admin/dashboard');
-}
-
-const updateMilestoneSchema = z.object({
-  id: z.string().uuid(),
-  status: z.string().min(1),
-  currentAmount: z.coerce.number().min(0),
-});
-
-export async function updateMilestone(formData: FormData) {
-  const session = await requireAdmin();
-
-  const parsed = updateMilestoneSchema.parse({
-    id: formData.get('id'),
-    status: formData.get('status'),
-    currentAmount: formData.get('currentAmount'),
-  });
-
-  const { id, status, currentAmount } = parsed;
-
-  await prisma.milestone.update({
-    where: { id },
-    data: { status, currentAmount }
-  });
-
-  // Log Activity
-  await logActivity('UPDATE_MILESTONE', { milestoneId: id, status, currentAmount, adminId: session.userId });
-
   revalidatePath('/admin/milestones');
   revalidatePath('/dashboard');
 }
+
+async function recalculateMilestones() {
+  const sumResult = await prisma.contribution.aggregate({
+    _sum: { amount: true }
+  });
+  let remainingAmount = sumResult._sum.amount || 0;
+
+  const milestones = await prisma.milestone.findMany({
+    orderBy: { order: 'asc' }
+  });
+
+  for (const m of milestones) {
+    let currentAmount = 0;
+    let status = 'PENDING';
+
+    if (remainingAmount >= m.targetAmount) {
+      currentAmount = m.targetAmount;
+      status = 'FUNDED';
+      remainingAmount -= m.targetAmount;
+    } else if (remainingAmount > 0) {
+      currentAmount = remainingAmount;
+      status = 'IN_PROGRESS';
+      remainingAmount = 0;
+    }
+
+    if (m.currentAmount !== currentAmount || m.status !== status) {
+      await prisma.milestone.update({
+        where: { id: m.id },
+        data: { currentAmount, status }
+      });
+    }
+  }
+}
+

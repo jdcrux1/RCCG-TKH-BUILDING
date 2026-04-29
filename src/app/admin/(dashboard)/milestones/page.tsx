@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/prisma';
 import { Flag, Plus, CheckCircle, Clock } from 'lucide-react';
-import { updateMilestone } from '@/app/admin/actions';
+
 
 export default async function MilestoneManagement() {
   const milestones = await prisma.milestone.findMany({
@@ -32,40 +32,17 @@ export default async function MilestoneManagement() {
               </div>
             </div>
 
-            <form action={updateMilestone} style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <input type="hidden" name="id" value={m.id} />
-              <input 
-                type="number" 
-                name="currentAmount" 
-                defaultValue={m.currentAmount}
-                style={{
-                  width: '120px',
-                  padding: '0.5rem',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid var(--glass-border)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'white'
-                }}
-              />
-              <select 
-                name="status" 
-                defaultValue={m.status}
-                style={{
-                  padding: '0.5rem',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid var(--glass-border)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'white'
-                }}
-              >
-                <option value="PENDING" style={{ color: 'black' }}>PENDING</option>
-                <option value="IN_PROGRESS" style={{ color: 'black' }}>IN_PROGRESS</option>
-                <option value="FUNDED" style={{ color: 'black' }}>FUNDED</option>
-              </select>
-              <button type="submit" className="btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}>
-                Update
-              </button>
-            </form>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <span style={{ 
+                padding: '0.2rem 0.6rem', 
+                borderRadius: 'var(--radius-sm)', 
+                fontSize: '0.8rem',
+                background: m.status === 'FUNDED' ? 'rgba(var(--success-rgb), 0.2)' : m.status === 'IN_PROGRESS' ? 'rgba(var(--accent-rgb), 0.2)' : 'rgba(255,255,255,0.1)',
+                color: m.status === 'FUNDED' ? 'var(--success)' : m.status === 'IN_PROGRESS' ? 'var(--accent)' : 'white',
+              }}>
+                {m.status.replace('_', ' ')}
+              </span>
+            </div>
           </div>
         ))}
         {milestones.length === 0 && (
