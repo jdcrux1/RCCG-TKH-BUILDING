@@ -26,7 +26,6 @@ export async function logout() {
 const addDonorSchema = z.object({
   name: z.string().min(1),
   phone: z.string().min(1),
-  email: z.string().email().or(z.literal('')),
   monthlyPledge: z.coerce.number().positive(),
   pin: z.string().optional(),
 });
@@ -37,12 +36,11 @@ export async function addDonor(formData: FormData) {
   const parsed = addDonorSchema.parse({
     name: formData.get('name'),
     phone: formData.get('phone'),
-    email: formData.get('email') || '',
     monthlyPledge: formData.get('monthlyPledge'),
     pin: formData.get('pin') || undefined,
   });
 
-  const { name, phone, email, monthlyPledge } = parsed;
+  const { name, phone, monthlyPledge } = parsed;
   const pin = parsed.pin || Math.floor(1000 + Math.random() * 9000).toString(); // Random 4-digit PIN
   
   const tier = getTier(monthlyPledge);
@@ -53,7 +51,6 @@ export async function addDonor(formData: FormData) {
     data: {
       name,
       phone,
-      email: email === '' ? null : email,
       monthlyPledge,
       totalPledged,
       tier,

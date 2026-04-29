@@ -92,22 +92,7 @@ export default function AddDonorModal() {
                 />
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.8rem', opacity: 0.7 }}>Email Address</label>
-                <input 
-                  name="email" 
-                  type="email"
-                  placeholder="e.g. john@example.com"
-                  style={{
-                    padding: '0.75rem',
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid var(--glass-border)',
-                    borderRadius: 'var(--radius-sm)',
-                    color: 'white',
-                    outline: 'none'
-                  }}
-                />
-              </div>
+
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <label style={{ fontSize: '0.8rem', opacity: 0.7 }}>Monthly Pledge (₦)</label>
