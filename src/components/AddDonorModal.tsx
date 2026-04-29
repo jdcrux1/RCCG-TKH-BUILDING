@@ -118,7 +118,7 @@ export default function AddDonorModal() {
                   <option value="20000" style={{ color: 'black' }}>Faithful Hand (₦20,000)</option>
                   <option value="10000" style={{ color: 'black' }}>Open-Heart (₦10,000)</option>
                   <option value="5000" style={{ color: 'black' }}>Willing Heart (₦5,000)</option>
-                  <option value="1000" style={{ color: 'black' }}>Supporter (Custom amount &lt; ₦5,000)</option>
+                  <option value="1000" style={{ color: 'black' }}>Supporter (₦1,000)</option>
                 </select>
               </div>
 
