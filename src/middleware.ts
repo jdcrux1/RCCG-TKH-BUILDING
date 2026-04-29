@@ -36,9 +36,19 @@ export default async function middleware(request: NextRequest) {
     const payload = await decrypt(session);
 
     // RBAC check
-    if (path.startsWith('/admin') && payload.role !== 'ADMIN') {
+    if (path.startsWith('/admin')) {
+      if (payload.role === 'ADMIN') {
+        return NextResponse.next();
+      }
+      if (payload.role === 'ONBOARDER') {
+        if (path === '/admin/onboard') {
+          return NextResponse.next();
+        }
+        return NextResponse.redirect(new URL('/admin/onboard', request.nextUrl.origin));
+      }
       return NextResponse.redirect(new URL('/login', request.nextUrl.origin));
     }
+    
     if (path.startsWith('/dashboard') && payload.role !== 'DONOR') {
       return NextResponse.redirect(new URL('/admin/login', request.nextUrl.origin));
     }

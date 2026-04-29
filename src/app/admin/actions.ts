@@ -18,6 +18,14 @@ async function requireAdmin() {
   return session;
 }
 
+async function requireAdminOrOnboarder() {
+  const session = await getSession();
+  if (!session || (session.role !== 'ADMIN' && session.role !== 'ONBOARDER')) {
+    throw new Error('Unauthorized');
+  }
+  return session;
+}
+
 export async function logout() {
   (await cookies()).set('session', '', { expires: new Date(0) });
   redirect('/');
@@ -31,7 +39,7 @@ const addDonorSchema = z.object({
 });
 
 export async function addDonor(formData: FormData) {
-  const session = await requireAdmin();
+  const session = await requireAdminOrOnboarder();
 
   const parsed = addDonorSchema.parse({
     name: formData.get('name'),

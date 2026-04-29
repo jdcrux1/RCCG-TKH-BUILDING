@@ -40,6 +40,19 @@
    PIN:   9999
 
 ==========================================
+  ONBOARDER LOGIN (Volunteers)
+  Login at: /admin/login
+==========================================
+
+1. Volunteer One
+   Phone: 08111111111
+   PIN:   1234
+
+2. Volunteer Two
+   Phone: 08222222222
+   PIN:   1234
+
+==========================================
   ADMIN LOGIN
   Login at: /admin/login
 ==========================================
