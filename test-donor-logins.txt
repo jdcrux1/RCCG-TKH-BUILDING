@@ -1,0 +1,50 @@
+==========================================
+  RCCG TKH KINGDOM BUILDERS - TEST DONORS
+  Login at: /login (Donor Login)
+==========================================
+
+1. Cornerstone Partner (Royal Gold)
+   Phone: 08100000001
+   PIN:   1111
+
+2. Pillar Builder (Platinum)
+   Phone: 08100000002
+   PIN:   2222
+
+3. Foundation Stone (Bronze)
+   Phone: 08100000003
+   PIN:   3333
+
+4. Nehemiah Builder (Emerald)
+   Phone: 08100000004
+   PIN:   4444
+
+5. Covenant Partners (Sapphire)
+   Phone: 08100000005
+   PIN:   5555
+
+6. Faithful Hand (Teal)
+   Phone: 08100000006
+   PIN:   6666
+
+7. Open-Heart (Coral)
+   Phone: 08100000007
+   PIN:   7777
+
+8. Willing Heart (Lavender)
+   Phone: 08100000008
+   PIN:   8888
+
+9. Supporter (Silver)
+   Phone: 08100000009
+   PIN:   9999
+
+==========================================
+  ADMIN LOGIN
+  Login at: /admin/login
+==========================================
+
+   Phone: 08052039446
+   PIN:   0414
+
+==========================================
