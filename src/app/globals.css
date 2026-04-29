@@ -156,6 +156,9 @@ button {
   .mobile-only-list {
     display: flex !important;
   }
+  .mobile-only {
+    display: flex !important;
+  }
   .responsive-header {
     flex-direction: column;
     align-items: flex-start !important;
@@ -166,5 +169,8 @@ button {
   .header-actions > button,
   .header-actions > a {
     flex: 1;
+  }
+  .main-content {
+    padding-bottom: 80px !important;
   }
 }
