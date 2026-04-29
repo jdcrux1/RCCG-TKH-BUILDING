@@ -31,16 +31,13 @@ model Donor {
 }
 
 model Contribution {
-  id          String    @id @default(uuid())
+  id          String   @id @default(uuid())
   amount      Float
-  date        DateTime  @default(now())
+  date        DateTime @default(now())
   reference   String?
   narrative   String?
-  status      String    @default("PENDING")  // PENDING, VERIFIED, REJECTED
-  verifiedBy  String?   // Admin ID who verified
-  verifiedAt  DateTime?
   donorId     String
-  donor       Donor     @relation(fields: [donorId], references: [id])
+  donor       Donor    @relation(fields: [donorId], references: [id])
 }
 
 model Milestone {

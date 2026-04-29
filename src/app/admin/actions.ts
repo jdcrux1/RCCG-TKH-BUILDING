@@ -86,41 +86,17 @@ export async function logContribution(formData: FormData) {
 
   const { donorId, amount, reference, date } = parsed;
 
-  // All contributions start as PENDING — must be verified separately
   await prisma.contribution.create({
     data: {
       donorId,
       amount,
       reference,
       date: new Date(date),
-      status: 'PENDING',
     }
   });
 
-  await logActivity('LOG_CONTRIBUTION', { donorId, amount, reference, status: 'PENDING', adminId: session.userId });
+  await logActivity('LOG_CONTRIBUTION', { donorId, amount, reference, adminId: session.userId });
 
-  revalidatePath('/admin/ledger');
-  revalidatePath('/admin/dashboard');
-}
-
-export async function verifyContribution(formData: FormData) {
-  const session = await requireAdmin();
-
-  const id = formData.get('id') as string;
-  if (!id) throw new Error('Contribution ID required');
-
-  await prisma.contribution.update({
-    where: { id },
-    data: {
-      status: 'VERIFIED',
-      verifiedBy: session.userId,
-      verifiedAt: new Date(),
-    }
-  });
-
-  await logActivity('VERIFY_CONTRIBUTION', { contributionId: id, adminId: session.userId });
-
-  // Recalculate milestones with only verified contributions
   await recalculateMilestones();
 
   revalidatePath('/admin/ledger');
@@ -129,38 +105,10 @@ export async function verifyContribution(formData: FormData) {
   revalidatePath('/dashboard');
 }
 
-export async function rejectContribution(formData: FormData) {
-  const session = await requireAdmin();
-
-  const id = formData.get('id') as string;
-  if (!id) throw new Error('Contribution ID required');
-
-  await prisma.contribution.update({
-    where: { id },
-    data: {
-      status: 'REJECTED',
-      verifiedBy: session.userId,
-      verifiedAt: new Date(),
-    }
-  });
-
-  await logActivity('REJECT_CONTRIBUTION', { contributionId: id, adminId: session.userId });
-
-  // Recalculate milestones (rejected contributions excluded)
-  await recalculateMilestones();
-
-  revalidatePath('/admin/ledger');
-  revalidatePath('/admin/dashboard');
-  revalidatePath('/admin/milestones');
-  revalidatePath('/dashboard');
-}
-
-// ─── MILESTONE RECALCULATION (VERIFIED ONLY) ────────────────────────────
+// ─── MILESTONE RECALCULATION ────────────────────────────
 
 async function recalculateMilestones() {
-  // Only count VERIFIED contributions towards milestones
   const sumResult = await prisma.contribution.aggregate({
-    where: { status: 'VERIFIED' },
     _sum: { amount: true }
   });
   let remainingAmount = sumResult._sum.amount || 0;

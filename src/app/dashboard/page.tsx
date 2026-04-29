@@ -26,9 +26,7 @@ async function getDonorData() {
 
   if (!donor) redirect('/login');
 
-  // Only count VERIFIED contributions
-  const verifiedContributions = donor.contributions.filter(c => c.status === 'VERIFIED');
-  const totalContributed = verifiedContributions.reduce((sum, c) => sum + c.amount, 0);
+  const totalContributed = donor.contributions.reduce((sum, c) => sum + c.amount, 0);
   const fulfillmentRate = donor.totalPledged > 0 ? (totalContributed / donor.totalPledged) * 100 : 0;
 
   // Streak Calculation
@@ -37,7 +35,7 @@ async function getDonorData() {
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
   
-  const sortedContributions = [...verifiedContributions].sort((a, b) => b.date.getTime() - a.date.getTime());
+  const sortedContributions = [...donor.contributions].sort((a, b) => b.date.getTime() - a.date.getTime());
   let checkMonth = currentMonth;
   let checkYear = currentYear;
   
@@ -280,7 +278,7 @@ export default async function DonorDashboard() {
                   <p style={{ fontWeight: '500' }}>₦{c.amount.toLocaleString()}</p>
                   <p style={{ fontSize: '0.8rem', opacity: 0.5 }}>{new Date(c.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                 </div>
-                <span style={{ fontSize: '0.7rem', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', padding: '4px 8px', borderRadius: '4px' }}>Verified</span>
+                <span style={{ fontSize: '0.7rem', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', padding: '4px 8px', borderRadius: '4px' }}>Logged</span>
               </div>
             )) : (
               <p style={{ opacity: 0.5, textAlign: 'center', padding: '2rem 0' }}>No contributions recorded yet.</p>
