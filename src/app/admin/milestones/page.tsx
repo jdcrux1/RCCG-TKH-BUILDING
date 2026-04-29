@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/prisma';
 import { Flag, Plus, CheckCircle, Clock } from 'lucide-react';
 import { updateMilestone } from '@/app/admin/actions';

@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/prisma';
 import { Users, TrendingUp, Target, CreditCard } from 'lucide-react';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';

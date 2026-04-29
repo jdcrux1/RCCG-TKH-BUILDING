@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/prisma';
 import { UserPlus, Search, Download, Filter } from 'lucide-react';
 import AddDonorModal from '@/components/AddDonorModal';

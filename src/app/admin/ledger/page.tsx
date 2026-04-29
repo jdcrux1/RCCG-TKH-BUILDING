@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/prisma';
 import { CreditCard, Search, ArrowRight, Calendar } from 'lucide-react';
 import { logContribution } from '@/app/admin/actions';
