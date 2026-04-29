@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, Users, CreditCard, Flag, LogOut, Menu, X } from 'lucide-react';
 import { useState } from 'react';
-import { logout } from './actions';
+import { logout } from '../actions';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
