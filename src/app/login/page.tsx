@@ -20,17 +20,13 @@ export default function DonorLogin() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, pin }),
+        body: JSON.stringify({ phone, pin, role: 'DONOR' }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        if (data.role === 'ADMIN') {
-          router.push('/admin/dashboard');
-        } else {
-          router.push('/dashboard');
-        }
+        router.push('/dashboard');
       } else {
         setError(data.error || 'Login failed');
       }
