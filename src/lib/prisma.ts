@@ -21,4 +21,3 @@ if (process.env.NODE_ENV !== 'production') {
 };
 
 // Export a helper for transactions
-export * from '@prisma/client';
