@@ -2,7 +2,8 @@
 
 import { prisma } from '@/lib/prisma';
 import { getTier, generateSecurePin, nairaToKobo, isValidTier } from '@/lib/tiers';
-import { hashPin, getSession } from '@/lib/auth';
+import { hashPin } from '@/lib/password';
+import { getSession } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import { triggerNotification } from '@/lib/comm-engine';
 import { cookies } from 'next/headers';

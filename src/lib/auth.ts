@@ -1,19 +1,9 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-
 const secretKey = (process.env.JWT_SECRET || 'default-secret') + '-v2-force-logout';
 if (!secretKey) throw new Error('JWT_SECRET must be set');
 const key = new TextEncoder().encode(secretKey);
-
-export async function hashPin(pin: string) {
-  return await bcrypt.hash(pin, 10);
-}
-
-export async function comparePin(pin: string, hashedPin: string) {
-  return await bcrypt.compare(pin, hashedPin);
-}
 
 export async function encrypt(payload: any) {
   return await new SignJWT(payload)

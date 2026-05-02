@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/prisma';
-import { comparePin, encrypt } from '@/lib/auth';
+import { comparePin, hashPassword, comparePassword } from '@/lib/password';
+import { encrypt } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import { logActivity } from '@/lib/logger';
 import { checkRateLimit, getClientKey } from '@/lib/rate-limit';
 import { sanitizePhoneNumber } from '@/lib/sanitize';
-import bcrypt from 'bcryptjs';
 import { SignJWT } from 'jose';
 
 const jwtSecret = process.env.JWT_SECRET;
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
         if (normalizedCredential.length < 3) {
           return NextResponse.json({ error: 'Passphrase too short for setup' }, { status: 400 });
         }
-        const hash = await bcrypt.hash(normalizedCredential.toLowerCase().replace(/\s+/g, ' '), 12);
+        const hash = await hashPassword(normalizedCredential.toLowerCase().replace(/\s+/g, ' '));
         const created = await prisma.superAdmin.create({ data: { passphrase: hash } });
         
         const userSession = await prisma.userSession.create({
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
       }
 
       // Verify passphrase
-      const isValid = await bcrypt.compare(normalizedCredential.toLowerCase().replace(/\s+/g, ' '), superAdmin.passphrase);
+      const isValid = await comparePassword(normalizedCredential.toLowerCase().replace(/\s+/g, ' '), superAdmin.passphrase);
       if (!isValid) {
         return NextResponse.json({ error: 'Invalid passphrase' }, { status: 401 });
       }
@@ -119,7 +119,7 @@ export async function POST(request: Request) {
     const staff = await prisma.staff.findUnique({ where: { username: normalizedIdentifier } });
     if (!staff) return NextResponse.json({ error: 'Account not found' }, { status: 404 });
 
-    const isCorrectPassword = await bcrypt.compare(normalizedCredential, staff.password);
+    const isCorrectPassword = await comparePassword(normalizedCredential, staff.password);
     if (!isCorrectPassword) {
       await logActivity('LOGIN_FAILED', { userId: staff.id, username: staff.username, reason: 'INCORRECT_PASSWORD' });
       return NextResponse.json({ error: 'Incorrect password' }, { status: 401 });
