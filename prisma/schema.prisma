@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,43 +8,115 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model Donor {
-  id              String         @id @default(uuid())
-  phone           String         @unique
-  pin             String         // Hashed PIN
-  name            String
-  spouseName      String?
-  email           String?
-  birthday        String?        // MM-DD
-  tier            String         // Automatically assigned
-  monthlyPledge   Float
-  totalPledged    Float          // 24 * monthlyPledge
-  startDate       DateTime       @default(now())
-  status          String         @default("ACTIVE")
-  role            String         @default("DONOR") // ADMIN or DONOR
-  contributions   Contribution[]
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+// ═══════════════════════════════════════════════════════════════
+// ENUMS - Strict type safety for fixed-value fields
+// ═══════════════════════════════════════════════════════════════
+
+enum DonorRole {
+  DONOR
+  ADMIN
 }
+
+enum DonorStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum UserRole {
+  VOLUNTEER
+  SUPERADMIN
+}
+
+enum ActionType {
+  CREATE_DONOR
+  UPDATE_DONOR
+  DELETE_DONOR
+  LOG_CONTRIBUTION
+  UPDATE_CONTRIBUTION
+  DELETE_CONTRIBUTION
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  CREATE_STAFF
+  REVOKE_STAFF
+  SYSTEM_UPDATE
+  PLEDGE_CONFIRMATION
+}
+
+enum MilestoneStatus {
+  PENDING
+  IN_PROGRESS
+  FUNDED
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DONOR TABLE
+// ═════════════════════════════════════════════════════════════==
+
+model Donor {
+  id            String         @id @default(uuid())
+  phone         String         @unique
+  pin           String
+  name          String
+  spouseName    String?
+  email         String?
+  birthday      String?        // MM-DD format
+  tier          String         // UserRole enum in application
+  monthlyPledge BigInt        // Store in kobo (BigInt) to avoid overflow
+  totalPledged  BigInt         // 24 * monthlyPledge
+  startDate     DateTime       @default(now())
+  status       String   @default("ACTIVE")
+  role         String   @default("DONOR")
+  contributions Contribution[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // Indexes for fast lookups
+  @@index([phone])
+  @@index([tier])
+  @@index([status])
+  @@index([role])
+  @@index([createdAt])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CONTRIBUTION TABLE
+// ═══════════════════════════════════════════════════════════════
 
 model Contribution {
   id          String   @id @default(uuid())
-  amount      Float
+  amount     BigInt   // Store in kobo (BigInt) to avoid overflow
   date        DateTime @default(now())
-  reference   String?
-  narrative   String?
-  donorId     String
-  donor       Donor    @relation(fields: [donorId], references: [id])
+  reference  String?
+  narrative  String?
+  donorId    String
+  donor      Donor    @relation(fields: [donorId], references: [id], onDelete: Cascade)
+
+  // Indexes for fast lookups
+  @@index([donorId])
+  @@index([date])
+  @@index([date, donorId])
 }
 
+// ═══════════════════════════════════════════════════════════════
+// MILESTONE TABLE
+// ═════════════════════════════════════════════════════════════==
+
 model Milestone {
-  id           String @id @default(uuid())
-  title        String
-  targetAmount Float
-  currentAmount Float  @default(0)
-  status       String // FUNDED, IN_PROGRESS, PENDING
+  id            String          @id @default(uuid())
+  title         String
+  targetAmount  BigInt          // Store in kobo
+  currentAmount BigInt        @default(0)
+  status        String @default("PENDING")
   order        Int
+
+  @@index([status])
+  @@index([order])
 }
+
+// ═══════════════════════════════════════════════════════════════
+// NEWS UPDATE TABLE
+// ═════════════════════════════════════════════════════════════==
 
 model NewsUpdate {
   id        String   @id @default(uuid())
@@ -56,13 +125,98 @@ model NewsUpdate {
   imageUrl  String?
   videoUrl  String?
   createdAt DateTime @default(now())
+
+  @@index([createdAt])
 }
+
+// ═══════════════════════════════════════════════════════════════
+// ACTIVITY LOG (Audit Trail)
+// ═════════════════════════════════════════════════════════════==
 
 model ActivityLog {
   id        String   @id @default(uuid())
-  action    String   // e.g., "CREATE_DONOR", "UPDATE_CONTRIBUTION"
-  details   String   // JSON string of details
-  userId    String?  // ID of admin who performed the action
-  userName  String?  // Name of admin
+  action    String   // ActionType enum
+  details   Json     // Store as JSON object
+  userId    String?
+  userName  String?
   createdAt DateTime @default(now())
+
+  @@index([action])
+  @@index([createdAt])
+  @@index([userId])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SUPER ADMIN (Root Access)
+// ═════════════════════════════════════════════════════════════==
+
+model SuperAdmin {
+  id          String    @id @default(uuid())
+  passphrase  String    // Hashed 3-word passphrase
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([id])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STAFF (Admin Users)
+// ═════════════════════════════════════════════════════════════==
+
+model Staff {
+  id        String    @id @default(uuid())
+  username  String    @unique
+  password  String    // Hashed password
+  role      String  @default("VOLUNTEER")
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+
+  @@index([username])
+  @@index([role])
+  @@index([isActive])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// USER SESSION (Active Sessions)
+// ═════════════════════════════════════════════════════════════==
+
+model UserSession {
+  sessionId        String    @id @default(uuid())
+  userRole        String
+  userId          String?
+  loginTimestamp  DateTime  @default(now())
+  logoutTimestamp DateTime?
+  durationMinutes Int?
+
+  @@index([sessionId])
+  @@index([userId])
+  @@index([loginTimestamp])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTION LOG (Sudo Audit Trail)
+// ═════════════════════════════════════════════════════════════==
+
+model ActionLog {
+  logId          String    @id @default(uuid())
+  userRole      String
+  actionType    String
+  targetRecordId String?
+  details      String?   // JSON string
+  timestamp    DateTime   @default(now())
+
+  @@index([actionType])
+  @@index([timestamp])
+  @@index([userRole])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SYSTEM VARIABLE (Configuration Store)
+// ═════════════════════════════════════════════════════════════==
+
+model SystemVariable {
+  id        String    @id @default(uuid())
+  key       String    @unique
+  value     String
+  updatedAt DateTime  @updatedAt
 }

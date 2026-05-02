@@ -16,7 +16,7 @@ export default function Home() {
           Kingdom Builders
         </h1>
         <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: 'var(--space-md)' }}>
-          Welcome to the RCCG The King's House Building Project Donor Management System. 
+          We&apos;re building a monument of faith, together. King&apos;s House Building Project Donor Management System. 
           Manage your pledges, track contributions, and witness our progress together.
         </p>
         
@@ -30,7 +30,7 @@ export default function Home() {
             borderRadius: 'var(--radius-sm)',
             fontWeight: '600'
           }}>
-            Admin Access
+            &apos;Building the Future, Together&apos;
           </Link>
         </div>
       </div>

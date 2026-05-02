@@ -1,6 +1,19 @@
 [build]
-  command = "npx prisma generate && next build"
+  command = "npx prisma generate && npx tsc --noEmit && next build"
   publish = ".next"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+[[redirects]]
+  from = "/api/cron/maintenance"
+  to = "/api/cron/maintenance"
+  status = 200
+
+[[scheduled]]
+  from = "0 3 * * *"
+  to = "/api/cron/maintenance"
+  worker = "multi"
+
+[build.environment]
+  NODE_OPTIONS = "--enable-source-maps"

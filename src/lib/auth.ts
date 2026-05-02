@@ -31,9 +31,30 @@ export async function decrypt(input: string): Promise<any> {
 }
 
 export async function getSession() {
-  const session = (await cookies()).get('session')?.value;
-  if (!session) return null;
-  return await decrypt(session);
+  const cookieStore = await cookies();
+  const session = cookieStore.get('session')?.value;
+  
+  if (session) {
+    try {
+      return await decrypt(session);
+    } catch {
+      // Fallback below
+    }
+  }
+
+  // Fallback to sudo_token
+  const sudoToken = cookieStore.get('sudo_token')?.value;
+  if (sudoToken) {
+    try {
+      const sudoSecret = new TextEncoder().encode(process.env.JWT_SECRET || 'default-secret');
+      const { payload } = await jwtVerify(sudoToken, sudoSecret);
+      return payload; // { role: 'SUPERADMIN', ... }
+    } catch {
+      return null;
+    }
+  }
+
+  return null;
 }
 
 export async function updateSession(request: NextRequest) {

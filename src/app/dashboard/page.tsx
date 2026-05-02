@@ -26,8 +26,8 @@ async function getDonorData() {
 
   if (!donor) redirect('/login');
 
-  const totalContributed = donor.contributions.reduce((sum, c) => sum + c.amount, 0);
-  const fulfillmentRate = donor.totalPledged > 0 ? (totalContributed / donor.totalPledged) * 100 : 0;
+  const totalContributed = donor.contributions.reduce((sum, c) => sum + BigInt(c.amount), BigInt(0));
+  const fulfillmentRate = donor.totalPledged > BigInt(0) ? (Number(totalContributed) / Number(donor.totalPledged)) * 100 : 0;
 
   // Streak Calculation
   let streak = 0;
@@ -71,12 +71,12 @@ async function getDonorData() {
   });
   
   const currentMilestone = milestones.find(m => m.status !== 'FUNDED') || milestones[milestones.length - 1];
-  const remainingForMilestone = currentMilestone ? currentMilestone.targetAmount - currentMilestone.currentAmount : 0;
-  const donorsNeeded = donor.monthlyPledge > 0 && currentMilestone ? Math.ceil(remainingForMilestone / donor.monthlyPledge) : 0;
+  const remainingForMilestone = currentMilestone ? currentMilestone.targetAmount - currentMilestone.currentAmount : BigInt(0);
+  const donorsNeeded = donor.monthlyPledge > BigInt(0) && currentMilestone ? Math.ceil(Number(remainingForMilestone) / Number(donor.monthlyPledge)) : 0;
 
   // Impact Card Calculation
-  const personalImpactPercentage = currentMilestone && currentMilestone.targetAmount > 0 
-    ? (totalContributed / currentMilestone.targetAmount) * 100 
+  const personalImpactPercentage = currentMilestone && currentMilestone.targetAmount > BigInt(0) 
+    ? (Number(totalContributed) / Number(currentMilestone.targetAmount)) * 100 
     : 0;
 
   // Encouragement
@@ -179,7 +179,7 @@ export default async function DonorDashboard() {
           <p style={{ opacity: 0.6 }}>Thank you for being a part of the Kingdom Builders family.</p>
         </div>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          {totalContributed > 0 && <TaxReceiptButton donorName={donor.name} totalContributed={totalContributed} />}
+          {totalContributed > BigInt(0) && <TaxReceiptButton donorName={donor.name} totalContributed={Number(totalContributed)} />}
         </div>
       </section>
 
@@ -221,8 +221,8 @@ export default async function DonorDashboard() {
           </div>
           <div>
             <h3 style={{ fontSize: '1.1rem', marginBottom: '8px' }}>Pledge Fulfillment</h3>
-            <p style={{ fontSize: '0.8rem', opacity: 0.6, marginBottom: '4px' }}>Total Contributed: <strong style={{ color: 'white' }}>₦{totalContributed.toLocaleString()}</strong></p>
-            <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>24-Month Goal: <strong style={{ color: 'white' }}>₦{donor.totalPledged.toLocaleString()}</strong></p>
+            <p style={{ fontSize: '0.8rem', opacity: 0.6, marginBottom: '4px' }}>Total Contributed: <strong style={{ color: 'white' }}>₦{(Number(totalContributed) / 100).toLocaleString()}</strong></p>
+            <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>24-Month Goal: <strong style={{ color: 'white' }}>₦{(Number(donor.totalPledged) / 100).toLocaleString()}</strong></p>
           </div>
         </div>
 
@@ -275,7 +275,7 @@ export default async function DonorDashboard() {
             {sortedContributions.length > 0 ? sortedContributions.slice(0, 5).map((c, i) => (
               <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '1rem', borderBottom: i < 4 ? '1px solid var(--glass-border)' : 'none' }}>
                 <div>
-                  <p style={{ fontWeight: '500' }}>₦{c.amount.toLocaleString()}</p>
+                  <p style={{ fontWeight: '500' }}>₦{(Number(c.amount) / 100).toLocaleString()}</p>
                   <p style={{ fontSize: '0.8rem', opacity: 0.5 }}>{new Date(c.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                 </div>
                 <span style={{ fontSize: '0.7rem', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', padding: '4px 8px', borderRadius: '4px' }}>Logged</span>

@@ -14,6 +14,6 @@ export async function logActivity(action: string, details: any) {
       }
     });
   } catch (error) {
-    console.error('Failed to log activity:', error);
+    console.error('[ACTIVITY_LOG_ERROR] Failed to log activity:', action, details, error);
   }
 }

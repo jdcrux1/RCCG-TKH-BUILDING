@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, CreditCard, Flag, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Users, CreditCard, Flag, LogOut, Menu, X, Info } from 'lucide-react';
 import { useState } from 'react';
 import { logout } from '../actions';
 
