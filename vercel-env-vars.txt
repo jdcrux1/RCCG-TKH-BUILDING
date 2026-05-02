@@ -1,0 +1,4 @@
+DATABASE_URL="postgresql://postgres.uhufwycfuethmaqwjlhb:1404Mababy%21%40%C2%A3%24@aws-0-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres.uhufwycfuethmaqwjlhb:1404Mababy%21%40%C2%A3%24@aws-0-eu-west-1.pooler.supabase.com:5432/postgres"
+JWT_SECRET="rccg_tkh_super_secret_key_v2_invalidated"
+SESSION_SECRET="rccg_tkh_session_secret_key_v2_invalidated"
