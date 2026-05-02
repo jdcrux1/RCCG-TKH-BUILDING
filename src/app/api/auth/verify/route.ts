@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+
+export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/prisma';
 import { comparePin, encrypt } from '@/lib/auth';
 import { cookies } from 'next/headers';
