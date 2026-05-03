@@ -1,0 +1,76 @@
+--- KINGDOM BUILDERS PRESENTATION LOGINS ---
+Portal URL: https://rccg-tkh-building.vercel.app/login
+
+Use these credentials to test the Donor Portal.
+----------------------------------------------
+
+1. [Cornerstone Partner]
+   Name: Presentation Donor 1
+   Phone: 07010000001
+   PIN: 7479
+   Donor ID: PRES-001
+   Monthly Pledge: ₦1,000,000
+----------------------------------------------
+2. [Pillar Builder]
+   Name: Presentation Donor 2
+   Phone: 07010000002
+   PIN: 6827
+   Donor ID: PRES-002
+   Monthly Pledge: ₦500,000
+----------------------------------------------
+3. [Foundation Stone]
+   Name: Presentation Donor 3
+   Phone: 07010000003
+   PIN: 3570
+   Donor ID: PRES-003
+   Monthly Pledge: ₦200,000
+----------------------------------------------
+4. [Nehemiah Builder]
+   Name: Presentation Donor 4
+   Phone: 07010000004
+   PIN: 4506
+   Donor ID: PRES-004
+   Monthly Pledge: ₦100,000
+----------------------------------------------
+5. [Covenant Partners]
+   Name: Presentation Donor 5
+   Phone: 07010000005
+   PIN: 3328
+   Donor ID: PRES-005
+   Monthly Pledge: ₦50,000
+----------------------------------------------
+6. [Faithful Hand]
+   Name: Presentation Donor 6
+   Phone: 07010000006
+   PIN: 4976
+   Donor ID: PRES-006
+   Monthly Pledge: ₦20,000
+----------------------------------------------
+7. [Open-Heart]
+   Name: Presentation Donor 7
+   Phone: 07010000007
+   PIN: 8181
+   Donor ID: PRES-007
+   Monthly Pledge: ₦10,000
+----------------------------------------------
+8. [Willing Heart]
+   Name: Presentation Donor 8
+   Phone: 07010000008
+   PIN: 2594
+   Donor ID: PRES-008
+   Monthly Pledge: ₦5,000
+----------------------------------------------
+9. [Supporter]
+   Name: Presentation Donor 9
+   Phone: 07010000009
+   PIN: 5022
+   Donor ID: PRES-009
+   Monthly Pledge: ₦2,500
+----------------------------------------------
+10. [Partner]
+   Name: Presentation Donor 10
+   Phone: 07010000010
+   PIN: 4224
+   Donor ID: PRES-010
+   Monthly Pledge: ₦15,000
+----------------------------------------------
