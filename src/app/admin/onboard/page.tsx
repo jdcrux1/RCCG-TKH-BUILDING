@@ -23,7 +23,7 @@ const TIERS: Tier[] = [
 export default function OnboardPage() {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [success, setSuccess] = useState<{pin: string, donorRefId: string} | null>(null);
   const [validationErrors, setValidationErrors] = useState<{field: string; message: string}[]>([]);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -34,10 +34,13 @@ export default function OnboardPage() {
     
     startTransition(async () => {
       try {
-        await addDonor(formData);
-        setSuccess(true);
-        formRef.current?.reset();
-        setTimeout(() => setSuccess(false), 5000);
+        const result = await addDonor(formData);
+        if (result?.success) {
+          setSuccess({ pin: result.pin, donorRefId: result.donorRefId });
+          formRef.current?.reset();
+          // Keep success message visible longer so they can copy the PIN
+          setTimeout(() => setSuccess(null), 15000);
+        }
       } catch (err: any) {
         try {
           const parsed = JSON.parse(err.message);
@@ -98,11 +101,25 @@ export default function OnboardPage() {
           )}
 
           {success && (
-            <div style={{ padding: '1rem', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid #10b981', borderRadius: 'var(--radius-sm)', marginBottom: 'var(--space-md)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <CheckCircle2 color="#10b981" size={24} />
-              <div>
-                <p style={{ color: '#10b981', fontSize: '1rem', fontWeight: 'bold', margin: 0 }}>Donor Successfully Registered!</p>
-                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.8rem', margin: 0 }}>You can now enter details for the next donor.</p>
+            <div style={{ padding: '1rem', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid #10b981', borderRadius: 'var(--radius-sm)', marginBottom: 'var(--space-md)', display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+              <CheckCircle2 color="#10b981" size={24} style={{ marginTop: '4px' }} />
+              <div style={{ flex: 1 }}>
+                <p style={{ color: '#10b981', fontSize: '1rem', fontWeight: 'bold', margin: '0 0 8px 0' }}>Donor Successfully Registered!</p>
+                
+                <div style={{ background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>Donor ID:</span>
+                    <span style={{ fontSize: '0.9rem', fontWeight: 'bold', fontFamily: 'monospace' }}>{success.donorRefId}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>Login PIN:</span>
+                    <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--accent)', fontFamily: 'monospace', letterSpacing: '2px' }}>{success.pin}</span>
+                  </div>
+                </div>
+                
+                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.8rem', margin: '12px 0 0 0' }}>
+                  Please copy and share these credentials with the donor now. This message will disappear in 15 seconds.
+                </p>
               </div>
             </div>
           )}

@@ -131,6 +131,7 @@ export async function addDonor(formData: FormData) {
     });
 
     revalidatePath('/admin/donors');
+    return { success: true, donorRefId, pin: donorPin };
   } catch (error: unknown) {
     console.error('Add donor error:', error);
     throw error;

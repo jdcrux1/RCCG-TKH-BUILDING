@@ -9,6 +9,7 @@ import styles from './AddDonorModal.module.css';
 export default function AddDonorModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [successData, setSuccessData] = useState<{pin: string, donorRefId: string} | null>(null);
   const { showToast } = useToast();
 
   return (
@@ -38,9 +39,11 @@ export default function AddDonorModal() {
               action={async (formData) => {
                 setLoading(true);
                 try {
-                  await addDonor(formData);
-                  showToast('Donor Saved');
-                  setIsOpen(false);
+                  const result = await addDonor(formData);
+                  if (result?.success) {
+                    setSuccessData({ pin: result.pin, donorRefId: result.donorRefId });
+                    showToast('Donor Registered Successfully');
+                  }
                 } catch (e: unknown) {
                   showToast((e as Error).message || 'Error saving donor', 'error');
                 } finally {
@@ -86,8 +89,13 @@ export default function AddDonorModal() {
                   <option value="20000" className={styles.selectOption}>Faithful Hand (₦20,000)</option>
                   <option value="10000" className={styles.selectOption}>Open-Heart (₦10,000)</option>
                   <option value="5000" className={styles.selectOption}>Willing Heart (₦5,000)</option>
-                  <option value="1000" className={styles.selectOption}>Supporter (₦1,000)</option>
                 </select>
+              </div>
+
+              <div style={{ marginBottom: '1.5rem', padding: '12px', background: 'rgba(245, 158, 11, 0.05)', borderRadius: '8px', border: '1px solid rgba(245, 158, 11, 0.1)' }}>
+                <p style={{ fontSize: '0.8rem', color: 'var(--accent)', textAlign: 'center', margin: 0 }}>
+                  Note: A random login PIN will be generated automatically.
+                </p>
               </div>
 
 
@@ -100,6 +108,37 @@ export default function AddDonorModal() {
                 {loading ? 'Saving...' : 'Register Kingdom Builder'}
               </button>
             </form>
+
+            {successData && (
+              <div style={{ 
+                marginTop: '1.5rem', 
+                padding: '1rem', 
+                background: 'rgba(16, 185, 129, 0.1)', 
+                border: '1px solid #10b981', 
+                borderRadius: 'var(--radius-sm)' 
+              }}>
+                <h4 style={{ color: '#10b981', marginBottom: '8px' }}>Success! Credentials:</h4>
+                <div style={{ background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '0.8rem' }}>
+                    <span>Donor ID:</span>
+                    <span style={{ fontWeight: 'bold' }}>{successData.donorRefId}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1rem' }}>
+                    <span>Login PIN:</span>
+                    <span style={{ fontWeight: 'bold', color: 'var(--accent)', letterSpacing: '2px' }}>{successData.pin}</span>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => {
+                    setSuccessData(null);
+                    setIsOpen(false);
+                  }}
+                  style={{ width: '100%', marginTop: '12px', padding: '8px', background: 'transparent', border: '1px solid #10b981', color: '#10b981', borderRadius: '4px', cursor: 'pointer' }}
+                >
+                  Done
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

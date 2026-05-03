@@ -45,6 +45,7 @@ export default async function DonorManagement({ searchParams }: { searchParams: 
           <p style={{ opacity: 0.6 }}>Manage Kingdom Builders profiles and pledges</p>
         </div>
         <div style={{ display: 'flex', gap: 'var(--space-sm)', width: 'auto' }} className="header-actions">
+          <AddDonorModal />
         </div>
       </header>
 
