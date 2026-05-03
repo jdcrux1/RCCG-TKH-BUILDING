@@ -32,9 +32,9 @@ async function main() {
 
   // Keep milestones but reset their progress for a fresh start
   const milestones = [
-    { title: 'Basement Phase', targetAmount: 150000000, currentAmount: 0, status: 'PENDING' as const, order: 1 },
-    { title: 'Ground Floor Phase', targetAmount: 200000000, currentAmount: 0, status: 'PENDING' as const, order: 2 },
-    { title: 'First Floor Phase', targetAmount: 300000000, currentAmount: 0, status: 'PENDING' as const, order: 3 },
+    { title: 'Basement', targetAmount: 50000000, currentAmount: 0, status: 'PENDING' as const, order: 1 },
+    { title: 'Ground Floor', targetAmount: 300000000, currentAmount: 0, status: 'PENDING' as const, order: 2 },
+    { title: 'First Floor', targetAmount: 300000000, currentAmount: 0, status: 'PENDING' as const, order: 3 },
   ];
 
   for (const m of milestones) {
