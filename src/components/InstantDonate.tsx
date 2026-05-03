@@ -16,27 +16,35 @@ export default function InstantDonate() {
       <button 
         onClick={() => setIsOpen(true)}
         style={{
-          background: 'transparent',
-          border: '2px solid var(--tier-primary)',
-          color: 'var(--tier-primary)',
-          padding: '1rem 2rem',
-          borderRadius: 'var(--radius-md)',
-          fontWeight: '600',
+          background: 'var(--tier-primary)',
+          border: 'none',
+          color: '#020617',
+          padding: '1.25rem 2.5rem',
+          borderRadius: '4px',
+          fontWeight: '700',
+          fontSize: '1.125rem',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
-          gap: '12px',
+          gap: '0.75rem',
           fontFamily: 'inherit',
-          transition: 'all 0.3s ease'
+          transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+          boxShadow: '0 4px 15px rgba(212, 175, 55, 0.2)'
         }}
         onMouseOver={(e) => {
-          e.currentTarget.style.background = 'rgba(212, 175, 55, 0.1)';
+          e.currentTarget.style.background = 'white';
+          e.currentTarget.style.transform = 'scale(1.02)';
+          e.currentTarget.style.boxShadow = '0 20px 40px rgba(245, 158, 11, 0.3)';
         }}
         onMouseOut={(e) => {
-          e.currentTarget.style.background = 'transparent';
+          e.currentTarget.style.background = 'var(--tier-primary)';
+          e.currentTarget.style.transform = 'scale(1)';
+          e.currentTarget.style.boxShadow = '0 4px 15px rgba(212, 175, 55, 0.2)';
         }}
       >
-        <Landmark size={20} /> Instant Donation
+        <Landmark size={24} /> Instant Donation
       </button>
     );
   }
