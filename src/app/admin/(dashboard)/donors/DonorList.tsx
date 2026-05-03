@@ -19,7 +19,7 @@ const TIER_COLORS: Record<string, { bg: string; text: string }> = {
 function formatWhatsAppLink(phone: string, name: string): string {
   const cleanPhone = phone.replace(/^0/, '234').replace(/\D/g, '');
   const firstName = name.split(' ')[0] || 'Brother/Sister';
-  const message = `Hello ${firstName}, you've been invited to the Kingdom Builders portal!\n\nLog in with your phone: ${phone}\n\nPlease check with the committee for your unique login PIN.\n\nVisit: https://rccg-tkh-building.netlify.app/login`;
+  const message = `Hello ${firstName}, you've been invited to the Kingdom Builders portal!\n\nLog in with your phone: ${phone}\n\nPlease check with the committee for your unique login PIN.\n\nVisit: https://rccg-tkh-building.vercel.app/login`;
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 }
 

@@ -184,7 +184,7 @@ export default function OnboardPage() {
 
             <div style={{ marginTop: 'var(--space-md)', padding: 'var(--space-sm)', background: 'rgba(245, 158, 11, 0.05)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(245, 158, 11, 0.1)' }}>
               <p style={{ fontSize: '0.8rem', color: 'var(--accent)', textAlign: 'center' }}>
-                Note: The donor's default login PIN will automatically be set to the <strong>last 4 digits of their phone number</strong>. Please inform them!
+                Note: A random login PIN will be generated and sent to the donor via WhatsApp. Please inform them!
               </p>
             </div>
 

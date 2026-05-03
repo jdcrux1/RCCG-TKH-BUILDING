@@ -115,7 +115,7 @@ export async function addDonor(formData: FormData) {
 
     // UPDATED WHATSAPP PAYLOAD
     const loginUrl = 'https://rccg-tkh-building.vercel.app/login';
-    const message = `Welcome! Log in at ${loginUrl} with Phone: ${sanitizedPhone} and PIN: ${donorPin}. IMPORTANT: When making bank transfers, you MUST use your unique Donor ID (${donorRefId}) in the transfer narration/description.`;
+    const message = `Hello ${sanitizedName.split(' ')[0]}, you've been invited to the Kingdom Builders portal!\n\nLog in with your phone: ${sanitizedPhone}\nYour unique login PIN: ${donorPin}\n\nVisit: ${loginUrl}\n\nIMPORTANT: When making bank transfers, you MUST use your unique Donor ID (${donorRefId}) in the transfer narration/description.`;
 
     await triggerNotification('PLEDGE_CONFIRMATION', donor.id, { 
       pin: donorPin,
