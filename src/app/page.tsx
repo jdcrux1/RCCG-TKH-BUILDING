@@ -45,7 +45,7 @@ export default function Home() {
             <Link href="/login" className={styles.primaryBtn}>
               Become a Kingdom Builder <ArrowRight size={24} />
             </Link>
-            <InstantDonate />
+            <InstantDonate className={styles.primaryBtn} />
           </div>
 
           <div className={styles.statsGrid}>
