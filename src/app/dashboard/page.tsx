@@ -97,6 +97,15 @@ async function getDonorData() {
     scale: 0.5 + ((i * 0.03) % 1),
   }));
 
+  // Global Progress
+  const totalTargetVar = await prisma.systemVariable.findUnique({ where: { key: 'totalTarget' } });
+  const globalTarget = BigInt(totalTargetVar?.value || '65000000000'); // 650M Naira in Kobo
+  const globalApprovedTotal = await prisma.contribution.aggregate({
+    _sum: { amount: true }
+  });
+  const globalTotal = globalApprovedTotal._sum.amount || BigInt(0);
+  const globalProgress = Number((globalTotal * BigInt(100)) / globalTarget);
+
   return { 
     donor, 
     totalContributed, 
@@ -105,10 +114,14 @@ async function getDonorData() {
     streak,
     gaveThisMonth,
     currentMilestone,
+    milestones,
     donorsNeeded,
     personalImpactPercentage,
     encouragement,
-    confettiItems
+    confettiItems,
+    globalTotal,
+    globalTarget,
+    globalProgress
   };
 }
 
@@ -124,9 +137,14 @@ export default async function DonorDashboard() {
     donorsNeeded,
     personalImpactPercentage,
     encouragement,
-    confettiItems
+    confettiItems,
+    milestones,
+    globalTotal,
+    globalTarget,
+    globalProgress
   } = await getDonorData();
 
+  const isFulfilled = fulfillmentRate >= 100;
   const showCelebration = fulfillmentRate >= 25;
   const fulfillmentDash = Math.min(fulfillmentRate, 100) * 3.14;
 
@@ -187,6 +205,56 @@ export default async function DonorDashboard() {
         </div>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
           {totalContributed > BigInt(0) && <TaxReceiptButton donorName={donor.name} totalContributed={Number(totalContributed)} />}
+        </div>
+      </section>
+
+      {/* 1. Personal Fulfillment Metrics */}
+      <section className="glass-card" style={{ 
+        position: 'relative',
+        overflow: 'hidden',
+        border: isFulfilled ? '2px solid #D4AF37' : '1px solid var(--glass-border)',
+        background: isFulfilled ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(0,0,0,0) 100%)' : 'var(--glass-bg)'
+      }}>
+        {isFulfilled && (
+          <div style={{ 
+            position: 'absolute', top: '12px', right: '12px',
+            background: '#D4AF37', color: '#000', padding: '4px 12px',
+            borderRadius: 'var(--radius-full)', fontSize: '0.75rem', fontWeight: 'bold',
+            boxShadow: '0 0 15px rgba(212, 175, 55, 0.5)',
+            display: 'flex', alignItems: 'center', gap: '4px'
+          }}>
+            <Award size={14} /> PLEDGE COMPLETED
+          </div>
+        )}
+        
+        <h3 style={{ fontSize: '1.1rem', marginBottom: '1.5rem', opacity: 0.8 }}>Your Personal Kingdom Legacy</h3>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.9rem' }}>
+          <span>Pledge Fulfillment</span>
+          <span style={{ fontWeight: 'bold', color: isFulfilled ? '#D4AF37' : 'var(--tier-primary)' }}>{fulfillmentRate.toFixed(1)}%</span>
+        </div>
+        
+        <div style={{ 
+          height: '12px', width: '100%', background: 'rgba(255,255,255,0.05)', 
+          borderRadius: '6px', overflow: 'hidden', marginBottom: '1.5rem' 
+        }}>
+          <div style={{ 
+            height: '100%', width: `${Math.min(fulfillmentRate, 100)}%`, 
+            background: isFulfilled ? 'linear-gradient(90deg, #D4AF37, #F9D71C)' : 'var(--tier-primary)',
+            boxShadow: isFulfilled ? '0 0 10px #D4AF37' : 'none',
+            transition: 'width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
+          }} />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div>
+            <p style={{ fontSize: '0.75rem', opacity: 0.5, textTransform: 'uppercase' }}>Verified Giving</p>
+            <p style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>₦{(Number(totalContributed) / 100).toLocaleString()}</p>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ fontSize: '0.75rem', opacity: 0.5, textTransform: 'uppercase' }}>24-Month Commitment</p>
+            <p style={{ fontSize: '1.4rem', fontWeight: 'bold', opacity: 0.9 }}>₦{(Number(donor.totalPledged) / 100).toLocaleString()}</p>
+          </div>
         </div>
       </section>
 
@@ -259,72 +327,119 @@ export default async function DonorDashboard() {
         </div>
       )}
 
-      {/* Main Stats Grid */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-        gap: 'var(--space-md)' 
+      {/* 2. Global Vision Card */}
+      <section className="glass-card" style={{ 
+        background: 'linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(20,20,20,0.6) 100%)',
+        border: '1px solid rgba(255,255,255,0.1)',
+        padding: '2rem'
       }}>
-        
-        {/* Fulfillment Ring Card */}
-        <div className="glass-card" style={{ borderLeft: '4px solid var(--tier-primary)', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          <div style={{ position: 'relative', width: '120px', height: '120px', flexShrink: 0 }}>
-            <svg width="120" height="120" viewBox="0 0 120 120">
-              <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="8" />
-              <circle 
-                cx="60" cy="60" r="50" fill="none" 
-                stroke="var(--tier-primary)" strokeWidth="8" 
-                strokeDasharray={`${fulfillmentDash} 314`}
-                strokeLinecap="round" 
-                transform="rotate(-90 60 60)" 
-                style={{ transition: 'stroke-dasharray 1s ease-out' }}
-              />
-            </svg>
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-              <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--tier-primary)' }}>{fulfillmentRate.toFixed(0)}%</span>
-            </div>
-          </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
           <div>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '8px' }}>Pledge Fulfillment</h3>
-            <p style={{ fontSize: '0.8rem', opacity: 0.6, marginBottom: '4px' }}>Total Contributed: <strong style={{ color: 'white' }}>₦{(Number(totalContributed) / 100).toLocaleString()}</strong></p>
-            <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>24-Month Goal: <strong style={{ color: 'white' }}>₦{(Number(donor.totalPledged) / 100).toLocaleString()}</strong></p>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '4px' }}>The Global Vision</h2>
+            <p style={{ opacity: 0.6 }}>Total Church-wide Contributions</p>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ fontSize: '1.8rem', fontWeight: '900', color: 'var(--tier-primary)' }}>₦ {(Number(globalTotal) / 100).toLocaleString()}</p>
+            <p style={{ fontSize: '0.8rem', opacity: 0.4 }}>Target: ₦ {(Number(globalTarget) / 100).toLocaleString()}</p>
           </div>
         </div>
 
-        {/* Giving Streak */}
-        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem' }}>
+        <div style={{ position: 'relative', height: '40px', background: 'rgba(255,255,255,0.03)', borderRadius: '20px', padding: '4px' }}>
+          <div style={{ 
+            height: '100%', width: `${globalProgress}%`, 
+            background: 'linear-gradient(90deg, var(--tier-primary) 0%, #fbbf24 100%)',
+            borderRadius: '16px',
+            boxShadow: '0 0 20px var(--tier-glow)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '0.8rem', fontWeight: 'bold', color: 'black',
+            transition: 'width 2s ease-out'
+          }}>
+            {globalProgress}%
+          </div>
+        </div>
+      </section>
+
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
+        gap: 'var(--space-md)' 
+      }}>
+        
+        {/* 3. Construction Milestones Timeline */}
+        <div className="glass-card">
+          <h3 style={{ fontSize: '1.2rem', marginBottom: '1.5rem' }}>Construction Milestones</h3>
+          <div style={{ position: 'relative', paddingLeft: '32px' }}>
+            {/* Vertical Spine */}
+            <div style={{ 
+              position: 'absolute', left: '7px', top: '10px', bottom: '10px', 
+              width: '2px', background: 'rgba(255,255,255,0.1)' 
+            }} />
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+              {milestones.map((ms) => {
+                const isCompleted = ms.status === 'FUNDED' || ms.status === 'COMPLETED';
+                const isCurrent = ms.id === currentMilestone?.id;
+
+                return (
+                  <div key={ms.id} style={{ position: 'relative' }}>
+                    {/* Node */}
+                    <div style={{ 
+                      position: 'absolute', left: '-31px', top: '4px',
+                      width: '16px', height: '16px', borderRadius: '50%',
+                      background: isCompleted ? 'var(--tier-primary)' : isCurrent ? 'var(--tier-primary)' : '#333',
+                      border: '4px solid #111',
+                      zIndex: 2,
+                      animation: isCurrent ? 'pulse-node 2s infinite' : 'none'
+                    }}>
+                      {isCompleted && <CheckCircle2 size={10} color="black" style={{ position: 'absolute', top: -1, left: -1 }} />}
+                    </div>
+                    
+                    <style dangerouslySetInnerHTML={{ __html: `
+                      @keyframes pulse-node {
+                        0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+                        70% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+                        100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+                      }
+                    `}} />
+
+                    <div>
+                      <p style={{ 
+                        fontWeight: 'bold', fontSize: '0.95rem', 
+                        color: isCompleted || isCurrent ? 'white' : '#666' 
+                      }}>{ms.title}</p>
+                      <p style={{ fontSize: '0.8rem', opacity: 0.5 }}>{ms.description || 'Phase Project Milestone'}</p>
+                      {isCurrent && (
+                        <span style={{ 
+                          fontSize: '0.65rem', padding: '2px 8px', borderRadius: '4px',
+                          background: 'rgba(212, 175, 55, 0.1)', color: 'var(--tier-primary)',
+                          marginTop: '4px', display: 'inline-block'
+                        }}>CURRENT PHASE</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Giving Streak & Encouragement */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+          <div className="glass-card" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ background: 'rgba(255,100,100,0.1)', padding: '12px', borderRadius: '50%' }}>
               <Flame size={32} color={streak > 0 ? '#ff6b6b' : 'rgba(255,255,255,0.2)'} />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.8rem', color: streak > 0 ? '#ff6b6b' : 'inherit' }}>{streak} Months</h3>
-              <p style={{ fontSize: '0.9rem', opacity: 0.6 }}>Consecutive Giving Streak</p>
+              <h3 style={{ fontSize: '1.5rem', color: streak > 0 ? '#ff6b6b' : 'inherit' }}>{streak} Month Streak</h3>
+              <p style={{ fontSize: '0.8rem', opacity: 0.5 }}>Your faithfulness is inspiring.</p>
             </div>
           </div>
-          <p style={{ fontSize: '0.8rem', opacity: 0.5 }}>
-            {streak > 0 ? "You're building an incredible habit of faithfulness!" : "Make a contribution this month to start your streak!"}
-          </p>
-        </div>
 
-        {/* Impact Summary & Community Goal */}
-        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <Users size={18} color="var(--tier-primary)" />
-              <h3 style={{ fontSize: '1rem' }}>Community Impact</h3>
-            </div>
-            <p style={{ fontSize: '0.9rem', opacity: 0.8, marginBottom: '12px' }}>
-              Your contributions have funded <strong>{personalImpactPercentage.toFixed(2)}%</strong> of the <span style={{ color: 'var(--tier-primary)' }}>{currentMilestone?.title}</span>.
-            </p>
-          </div>
-          <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)' }}>
-            <p style={{ fontSize: '0.85rem' }}>
-              We only need <strong style={{ color: 'var(--tier-primary)' }}>{donorsNeeded}</strong> more donors at your tier level to fully fund this phase!
-            </p>
+          <div className="glass-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center' }}>
+            <Quote size={32} color="var(--tier-primary)" style={{ opacity: 0.3, marginBottom: '1rem', alignSelf: 'center' }} />
+            <p style={{ fontSize: '1.1rem', fontStyle: 'italic', opacity: 0.9 }}>&ldquo;{encouragement}&rdquo;</p>
           </div>
         </div>
-
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'var(--space-md)' }}>
