@@ -11,6 +11,7 @@ import { redirect } from 'next/navigation';
 import { logActivity } from '@/lib/logger';
 import { sanitizePhoneNumber, toTitleCase } from '@/lib/sanitize';
 import { z } from 'zod';
+import crypto from 'crypto';
 
 async function requireAdmin() {
   const session = await getSession();
@@ -57,6 +58,12 @@ async function checkIdempotency(phone: string): Promise<boolean> {
   return !!recentDonor;
 }
 
+// Sequential Reference Generation
+async function generateDonorRefId() {
+  const count = await prisma.donor.count();
+  return `KB-${(count + 1).toString().padStart(3, '0')}`;
+}
+
 // ADD DONOR
 export async function addDonor(formData: FormData) {
   try {
@@ -81,7 +88,8 @@ export async function addDonor(formData: FormData) {
       throw new Error('Donor with this phone already exists');
     }
 
-    const donorPin = sanitizedPhone.slice(-4);
+    const donorRefId = await generateDonorRefId();
+    const donorPin = crypto.randomInt(1000, 10000).toString();
     const monthlyPledgeKobo = nairaToKobo(monthlyPledge);
     const totalPledgedKobo = monthlyPledgeKobo * BigInt(24);
     const tier = getTier(monthlyPledge);
@@ -99,12 +107,21 @@ export async function addDonor(formData: FormData) {
         monthlyPledge: monthlyPledgeKobo,
         totalPledged: totalPledgedKobo,
         tier,
+        donorRefId,
         pin: hashedPin,
         role: 'DONOR',
       },
     });
 
-    await triggerNotification('PLEDGE_CONFIRMATION', donor.id, { pin: donorPin });
+    // UPDATED WHATSAPP PAYLOAD
+    const loginUrl = 'https://rccg-tkh-building.vercel.app/login';
+    const message = `Welcome! Log in at ${loginUrl} with Phone: ${sanitizedPhone} and PIN: ${donorPin}. IMPORTANT: When making bank transfers, you MUST use your unique Donor ID (${donorRefId}) in the transfer narration/description.`;
+
+    await triggerNotification('PLEDGE_CONFIRMATION', donor.id, { 
+      pin: donorPin,
+      donorRefId,
+      customMessage: message 
+    });
     await logActivity('CREATE_DONOR', {
       donorId: donor.id,
       name: sanitizedName,

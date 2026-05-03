@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { approvePaymentClaim, rejectPaymentClaim, generateMasterReport, reverseContribution, updateSystemVariable } from './actions';
 
 type Data = {
   contributions: any[];
@@ -15,6 +16,7 @@ type Data = {
     basementTarget: string;
     groundFloorTarget: string;
   };
+  paymentClaims: any[];
 };
 
 export default function SudoDashboard({ data }: { data: Data }) {
@@ -24,6 +26,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
   const [sessions, setSessions] = useState(data.sessions);
   const [actionLogs, setActionLogs] = useState(data.actionLogs);
   const [staff, setStaff] = useState(data.staff);
+  const [paymentClaims, setPaymentClaims] = useState(data.paymentClaims);
   const [systemVars, setSystemVars] = useState(data.systemVariables);
   const [editId, setEditId] = useState<string | null>(null);
   const [editAmount, setEditAmount] = useState('');
@@ -137,20 +140,53 @@ export default function SudoDashboard({ data }: { data: Data }) {
   };
 
   const handleUpdateSystemVar = async (key: string) => {
-    await fetch('/api/sudo-update-system-var', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key, value: varValue }),
-    });
-    setSystemVars({ ...systemVars, [key]: varValue });
-    setEditingVar(null);
+    const res = await updateSystemVariable(key, varValue);
+    if (res.success) {
+      setSystemVars({ ...systemVars, [key]: varValue });
+      setEditingVar(null);
+    } else {
+      setError('Failed to update system variable');
+      setTimeout(() => setError(null), 3000);
+    }
+  };
+
+  const handleGenerateMasterReport = async () => {
+    try {
+      const res = await generateMasterReport();
+      if (res.success && res.csv) {
+        const blob = new Blob([res.csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `KingdomBuilders_MasterReport_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+      }
+    } catch (e) {
+      setError('Failed to generate master report');
+      setTimeout(() => setError(null), 3000);
+    }
+  };
+
+  const handleReverseContribution = async (id: string) => {
+    if (!confirm('REVERSE this contribution? This will deduct the amount from the donor balance.')) return;
+    const prevContributions = [...contributions];
+    setContributions(contributions.filter(c => c.id !== id));
+    
+    try {
+      const res = await reverseContribution(id);
+      if (!res.success) throw new Error(res.error);
+    } catch (e) {
+      setContributions(prevContributions);
+      setError('Reversal failed: ' + (e as Error).message);
+      setTimeout(() => setError(null), 3000);
+    }
   };
 
   const handleExportCSV = async () => {
     const rows = [
       ['ID', 'Donor', 'Phone', 'Amount', 'Date', 'Reference', 'Narrative'],
       ...contributions.map(c => [
-        c.id, c.donor?.name || '', c.donor?.phone || '', c.amount, 
+        c.id, c.donor?.name || '', c.donor?.phone || '', (Number(c.amount) / 100).toFixed(2), 
         c.date ? new Date(c.date).toISOString().split('T')[0] : '', 
         c.reference || '', c.narrative || ''
       ])
@@ -160,7 +196,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'contributions.csv';
+    a.download = 'ledger_export.csv';
     a.click();
   };
 
@@ -180,7 +216,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
       </div>
 
       <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
-        {['access', 'watchtower', 'team', 'system'].map(tab => (
+        {['access', 'reconciliation', 'watchtower', 'team', 'system'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -198,6 +234,74 @@ export default function SudoDashboard({ data }: { data: Data }) {
           </button>
         ))}
       </div>
+
+      {activeTab === 'reconciliation' && (
+        <div style={{ border: '1px solid #222' }}>
+          <div style={{ padding: '12px', background: '#111', fontSize: '14px', color: '#888', borderBottom: '1px solid #222' }}>PENDING PAYMENT VERIFICATIONS</div>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+              <thead>
+                <tr style={{ background: '#050505', color: '#666' }}>
+                  <th style={{ padding: '12px', textAlign: 'left' }}>DONOR (ID)</th>
+                  <th style={{ padding: '12px', textAlign: 'left' }}>AMOUNT</th>
+                  <th style={{ padding: '12px', textAlign: 'left' }}>DATE</th>
+                  <th style={{ padding: '12px', textAlign: 'left' }}>BANK</th>
+                  <th style={{ padding: '12px', textAlign: 'right' }}>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paymentClaims.filter(c => c.status === 'PENDING').length > 0 ? (
+                  paymentClaims.filter(c => c.status === 'PENDING').map(claim => (
+                    <tr key={claim.id} style={{ borderBottom: '1px solid #111' }}>
+                      <td style={{ padding: '12px' }}>
+                        <div style={{ color: '#fff' }}>{claim.donor?.name}</div>
+                        <div style={{ color: '#444', fontSize: '10px' }}>{claim.donor?.donorRefId}</div>
+                      </td>
+                      <td style={{ padding: '12px', color: '#fff', fontWeight: 'bold' }}>₦{(Number(claim.amount) / 100).toLocaleString()}</td>
+                      <td style={{ padding: '12px' }}>{new Date(claim.date).toLocaleDateString()}</td>
+                      <td style={{ padding: '12px' }}>{claim.bankName}</td>
+                      <td style={{ padding: '12px', textAlign: 'right' }}>
+                        <button 
+                          onClick={async () => {
+                            if (!confirm('Approve this payment? This will update the ledger.')) return;
+                            const res = await approvePaymentClaim(claim.id);
+                            if (res.success) {
+                              setPaymentClaims(paymentClaims.map(c => c.id === claim.id ? { ...c, status: 'APPROVED' } : c));
+                            } else {
+                              alert(res.error);
+                            }
+                          }}
+                          style={{ background: '#0f02', border: '1px solid #0f0', color: '#0f0', padding: '4px 12px', cursor: 'pointer', marginRight: '8px', fontSize: '10px' }}
+                        >
+                          APPROVE
+                        </button>
+                        <button 
+                          onClick={async () => {
+                            if (!confirm('Reject this payment?')) return;
+                            const res = await rejectPaymentClaim(claim.id);
+                            if (res.success) {
+                              setPaymentClaims(paymentClaims.map(c => c.id === claim.id ? { ...c, status: 'REJECTED' } : c));
+                            } else {
+                              alert(res.error);
+                            }
+                          }}
+                          style={{ background: '#f002', border: '1px solid #f00', color: '#f00', padding: '4px 12px', cursor: 'pointer', fontSize: '10px' }}
+                        >
+                          REJECT
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} style={{ padding: '40px', textAlign: 'center', color: '#444' }}>No pending verifications. All clear!</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {activeTab === 'access' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -241,8 +345,8 @@ export default function SudoDashboard({ data }: { data: Data }) {
                           </>
                         ) : (
                           <>
-                            <button onClick={() => { setEditId(c.id); setEditAmount(c.amount.toString()); }} style={{ background: 'transparent', border: 'none', color: '#666', cursor: 'pointer', marginRight: '8px' }}>edit</button>
-                            <button onClick={() => handleDeleteContribution(c.id)} style={{ background: 'transparent', border: 'none', color: '#666', cursor: 'pointer' }}>del</button>
+                            <button onClick={() => { setEditId(c.id); setEditAmount((Number(c.amount)/100).toString()); }} style={{ background: 'transparent', border: 'none', color: '#666', cursor: 'pointer', marginRight: '8px' }}>edit</button>
+                            <button onClick={() => handleReverseContribution(c.id)} style={{ background: 'transparent', border: '1px solid #f002', color: '#f44', cursor: 'pointer', padding: '2px 6px', fontSize: '10px' }}>REVERSE</button>
                           </>
                         )}
                       </td>
@@ -282,14 +386,17 @@ export default function SudoDashboard({ data }: { data: Data }) {
 
           <div>
             <div style={{ marginBottom: '12px', fontSize: '14px', color: '#888' }}>ACTION FEED</div>
-            <div style={{ border: '1px solid #222', padding: '12px', height: '400px', overflowY: 'auto', fontSize: '11px', background: '#050505' }}>
+            <div style={{ border: '1px solid #222', padding: '12px', height: '400px', overflowY: 'auto', fontSize: '11px', background: '#050505', display: 'flex', flexDirection: 'column', gap: '4px' }}>
               {actionLogs.map(log => (
-                <div key={log.logId} style={{ padding: '4px 0', borderBottom: '1px solid #111', color: '#888' }}>
-                  <span style={{ color: '#444' }}>[{formatTime(log.timestamp)}]</span> {log.userRole} {log.actionType}
-                  {log.targetRecordId && <span style={{ color: '#333' }}> #{log.targetRecordId.slice(0,8)}</span>}
+                <div key={log.logId} style={{ padding: '8px', borderLeft: '2px solid #333', background: '#0a0a0a', color: '#aaa', display: 'flex', justifyContent: 'space-between' }}>
+                  <span>
+                    <span style={{ color: '#555' }}>[{formatTime(log.timestamp)}]</span> <strong style={{ color: '#ddd' }}>{log.userRole}</strong> {log.actionType.replace(/_/g, ' ')}
+                    {log.targetRecordId && <span style={{ color: '#444' }}> #{log.targetRecordId.slice(0,8)}</span>}
+                  </span>
+                  <span style={{ fontSize: '9px', color: '#444' }}>{log.details || ''}</span>
                 </div>
               ))}
-              {actionLogs.length === 0 && <div style={{ color: '#444' }}>no actions logged</div>}
+              {actionLogs.length === 0 && <div style={{ color: '#444', textAlign: 'center', padding: '2rem' }}>no actions logged</div>}
             </div>
           </div>
         </div>
@@ -398,12 +505,20 @@ export default function SudoDashboard({ data }: { data: Data }) {
           </div>
 
           <div>
-            <div style={{ marginBottom: '12px', fontSize: '14px', color: '#888' }}>COLD STORAGE</div>
+            <div style={{ marginBottom: '12px', fontSize: '14px', color: '#888' }}>MASTER REPORT</div>
+            <button 
+              onClick={handleGenerateMasterReport}
+              style={{ width: '100%', padding: '16px', background: '#d97706', color: '#000', border: 'none', cursor: 'pointer', fontFamily: 'monospace', fontWeight: 'bold', marginBottom: '24px' }}
+            >
+              GENERATE MASTER FINANCIAL CSV
+            </button>
+
+            <div style={{ marginBottom: '12px', fontSize: '14px', color: '#888' }}>LEDGER EXPORT</div>
             <button 
               onClick={handleExportCSV}
-              style={{ padding: '12px 24px', background: '#111', border: '1px solid #333', color: '#fff', cursor: 'pointer', fontFamily: 'monospace' }}
+              style={{ width: '100%', padding: '12px', background: '#111', border: '1px solid #333', color: '#fff', cursor: 'pointer', fontFamily: 'monospace' }}
             >
-              export database csv
+              export current ledger csv
             </button>
           </div>
         </div>

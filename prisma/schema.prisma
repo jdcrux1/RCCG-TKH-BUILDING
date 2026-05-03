@@ -50,6 +50,12 @@ enum MilestoneStatus {
   FUNDED
 }
 
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 // ═══════════════════════════════════════════════════════════════
 // DONOR TABLE
 // ═════════════════════════════════════════════════════════════==
@@ -58,6 +64,7 @@ model Donor {
   id            String         @id @default(uuid())
   phone         String         @unique
   pin           String
+  donorRefId    String?        @unique // e.g., 'KB-045'
   name          String
   spouseName    String?
   email         String?
@@ -69,6 +76,8 @@ model Donor {
   status       String   @default("ACTIVE")
   role         String   @default("DONOR")
   contributions Contribution[]
+  paymentClaims PaymentClaim[]
+  totalContributed BigInt        @default(0)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
@@ -220,4 +229,19 @@ model SystemVariable {
   key       String    @unique
   value     String
   updatedAt DateTime  @updatedAt
+}
+
+model PaymentClaim {
+  id        String        @id @default(cuid())
+  donorId   String
+  donor     Donor         @relation(fields: [donorId], references: [id], onDelete: Cascade)
+  amount    BigInt        // Store in kobo
+  date      DateTime
+  bankName  String?
+  status    PaymentStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+
+  @@index([donorId])
+  @@index([status])
+  @@index([createdAt])
 }

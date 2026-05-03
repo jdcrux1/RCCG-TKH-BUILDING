@@ -2,8 +2,9 @@ export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import { Target, Award, CheckCircle2, CalendarDays, Flame, Quote, Users } from 'lucide-react';
+import { Target, Award, CheckCircle2, CalendarDays, Flame, Quote, Users, Landmark, Copy, Info } from 'lucide-react';
 import TaxReceiptButton from '@/components/TaxReceiptButton';
+import PaymentClaimForm from './PaymentClaimForm';
 
 // Encouragement Messages
 const encouragements = [
@@ -21,7 +22,13 @@ async function getDonorData() {
 
   const donor = await prisma.donor.findUnique({
     where: { id: session.userId },
-    include: { contributions: true }
+    include: { 
+      contributions: true,
+      paymentClaims: {
+        orderBy: { createdAt: 'desc' },
+        take: 5
+      }
+    }
   });
 
   if (!donor) redirect('/login');
@@ -183,6 +190,64 @@ export default async function DonorDashboard() {
         </div>
       </section>
 
+      {/* PHASE 3: Bank Details Banner */}
+      <section style={{ 
+        background: 'linear-gradient(135deg, var(--tier-primary) 0%, #d97706 100%)',
+        borderRadius: 'var(--radius-md)',
+        padding: '1.5rem',
+        color: 'var(--primary)',
+        boxShadow: '0 10px 25px -5px var(--tier-glow)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1rem'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <Landmark size={28} />
+          <div>
+            <h2 style={{ fontSize: '1.2rem', fontWeight: 'bold', margin: 0 }}>Official Bank Transfer Details</h2>
+            <p style={{ fontSize: '0.9rem', opacity: 0.9 }}>Use the details below for all your contributions.</p>
+          </div>
+        </div>
+
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+          gap: '1.5rem',
+          background: 'rgba(255,255,255,0.1)',
+          padding: '1.2rem',
+          borderRadius: 'var(--radius-sm)',
+          border: '1px solid rgba(255,255,255,0.2)'
+        }}>
+          <div>
+            <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.8, marginBottom: '4px' }}>Bank Name</p>
+            <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Premium Trust Bank</p>
+          </div>
+          <div>
+            <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.8, marginBottom: '4px' }}>Account Number</p>
+            <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>0040239581</p>
+          </div>
+          <div style={{ gridColumn: '1 / -1' }}>
+            <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.8, marginBottom: '4px' }}>Account Name</p>
+            <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>RCCG The King's House Building Project</p>
+          </div>
+        </div>
+
+        <div style={{ 
+          background: 'rgba(0,0,0,0.2)', 
+          padding: '1rem', 
+          borderRadius: 'var(--radius-sm)', 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '12px',
+          border: '1px dashed rgba(255,255,255,0.4)'
+        }}>
+          <Info size={20} />
+          <p style={{ fontSize: '0.95rem' }}>
+            IMPORTANT: Use your Unique Donor ID <strong style={{ fontSize: '1.1rem', background: 'white', color: 'var(--tier-primary)', padding: '2px 8px', borderRadius: '4px' }}>{donor.donorRefId || 'PENDING'}</strong> as the transfer narration.
+          </p>
+        </div>
+      </section>
+
       {/* Thank You / Prompt Banner */}
       {gaveThisMonth ? (
         <div className="glass-card" style={{ background: 'rgba(16, 185, 129, 0.1)', borderColor: 'rgba(16, 185, 129, 0.2)', color: 'var(--success)', display: 'flex', alignItems: 'center', gap: '12px', padding: '1rem var(--space-md)' }}>
@@ -265,24 +330,45 @@ export default async function DonorDashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'var(--space-md)' }}>
         
         {/* Contribution Timeline */}
-        <div className="glass-card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 'var(--space-md)' }}>
-            <CalendarDays size={20} color="var(--tier-primary)" />
-            <h3 style={{ fontSize: '1.2rem' }}>Recent Contributions</h3>
           </div>
+        </div>
+
+        {/* PHASE 3: Log a Payment Form & Status */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+          <PaymentClaimForm />
           
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {sortedContributions.length > 0 ? sortedContributions.slice(0, 5).map((c, i) => (
-              <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '1rem', borderBottom: i < 4 ? '1px solid var(--glass-border)' : 'none' }}>
-                <div>
-                  <p style={{ fontWeight: '500' }}>₦{(Number(c.amount) / 100).toLocaleString()}</p>
-                  <p style={{ fontSize: '0.8rem', opacity: 0.5 }}>{new Date(c.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          <div className="glass-card">
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>Pending Verifications</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+              {donor.paymentClaims?.length > 0 ? donor.paymentClaims.map((claim) => (
+                <div key={claim.id} style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center', 
+                  padding: '10px',
+                  background: 'rgba(255,255,255,0.02)',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--glass-border)'
+                }}>
+                  <div>
+                    <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>₦{(Number(claim.amount) / 100).toLocaleString()}</p>
+                    <p style={{ fontSize: '0.75rem', opacity: 0.5 }}>{new Date(claim.date).toLocaleDateString()}</p>
+                  </div>
+                  <span style={{ 
+                    fontSize: '0.65rem', 
+                    padding: '3px 8px', 
+                    borderRadius: '4px',
+                    background: claim.status === 'PENDING' ? 'rgba(245, 158, 11, 0.1)' : claim.status === 'APPROVED' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                    color: claim.status === 'PENDING' ? '#f59e0b' : claim.status === 'APPROVED' ? 'var(--success)' : '#ef4444',
+                    border: `1px solid ${claim.status === 'PENDING' ? '#f59e0b' : claim.status === 'APPROVED' ? 'var(--success)' : '#ef4444'}`
+                  }}>
+                    {claim.status}
+                  </span>
                 </div>
-                <span style={{ fontSize: '0.7rem', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', padding: '4px 8px', borderRadius: '4px' }}>Logged</span>
-              </div>
-            )) : (
-              <p style={{ opacity: 0.5, textAlign: 'center', padding: '2rem 0' }}>No contributions recorded yet.</p>
-            )}
+              )) : (
+                <p style={{ fontSize: '0.85rem', opacity: 0.5, textAlign: 'center' }}>No recent payment claims.</p>
+              )}
+            </div>
           </div>
         </div>
 

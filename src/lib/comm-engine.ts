@@ -46,7 +46,7 @@ export async function triggerNotification(type: MessageType, donorId: string, da
 
   switch (type) {
     case 'PLEDGE_CONFIRMATION':
-      message = `God bless you ${donor.name}! Your Kingdom Builder pledge of ₦${(Number(donor.monthlyPledge) / 100).toLocaleString()}/month has been recorded. Tier: ${donor.tier}. PIN: ${data.pin || '1234'}`;
+      message = (data.customMessage as string) || `God bless you ${donor.name}! Your Kingdom Builder pledge of ₦${(Number(donor.monthlyPledge) / 100).toLocaleString()}/month has been recorded. Tier: ${donor.tier}. PIN: ${data.pin || '1234'}`;
       subject = 'Kingdom Builder Pledge Confirmation';
       break;
     case 'CONTRIBUTION_RECEIVED':

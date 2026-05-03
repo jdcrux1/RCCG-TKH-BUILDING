@@ -20,7 +20,7 @@ async function verifySudo(): Promise<boolean> {
 }
 
 async function getData() {
-  const [contributions, donors, sessions, actionLogs, staff, milestones] = await Promise.all([
+  const [contributions, donors, sessions, actionLogs, staff, milestones, paymentClaims] = await Promise.all([
     prisma.contribution.findMany({ 
       include: { donor: true },
       orderBy: { date: 'desc' },
@@ -30,6 +30,10 @@ async function getData() {
     getActionLogs(100),
     prisma.staff.findMany({ orderBy: { createdAt: 'desc' } }),
     prisma.milestone.findMany({ orderBy: { order: 'asc' } }),
+    prisma.paymentClaim.findMany({
+      include: { donor: true },
+      orderBy: { createdAt: 'desc' }
+    }),
   ]);
 
   const totalTarget = await prisma.systemVariable.findUnique({ where: { key: 'totalTarget' } });
@@ -43,6 +47,7 @@ async function getData() {
     actionLogs, 
     staff,
     milestones,
+    paymentClaims,
     systemVariables: {
       totalTarget: totalTarget?.value || '500000000',
       basementTarget: basementTarget?.value || '150000000',
