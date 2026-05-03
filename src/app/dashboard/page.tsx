@@ -339,7 +339,7 @@ export default async function DonorDashboard() {
           <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 10px #10b981' }} />
           <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>Technical Support (WhatsApp/Text Only)</p>
         </div>
-        <p style={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--tier-primary)' }}>+234 812 345 6789</p>
+        <p style={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--tier-primary)' }}>08052039445</p>
       </section>
 
       {/* Thank You / Prompt Banner */}
