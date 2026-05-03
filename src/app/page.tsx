@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, ChevronRight } from 'lucide-react';
 import styles from './landing.module.css';
+import InstantDonate from '@/components/InstantDonate';
 
 export default function Home() {
   return (
@@ -44,6 +45,7 @@ export default function Home() {
             <Link href="/login" className={styles.primaryBtn}>
               Become a Kingdom Builder <ArrowRight size={24} />
             </Link>
+            <InstantDonate />
           </div>
 
           <div className={styles.statsGrid}>

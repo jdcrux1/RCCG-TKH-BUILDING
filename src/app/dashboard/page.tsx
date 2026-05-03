@@ -301,19 +301,45 @@ export default async function DonorDashboard() {
         </div>
 
         <div style={{ 
-          background: 'rgba(0,0,0,0.2)', 
-          padding: '1rem', 
+          background: 'rgba(0,0,0,0.4)', 
+          padding: '1.5rem', 
           borderRadius: 'var(--radius-sm)', 
           display: 'flex', 
           alignItems: 'center', 
-          gap: '12px',
-          border: '1px dashed rgba(255,255,255,0.4)'
+          gap: '16px',
+          border: '2px solid white',
+          boxShadow: '0 0 20px rgba(255,255,255,0.3)',
+          animation: 'pulse-border 2s infinite'
         }}>
-          <Info size={20} />
-          <p style={{ fontSize: '0.95rem' }}>
-            IMPORTANT: Use your Unique Donor ID <strong style={{ fontSize: '1.1rem', background: 'white', color: 'var(--tier-primary)', padding: '2px 8px', borderRadius: '4px' }}>{donor.donorRefId || 'PENDING'}</strong> as the transfer narration.
+          <div style={{ 
+            background: 'white', color: 'var(--tier-primary)', 
+            width: '40px', height: '40px', borderRadius: '50%', 
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 
+          }}>
+            <Info size={24} />
+          </div>
+          <p style={{ fontSize: '1rem', lineHeight: '1.4' }}>
+            <strong style={{ display: 'block', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '4px', opacity: 0.8 }}>CRITICAL INSTRUCTION:</strong>
+            You <span style={{ textDecoration: 'underline', fontWeight: '900' }}>MUST</span> include your Unique ID <strong style={{ fontSize: '1.4rem', color: '#fff', textShadow: '0 0 10px rgba(255,255,255,0.5)' }}>{donor.donorRefId || 'PENDING'}</strong> in the <strong>Narration/Description</strong> field of your bank transfer.
           </p>
         </div>
+
+        <style dangerouslySetInnerHTML={{ __html: `
+          @keyframes pulse-border {
+            0% { border-color: rgba(255,255,255,1); }
+            50% { border-color: rgba(255,255,255,0.2); }
+            100% { border-color: rgba(255,255,255,1); }
+          }
+        `}} />
+      </section>
+
+      {/* Technical Support */}
+      <section className="glass-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.5rem', border: '1px solid #333' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 10px #10b981' }} />
+          <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>Technical Support (WhatsApp/Text Only)</p>
+        </div>
+        <p style={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--tier-primary)' }}>+234 812 345 6789</p>
       </section>
 
       {/* Thank You / Prompt Banner */}

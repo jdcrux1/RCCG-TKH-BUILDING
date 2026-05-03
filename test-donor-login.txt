@@ -1,0 +1,11 @@
+--- TEST DONOR CREDENTIALS (UPDATED) ---
+Name: Test Donor Senior
+Phone: 08012345678
+PIN: 1234
+Tier: Cornerstone Partner
+Donor ID: KB-TEST
+URL: https://rccg-tkh-building.vercel.app/login
+
+NOTE: The system automatically sanitizes phone numbers. 
+You can type '08012345678' or '+2348012345678' in the login field.
+-----------------------------------------
