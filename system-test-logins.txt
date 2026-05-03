@@ -1,0 +1,75 @@
+=== KINGDOM BUILDERS SYSTEM TEST ACCOUNTS ===
+Generated on: 5/3/2026, 11:53:14 AM
+Portal: https://rccg-tkh-building.vercel.app/login
+==============================================
+
+--- SUPER ADMIN (SUDO) ---
+Identifier: sudo
+Passphrase: it is well
+--------------------------
+
+--- STAFF: ADMINS ---
+1. User: admin_test_1 | Pass: adminpass1
+2. User: admin_test_2 | Pass: adminpass2
+----------------------
+
+--- STAFF: VOLUNTEERS ---
+1. User: volunteer_test_1 | Pass: volpass1
+2. User: volunteer_test_2 | Pass: volpass2
+3. User: volunteer_test_3 | Pass: volpass3
+4. User: volunteer_test_4 | Pass: volpass4
+5. User: volunteer_test_5 | Pass: volpass5
+--------------------------
+
+--- TEST DONORS ---
+1. [Cornerstone Partner]
+   Name: Test Donor 1
+   Phone: 09010000001
+   PIN: 6552
+   ID: TEST-001
+2. [Pillar Builder]
+   Name: Test Donor 2
+   Phone: 09010000002
+   PIN: 8560
+   ID: TEST-002
+3. [Foundation Stone]
+   Name: Test Donor 3
+   Phone: 09010000003
+   PIN: 1924
+   ID: TEST-003
+4. [Nehemiah Builder]
+   Name: Test Donor 4
+   Phone: 09010000004
+   PIN: 9700
+   ID: TEST-004
+5. [Covenant Partners]
+   Name: Test Donor 5
+   Phone: 09010000005
+   PIN: 4071
+   ID: TEST-005
+6. [Faithful Hand]
+   Name: Test Donor 6
+   Phone: 09010000006
+   PIN: 5442
+   ID: TEST-006
+7. [Open-Heart]
+   Name: Test Donor 7
+   Phone: 09010000007
+   PIN: 1039
+   ID: TEST-007
+8. [Willing Heart]
+   Name: Test Donor 8
+   Phone: 09010000008
+   PIN: 3831
+   ID: TEST-008
+9. [Cornerstone Partner]
+   Name: Test Donor 9
+   Phone: 09010000009
+   PIN: 7171
+   ID: TEST-009
+10. [Pillar Builder]
+   Name: Test Donor 10
+   Phone: 09010000010
+   PIN: 8558
+   ID: TEST-010
+-------------------
