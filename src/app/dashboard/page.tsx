@@ -330,6 +330,24 @@ export default async function DonorDashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'var(--space-md)' }}>
         
         {/* Contribution Timeline */}
+        <div className="glass-card">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 'var(--space-md)' }}>
+            <CalendarDays size={20} color="var(--tier-primary)" />
+            <h3 style={{ fontSize: '1.2rem' }}>Recent Contributions</h3>
+          </div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {sortedContributions.length > 0 ? sortedContributions.slice(0, 5).map((c, i) => (
+              <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '1rem', borderBottom: i < 4 ? '1px solid var(--glass-border)' : 'none' }}>
+                <div>
+                  <p style={{ fontWeight: '500' }}>₦{(Number(c.amount) / 100).toLocaleString()}</p>
+                  <p style={{ fontSize: '0.8rem', opacity: 0.5 }}>{new Date(c.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                </div>
+                <span style={{ fontSize: '0.7rem', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', padding: '4px 8px', borderRadius: '4px' }}>Logged</span>
+              </div>
+            )) : (
+              <p style={{ opacity: 0.5, textAlign: 'center', padding: '2rem 0' }}>No contributions recorded yet.</p>
+            )}
           </div>
         </div>
 
