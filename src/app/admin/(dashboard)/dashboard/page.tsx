@@ -247,13 +247,6 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      <style jsx>{`
-        @media (max-width: 768px) {
-          .responsive-grid-2 {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }
