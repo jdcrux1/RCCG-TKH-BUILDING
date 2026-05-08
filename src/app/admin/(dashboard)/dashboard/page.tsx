@@ -77,47 +77,44 @@ export default async function AdminDashboard() {
   ];
 
   return (
-    <div style={{ animation: 'fadeIn 0.5s ease-out' }}>
+    <div className="animate-fade-in">
       <header style={{ 
         marginBottom: 'var(--space-lg)', 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
         background: 'linear-gradient(90deg, rgba(30,41,59,0.5) 0%, rgba(30,41,59,0) 100%)',
         padding: '20px',
         borderRadius: 'var(--radius-md)',
         borderLeft: '4px solid var(--accent)'
-      }}>
+      }} className="responsive-header">
         <div>
-          <h1 style={{ fontSize: '2rem', fontWeight: '800', letterSpacing: '-0.025em', margin: 0 }}>Executive Intelligence</h1>
+          <h1 style={{ fontWeight: '800', letterSpacing: '-0.025em', margin: 0 }}>Executive Intelligence</h1>
           <p style={{ opacity: 0.6, fontSize: '0.9rem', marginTop: '4px' }}>Kingdom Builders Campaign Strategy & Analytics</p>
         </div>
-        <div style={{ textAlign: 'right' }}>
+        <div style={{ textAlign: 'left' }} className="mobile-only">
+           <div style={{ marginTop: '1rem', padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+              <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>TARGET: </span>
+              <span style={{ fontWeight: 'bold', color: 'var(--accent)' }}>₦650,000,000</span>
+           </div>
+        </div>
+        <div style={{ textAlign: 'right' }} className="desktop-only">
           <div style={{ fontSize: '0.75rem', opacity: 0.5, fontWeight: 'bold', textTransform: 'uppercase' }}>Current Target</div>
           <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--accent)' }}>₦650,000,000</div>
         </div>
       </header>
 
       {/* Primary Stats Grid */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', 
-        gap: 'var(--space-md)',
-        marginBottom: 'var(--space-lg)'
-      }}>
+      <div className="responsive-grid responsive-grid-2 responsive-grid-4" style={{ marginBottom: 'var(--space-lg)' }}>
         {statCards.map((card, i) => {
           const Icon = card.icon;
           return (
             <div key={i} className="glass-card" style={{ 
               position: 'relative', 
               overflow: 'hidden',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
               cursor: 'default'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                  <p style={{ fontSize: '0.8rem', opacity: 0.6, marginBottom: '4px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{card.title}</p>
-                  <h3 style={{ fontSize: '1.8rem', fontWeight: '800', margin: 0 }}>{card.value}</h3>
+                  <p style={{ fontSize: '0.75rem', opacity: 0.6, marginBottom: '4px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{card.title}</p>
+                  <h3 style={{ fontWeight: '800', margin: 0 }}>{card.value}</h3>
                 </div>
                 <div style={{ 
                   background: `${card.color}20`, 
@@ -139,28 +136,17 @@ export default async function AdminDashboard() {
                 {card.positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
                 <span style={{ fontWeight: '600' }}>{card.trend}</span>
               </div>
-              {/* Background Accent */}
-              <div style={{ 
-                position: 'absolute', 
-                bottom: '-20px', 
-                right: '-20px', 
-                width: '80px', 
-                height: '80px', 
-                background: card.color, 
-                opacity: 0.03, 
-                borderRadius: '50%' 
-              }} />
             </div>
           );
         })}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 'var(--space-md)', marginBottom: 'var(--space-lg)' }}>
+      <div className="responsive-grid responsive-grid-2" style={{ gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: 'var(--space-md)', marginBottom: 'var(--space-lg)' }}>
         {/* Growth Analytics */}
-        <div className="glass-card" style={{ padding: '24px' }}>
+        <div className="glass-card" style={{ padding: '24px', minWidth: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700' }}>Fulfillment Velocity</h3>
+              <h3 style={{ margin: 0, fontWeight: '700' }}>Fulfillment Velocity</h3>
               <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.5 }}>Net contributions analyzed over 6 months</p>
             </div>
             <Activity size={20} style={{ opacity: 0.3 }} />
@@ -173,12 +159,12 @@ export default async function AdminDashboard() {
         {/* Goal Progress Ring */}
         <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center' }}>
           <h3 style={{ marginBottom: '24px', fontSize: '1.1rem', fontWeight: '700' }}>Overall Milestone Progress</h3>
-          <ProgressRing percentage={stats.progressPercent} size={180} strokeWidth={12} />
+          <ProgressRing percentage={stats.progressPercent} size={160} strokeWidth={12} />
           <div style={{ marginTop: '24px' }}>
             <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>₦{(Number(stats.totalRaised) / 100).toLocaleString()}</div>
           </div>
           <div style={{ width: '100%', marginTop: '24px' }}>
-             <ProgressBar percentage={stats.progressPercent} height={12} />
+             <ProgressBar percentage={stats.progressPercent} height={10} />
              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', marginTop: '8px', opacity: 0.5 }}>
                <span>START</span>
                <span>TARGET: ₦650M</span>
@@ -187,7 +173,7 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)' }}>
+      <div className="responsive-grid responsive-grid-2">
         {/* Recent Enrollments */}
         <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
           <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -195,8 +181,8 @@ export default async function AdminDashboard() {
             <Link href="/admin/donors" style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 'bold' }}>VIEW ALL</Link>
           </div>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
-              <thead>
+            <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+              <thead className="desktop-only">
                 <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
                   <th style={{ padding: '12px 24px', opacity: 0.5, fontWeight: '500' }}>DONOR</th>
                   <th style={{ padding: '12px 24px', opacity: 0.5, fontWeight: '500' }}>TIER</th>
@@ -206,11 +192,11 @@ export default async function AdminDashboard() {
               <tbody>
                 {stats.recentDonors.map((donor, idx) => (
                   <tr key={donor.id} style={{ borderBottom: idx === stats.recentDonors.length - 1 ? 'none' : '1px solid var(--glass-border)' }}>
-                    <td style={{ padding: '16px 24px' }}>
+                    <td style={{ padding: '16px 24px' }} data-label="DONOR">
                       <div style={{ fontWeight: '600' }}>{donor.name}</div>
                       <div style={{ fontSize: '0.75rem', opacity: 0.5 }}>{donor.phone}</div>
                     </td>
-                    <td style={{ padding: '16px 24px' }}>
+                    <td style={{ padding: '16px 24px' }} data-label="TIER">
                       <span style={{ 
                         background: 'rgba(99,102,241,0.1)', 
                         color: 'var(--accent)', 
@@ -222,7 +208,7 @@ export default async function AdminDashboard() {
                         {donor.tier}
                       </span>
                     </td>
-                    <td style={{ padding: '16px 24px', opacity: 0.7 }}>
+                    <td style={{ padding: '16px 24px', opacity: 0.7 }} data-label="DATE">
                       {format(new Date(donor.createdAt), 'MMM dd, yyyy')}
                     </td>
                   </tr>
@@ -261,7 +247,15 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .responsive-grid-2 {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
+
 

@@ -48,7 +48,7 @@ export default async function ManualLedger({
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr', gap: 'var(--space-md)', animation: 'fadeIn 0.5s ease-out' }}>
+    <div className="responsive-grid responsive-grid-2" style={{ gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 2fr)', animation: 'fadeIn 0.5s ease-out' }}>
       {/* Log Form Section */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
         <div className="glass-card" style={{ borderLeft: '4px solid var(--accent)' }}>
@@ -64,15 +64,8 @@ export default async function ManualLedger({
               name="q" 
               defaultValue={query}
               placeholder="Search donor name..." 
-              style={{
-                width: '100%',
-                padding: '0.75rem 0.75rem 0.75rem 2.5rem',
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid var(--glass-border)',
-                borderRadius: 'var(--radius-sm)',
-                color: 'white',
-                fontSize: '0.9rem'
-              }}
+              className="responsive-input"
+              style={{ paddingLeft: '2.5rem' }}
             />
           </form>
           
@@ -82,15 +75,7 @@ export default async function ManualLedger({
               <select 
                 name="donorId" 
                 required
-                style={{
-                  padding: '0.75rem',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid var(--glass-border)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'white',
-                  outline: 'none',
-                  fontSize: '1rem'
-                }}
+                className="responsive-input"
               >
                 <option value="" disabled selected>Select from search results...</option>
                 {donors.map(d => (
@@ -109,15 +94,7 @@ export default async function ManualLedger({
               <select 
                 name="amount" 
                 required
-                style={{
-                  padding: '0.75rem',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid var(--glass-border)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'white',
-                  outline: 'none',
-                  fontSize: '1rem'
-                }}
+                className="responsive-input"
               >
                 <option value="" disabled selected>Select tier level...</option>
                 {TIERS.map(t => (
@@ -135,14 +112,7 @@ export default async function ManualLedger({
                 type="text" 
                 name="reference" 
                 placeholder="Reference Number (Optional)" 
-                style={{
-                  padding: '0.75rem',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid var(--glass-border)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'white',
-                  outline: 'none'
-                }}
+                className="responsive-input"
               />
             </div>
 
@@ -153,14 +123,7 @@ export default async function ManualLedger({
                 name="date" 
                 defaultValue={new Date().toISOString().split('T')[0]}
                 required
-                style={{
-                  padding: '0.75rem',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid var(--glass-border)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'white',
-                  outline: 'none'
-                }}
+                className="responsive-input"
               />
             </div>
 
@@ -176,16 +139,16 @@ export default async function ManualLedger({
         <div style={{ padding: '24px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '800' }}>Transaction Audit</h2>
-            <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.5 }}>Full chronological history of all contributions</p>
+            <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.5 }}>Full chronological history</p>
           </div>
-          <div style={{ background: 'var(--success)20', color: 'var(--success)', padding: '4px 12px', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', fontWeight: '700' }}>
+          <div style={{ background: 'var(--success)20', color: 'var(--success)', padding: '4px 12px', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', fontWeight: '700' }} className="desktop-only">
             {total} RECORDED
           </div>
         </div>
 
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead>
+        <div style={{ overflowX: 'hidden' }}>
+          <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead className="desktop-only">
               <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
                 <th style={{ padding: '16px 24px', fontSize: '0.75rem', opacity: 0.5, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Builder</th>
                 <th style={{ padding: '16px 24px', fontSize: '0.75rem', opacity: 0.5, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Details</th>
@@ -196,13 +159,12 @@ export default async function ManualLedger({
               {contributions.map((c, idx) => (
                 <tr key={c.id} style={{ 
                   borderBottom: idx === contributions.length - 1 ? 'none' : '1px solid var(--glass-border)',
-                  transition: 'background 0.2s ease'
-                }} className="table-row-hover">
-                  <td style={{ padding: '20px 24px' }}>
+                }} className="animate-fade-in">
+                  <td style={{ padding: '20px 24px' }} data-label="Builder">
                     <div style={{ fontWeight: '700', fontSize: '1rem' }}>{c.donor.name}</div>
                     <div style={{ fontSize: '0.75rem', opacity: 0.4 }}>{c.donor.phone}</div>
                   </td>
-                  <td style={{ padding: '20px 24px' }}>
+                  <td style={{ padding: '20px 24px' }} data-label="Details">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
                       <Calendar size={14} style={{ opacity: 0.5 }} />
                       {new Date(c.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -211,7 +173,7 @@ export default async function ManualLedger({
                       Ref: {c.reference || 'SYSTEM_LOG'}
                     </div>
                   </td>
-                  <td style={{ padding: '20px 24px', textAlign: 'right' }}>
+                  <td style={{ padding: '20px 24px', textAlign: 'right' }} data-label="Amount">
                     <div style={{ color: 'var(--success)', fontWeight: '800', fontSize: '1.1rem' }}>
                       +₦{(Number(c.amount) / 100).toLocaleString()}
                     </div>
@@ -229,35 +191,33 @@ export default async function ManualLedger({
         </div>
 
         {/* Pagination */}
-        <div style={{ padding: '24px', borderTop: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ padding: '24px', borderTop: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} className="responsive-header">
           <span style={{ opacity: 0.4, fontSize: '0.8rem' }}>Page {page} of {totalPages}</span>
-          <div style={{ display: 'flex', gap: '4px' }}>
+          <div style={{ display: 'flex', gap: '8px' }}>
             <a 
               href={`/admin/ledger?page=${page - 1}${query ? `&q=${query}` : ''}`}
+              className="btn-primary"
               style={{ 
                 padding: '8px 16px', 
-                borderRadius: '6px',
-                border: '1px solid var(--glass-border)', 
-                background: page <= 1 ? 'rgba(255,255,255,0.02)' : 'var(--glass-hover)', 
-                color: page <= 1 ? '#444' : 'white', 
+                background: page <= 1 ? 'rgba(255,255,255,0.05)' : 'var(--accent)', 
+                color: page <= 1 ? '#666' : 'var(--primary)', 
                 pointerEvents: page <= 1 ? 'none' : 'auto',
                 fontSize: '0.8rem',
-                fontWeight: '600'
+                minHeight: '44px'
               }}
             >
-              Previous
+              Prev
             </a>
             <a 
               href={`/admin/ledger?page=${page + 1}${query ? `&q=${query}` : ''}`}
+              className="btn-primary"
               style={{ 
                 padding: '8px 16px', 
-                borderRadius: '6px',
-                border: '1px solid var(--glass-border)', 
-                background: page >= totalPages ? 'rgba(255,255,255,0.02)' : 'var(--glass-hover)', 
-                color: page >= totalPages ? '#444' : 'white', 
+                background: page >= totalPages ? 'rgba(255,255,255,0.05)' : 'var(--accent)', 
+                color: page >= totalPages ? '#666' : 'var(--primary)', 
                 pointerEvents: page >= totalPages ? 'none' : 'auto',
                 fontSize: '0.8rem',
-                fontWeight: '600'
+                minHeight: '44px'
               }}
             >
               Next
@@ -266,6 +226,14 @@ export default async function ManualLedger({
         </div>
       </div>
 
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .responsive-grid-2 {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
+
