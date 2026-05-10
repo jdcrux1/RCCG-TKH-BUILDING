@@ -1,15 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Landmark, Copy, X, Info } from 'lucide-react';
+import { Landmark, X } from 'lucide-react';
 
 export default function InstantDonate({ className }: { className?: string }) {
   const [isOpen, setIsOpen] = useState(false);
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    alert('Copied to clipboard!');
-  };
 
   if (!isOpen) {
     return (
@@ -81,42 +76,16 @@ export default function InstantDonate({ className }: { className?: string }) {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div style={{ background: '#0a0a0a', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid #222' }}>
-            <p style={{ fontSize: '0.7rem', textTransform: 'uppercase', opacity: 0.4, marginBottom: '4px' }}>Bank Name</p>
-            <p style={{ fontWeight: '600' }}>Premium Trust Bank</p>
-          </div>
-
-          <div style={{ background: '#0a0a0a', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid #222', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <p style={{ fontSize: '0.7rem', textTransform: 'uppercase', opacity: 0.4, marginBottom: '4px' }}>Account Number</p>
-              <p style={{ fontWeight: 'bold', fontSize: '1.2rem', letterSpacing: '1px' }}>0040239581</p>
-            </div>
-            <button 
-              onClick={() => copyToClipboard('0040239581')}
-              style={{ background: 'transparent', border: 'none', color: 'var(--tier-primary)', cursor: 'pointer' }}
-            >
-              <Copy size={20} />
-            </button>
-          </div>
-
-          <div style={{ background: '#0a0a0a', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid #222' }}>
-            <p style={{ fontSize: '0.7rem', textTransform: 'uppercase', opacity: 0.4, marginBottom: '4px' }}>Account Name</p>
-            <p style={{ fontWeight: '600' }}>RCCG The King&apos;s House Building Project</p>
-          </div>
-
           <div style={{ 
-            background: 'rgba(212, 175, 55, 0.1)', 
-            padding: '1rem', 
-            borderRadius: 'var(--radius-sm)', 
-            border: '1px solid var(--tier-primary)',
-            display: 'flex',
-            gap: '12px',
-            alignItems: 'flex-start'
+            background: 'rgba(212, 175, 55, 0.05)', 
+            padding: '2rem', 
+            borderRadius: 'var(--radius-md)', 
+            border: '1px dashed var(--tier-primary)',
+            textAlign: 'center'
           }}>
-            <Info size={20} color="var(--tier-primary)" style={{ flexShrink: 0 }} />
-            <p style={{ fontSize: '0.85rem', lineHeight: '1.4' }}>
-              <strong>NARRATION:</strong> Please use <span style={{ color: 'var(--tier-primary)', fontWeight: 'bold' }}>&quot;GUEST&quot;</span> or your phone number as the narration for this transfer.
-            </p>
+            <Landmark size={48} color="var(--tier-primary)" style={{ opacity: 0.3, marginBottom: '1rem' }} />
+            <p style={{ fontWeight: '600', color: 'var(--tier-primary)', fontSize: '1.1rem' }}>Account Details Coming Soon</p>
+            <p style={{ opacity: 0.5, fontSize: '0.8rem', marginTop: '8px' }}>The project bank account is currently being finalized.</p>
           </div>
         </div>
 
@@ -134,7 +103,7 @@ export default function InstantDonate({ className }: { className?: string }) {
             cursor: 'pointer'
           }}
         >
-          I have made the transfer
+          Close
         </button>
       </div>
     </div>

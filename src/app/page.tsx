@@ -27,7 +27,7 @@ export default function Home() {
 
         {/* Content Section */}
         <div className={styles.content}>
-          <span className={styles.label}>Building Project 2024-2026</span>
+          <span className={styles.label}>Building Project 2026-2028</span>
           
           <h1 className={styles.title}>
             Building a <br />
@@ -44,7 +44,7 @@ export default function Home() {
 
           <div className={styles.cta}>
             <Link href="/login" className={styles.primaryBtn}>
-              Become a Kingdom Builder <ArrowRight size={24} />
+              Kingdom Builder Login <ArrowRight size={24} />
             </Link>
             <InstantDonate className={styles.primaryBtn} />
           </div>
