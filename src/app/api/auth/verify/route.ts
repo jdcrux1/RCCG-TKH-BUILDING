@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/prisma';
@@ -16,8 +16,8 @@ if (!jwtSecret) {
 }
 const secret = new TextEncoder().encode(jwtSecret);
 
-export async function POST(request: Request) {
-  const clientKey = getClientKey(request as any);
+export async function POST(request: NextRequest) {
+  const clientKey = getClientKey(request);
   const rateLimitId = `verify:${clientKey}`;
   
   if (process.env.NODE_ENV === 'production' && !checkRateLimit(rateLimitId, 5, 900000)) {
@@ -143,7 +143,7 @@ export async function POST(request: Request) {
     await logActivity('LOGIN_SUCCESS', { userId: staff.id, role: staff.role });
     return response;
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[Verify API Error]', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

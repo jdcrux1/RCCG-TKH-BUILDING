@@ -1,11 +1,11 @@
+import { NextRequest, NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
-import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { verifySudoToken, logAction } from '@/lib/sudo-auth';
 
-export async function POST(request: Request) {
-  if (!await verifySudoToken(request as any)) {
+export async function POST(request: NextRequest) {
+  if (!await verifySudoToken(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

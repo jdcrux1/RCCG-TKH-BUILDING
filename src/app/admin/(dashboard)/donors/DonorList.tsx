@@ -206,7 +206,7 @@ function DonorListComponent({
 
       {donors.length === 0 && (
         <div style={{ padding: '3rem', textAlign: 'center', background: 'var(--glass)', borderRadius: 'var(--radius-md)', border: '1px solid var(--glass-border)', opacity: 0.5 }}>
-          No donors found. Click "Add Donor" to get started.
+          No donors found. Click &quot;Add Donor&quot; to get started.
         </div>
       )}
     </>

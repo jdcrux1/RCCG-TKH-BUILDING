@@ -67,7 +67,7 @@ async function generateDonorRefId() {
 // ADD DONOR
 export async function addDonor(formData: FormData) {
   try {
-    const session = await requireAdminOrOnboarder();
+    await requireAdminOrOnboarder();
     const parsed = addDonorSchema.parse({
       name: formData.get('name'),
       phone: formData.get('phone'),
@@ -148,7 +148,7 @@ const logContributionSchema = z.object({
 
 export async function logContribution(formData: FormData) {
   try {
-    const session = await requireAdmin();
+    await requireAdmin();
     const parsed = logContributionSchema.parse({
       donorId: formData.get('donorId'),
       amount: formData.get('amount'),
@@ -190,11 +190,11 @@ export async function logContribution(formData: FormData) {
 // UPDATE DONOR STATUS (e.g., Welcome Sent)
 export async function updateDonorStatus(donorId: string, newStatus: string) {
   try {
-    const session = await requireAdmin();
+    await requireAdmin();
     
     await prisma.donor.update({
       where: { id: donorId },
-      data: { status: newStatus as any },
+      data: { status: newStatus },
     });
 
     await logActivity('UPDATE_DONOR_STATUS', { donorId, newStatus });
@@ -231,7 +231,7 @@ async function recalculateMilestones() {
     if (m.currentAmount !== currentAmount || m.status !== status) {
       await prisma.milestone.update({
         where: { id: m.id },
-        data: { currentAmount, status: status as any },
+        data: { currentAmount, status: status },
       });
     }
   }

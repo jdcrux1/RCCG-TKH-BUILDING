@@ -5,7 +5,16 @@ const secretKey = (process.env.JWT_SECRET || 'default-secret') + '-v2-force-logo
 if (!secretKey) throw new Error('JWT_SECRET must be set');
 const key = new TextEncoder().encode(secretKey);
 
-export async function encrypt(payload: any) {
+export type SessionPayload = {
+  id?: string;
+  name?: string;
+  phone?: string;
+  role: string;
+  expires?: Date | string;
+  [key: string]: any;
+};
+
+export async function encrypt(payload: SessionPayload) {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
@@ -13,11 +22,11 @@ export async function encrypt(payload: any) {
     .sign(key);
 }
 
-export async function decrypt(input: string): Promise<any> {
+export async function decrypt(input: string): Promise<SessionPayload> {
   const { payload } = await jwtVerify(input, key, {
     algorithms: ['HS256'],
   });
-  return payload;
+  return payload as SessionPayload;
 }
 
 export async function getSession() {

@@ -17,7 +17,7 @@ export default function Home() {
         <div className={styles.background}>
           <Image 
             src="/images/hero-building.png" 
-            alt="The King's House Citadel" 
+            alt="The King&apos;s House Citadel" 
             fill
             className={styles.backgroundImg}
             priority
@@ -40,6 +40,7 @@ export default function Home() {
             A state-of-the-art citadel featuring a dedicated basement, expansive ground floor sanctuary, 
             and premium first-floor facilities with ample parking space.
           </p>
+
 
           <div className={styles.cta}>
             <Link href="/login" className={styles.primaryBtn}>
