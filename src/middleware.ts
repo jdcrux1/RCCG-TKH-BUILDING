@@ -142,16 +142,13 @@ export default async function middleware(request: NextRequest) {
       if (role === ROLES.ADMIN) {
         return NextResponse.next();
       }
-      // Volunteer (limited access)
+      // Volunteer (strictly restricted to onboarding as requested)
       if (role === ROLES.VOLUNTEER) {
-        // Volunteers can only access specific routes
-        const volunteerAllowed = ['/admin/donors', '/admin/ledger', '/admin/onboard'];
-        const isAllowed = volunteerAllowed.some(r => path.startsWith(r));
-        if (isAllowed) {
+        if (path === '/admin/onboard') {
           return NextResponse.next();
         }
-        // Otherwise redirect to donors list
-        return NextResponse.redirect(new URL('/admin/donors', origin));
+        // Otherwise redirect to onboarding page
+        return NextResponse.redirect(new URL('/admin/onboard', origin));
       }
       // ONBOARDER can only access onboard
       if (role === ROLES.ONBOARDER) {

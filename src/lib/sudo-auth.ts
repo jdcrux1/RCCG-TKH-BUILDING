@@ -54,10 +54,33 @@ export async function endSession(sessionId: string) {
 }
 
 export async function getActiveSessions() {
-  return await prisma.userSession.findMany({
+  const sessions = await prisma.userSession.findMany({
     where: { logoutTimestamp: null },
     orderBy: { loginTimestamp: 'desc' },
   });
+
+  const enrichedSessions = await Promise.all(
+    sessions.map(async (s) => {
+      let userName = 'Unknown';
+      if (s.userId) {
+        if (s.userRole === 'SUPERADMIN') {
+          userName = 'Super Admin';
+        } else if (s.userRole === 'ADMIN' || s.userRole === 'VOLUNTEER' || s.userRole === 'ONBOARDER') {
+          const staff = await prisma.staff.findUnique({ where: { id: s.userId } });
+          if (staff) userName = staff.username;
+        } else if (s.userRole === 'DONOR') {
+          const donor = await prisma.donor.findUnique({ where: { id: s.userId } });
+          if (donor) userName = donor.name;
+        }
+      }
+      return {
+        ...s,
+        userName
+      };
+    })
+  );
+
+  return enrichedSessions;
 }
 
 export async function getActionLogs(limit = 100) {

@@ -29,7 +29,7 @@ export default function OnboardPage() {
 
   const handleSubmit = (formData: FormData) => {
     setError(null);
-    setSuccess(false);
+    setSuccess(null);
     setValidationErrors([]);
     
     startTransition(async () => {

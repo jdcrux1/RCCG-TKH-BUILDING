@@ -103,8 +103,19 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Account not active' }, { status: 403 });
       }
 
-      const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
-      const sessionData = { userId: donor.id, role: donor.role, name: donor.name, expires: expires.toISOString() };
+      // CREATE DATABASE SESSION
+      const userSession = await prisma.userSession.create({
+        data: { userRole: donor.role, userId: donor.id }
+      });
+
+      const expires = new Date(Date.now() + 2 * 60 * 60 * 1000);
+      const sessionData = { 
+        userId: donor.id, 
+        role: donor.role, 
+        name: donor.name, 
+        expires: expires.toISOString(),
+        sessionId: userSession.sessionId 
+      };
       const sessionToken = await encrypt(sessionData);
 
       const response = NextResponse.json({ success: true, redirectUrl: '/dashboard' });
@@ -129,8 +140,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Account disabled' }, { status: 403 });
     }
 
-    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    const sessionData = { userId: staff.id, role: staff.role, name: staff.username, expires: expires.toISOString() };
+    // CREATE DATABASE SESSION
+    const userSession = await prisma.userSession.create({
+      data: { userRole: staff.role, userId: staff.id }
+    });
+
+    const expires = new Date(Date.now() + 2 * 60 * 60 * 1000);
+    const sessionData = { 
+      userId: staff.id, 
+      role: staff.role, 
+      name: staff.username, 
+      expires: expires.toISOString(),
+      sessionId: userSession.sessionId
+    };
     const sessionToken = await encrypt(sessionData);
 
     let redirectUrl = '/admin/dashboard';

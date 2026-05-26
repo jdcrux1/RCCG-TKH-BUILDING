@@ -170,3 +170,65 @@ export async function updateSystemVariable(key: string, value: string) {
     return { success: false, error: 'Failed to update system variable' };
   }
 }
+
+export async function revokeSession(sessionId: string) {
+  try {
+    await requireSuperAdmin();
+    const now = new Date();
+    
+    const session = await prisma.userSession.findUnique({ where: { sessionId } });
+    if (session) {
+      const duration = Math.round(
+        (now.getTime() - session.loginTimestamp.getTime()) / 60000
+      );
+      
+      await prisma.userSession.update({
+        where: { sessionId },
+        data: {
+          logoutTimestamp: now,
+          durationMinutes: duration
+        }
+      });
+    }
+    
+    await logAction('SUPERADMIN', 'REVOKE_SESSION', sessionId);
+    revalidatePath('/sudo-root');
+    return { success: true };
+  } catch (error) {
+    console.error('Revoke session error:', error);
+    return { success: false, error: 'Failed to revoke session' };
+  }
+}
+
+export async function killAllSessions() {
+  try {
+    await requireSuperAdmin();
+    const now = new Date();
+    
+    // Revoke all active sessions in DB
+    const activeSessions = await prisma.userSession.findMany({
+      where: { logoutTimestamp: null }
+    });
+    
+    for (const session of activeSessions) {
+      const duration = Math.round(
+        (now.getTime() - session.loginTimestamp.getTime()) / 60000
+      );
+      
+      await prisma.userSession.update({
+        where: { sessionId: session.sessionId },
+        data: {
+          logoutTimestamp: now,
+          durationMinutes: duration
+        }
+      });
+    }
+    
+    await logAction('SUPERADMIN', 'KILL_ALL_SESSIONS', 'SYSTEM');
+    revalidatePath('/sudo-root');
+    return { success: true };
+  } catch (error) {
+    console.error('Kill all sessions error:', error);
+    return { success: false, error: 'Failed to terminate all sessions' };
+  }
+}

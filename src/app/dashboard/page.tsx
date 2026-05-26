@@ -5,6 +5,10 @@ import { redirect } from 'next/navigation';
 import { Target, Award, CheckCircle2, CalendarDays, Flame, Quote, Users, Landmark, Copy, Info } from 'lucide-react';
 import TaxReceiptButton from '@/components/TaxReceiptButton';
 import PaymentClaimForm from './PaymentClaimForm';
+import BankDetailsBanner from '@/components/BankDetailsBanner';
+import MilestonesTimeline from '@/components/MilestonesTimeline';
+import AutoRefresh from '@/components/AutoRefresh';
+import { getTierColor } from '@/lib/tiers';
 
 // Encouragement Messages
 const encouragements = [
@@ -36,37 +40,93 @@ async function getDonorData() {
   const totalContributed = donor.contributions.reduce((sum, c) => sum + BigInt(c.amount), BigInt(0));
   const fulfillmentRate = donor.totalPledged > BigInt(0) ? (Number(totalContributed) / Number(donor.totalPledged)) * 100 : 0;
 
-  // Streak Calculation
+  // Schedule-Aware Pledge-Credit Streak Calculation (Flawless Prepayment & Catch-up rewards)
   let streak = 0;
   const now = new Date();
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
   
+  const monthlyPledgeKobo = Number(donor.monthlyPledge);
+  const totalGivenKobo = Number(totalContributed);
   const sortedContributions = [...donor.contributions].sort((a, b) => b.date.getTime() - a.date.getTime());
-  let checkMonth = currentMonth;
-  let checkYear = currentYear;
   
-  while (true) {
-    const gaveInMonth = sortedContributions.some(c => 
-      c.date.getMonth() === checkMonth && c.date.getFullYear() === checkYear
+  if (monthlyPledgeKobo > 0) {
+    const startYear = donor.startDate.getFullYear();
+    const startMonth = donor.startDate.getMonth();
+    
+    // Calculate total elapsed months since pledge start (at least 1)
+    const elapsedMonths = Math.max(1, 
+      (currentYear - startYear) * 12 + (currentMonth - startMonth) + 1
     );
-    if (gaveInMonth) {
-      streak++;
-      checkMonth--;
-      if (checkMonth < 0) {
-        checkMonth = 11;
-        checkYear--;
-      }
+    
+    // Expected amount by today to be fully caught up
+    const expectedAccumulatedKobo = elapsedMonths * monthlyPledgeKobo;
+    
+    if (totalGivenKobo >= expectedAccumulatedKobo) {
+      // If fully paid or paid ahead, grant maximum elapsed months as streak
+      streak = elapsedMonths;
     } else {
-      if (streak === 0 && checkMonth === currentMonth && checkYear === currentYear) {
+      // If lagging, count how many months of pledges their total contributions cover
+      const coveredMonths = Math.floor(totalGivenKobo / monthlyPledgeKobo);
+      
+      // Fallback: Check standard consecutive transaction months in case they started active contributions recently
+      let consecutiveActiveMonths = 0;
+      let checkMonth = currentMonth;
+      let checkYear = currentYear;
+      
+      while (true) {
+        const gaveInMonth = sortedContributions.some(c => 
+          c.date.getMonth() === checkMonth && c.date.getFullYear() === checkYear
+        );
+        if (gaveInMonth) {
+          consecutiveActiveMonths++;
+          checkMonth--;
+          if (checkMonth < 0) {
+            checkMonth = 11;
+            checkYear--;
+          }
+        } else {
+          if (consecutiveActiveMonths === 0 && checkMonth === currentMonth && checkYear === currentYear) {
+            checkMonth--;
+            if (checkMonth < 0) {
+              checkMonth = 11;
+              checkYear--;
+            }
+            continue;
+          }
+          break;
+        }
+      }
+      
+      streak = Math.max(coveredMonths, consecutiveActiveMonths);
+    }
+  } else {
+    // Supporter/one-off fallback: use standard consecutive monthly transaction count
+    let checkMonth = currentMonth;
+    let checkYear = currentYear;
+    
+    while (true) {
+      const gaveInMonth = sortedContributions.some(c => 
+        c.date.getMonth() === checkMonth && c.date.getFullYear() === checkYear
+      );
+      if (gaveInMonth) {
+        streak++;
         checkMonth--;
         if (checkMonth < 0) {
           checkMonth = 11;
           checkYear--;
         }
-        continue;
+      } else {
+        if (streak === 0 && checkMonth === currentMonth && checkYear === currentYear) {
+          checkMonth--;
+          if (checkMonth < 0) {
+            checkMonth = 11;
+            checkYear--;
+          }
+          continue;
+        }
+        break;
       }
-      break;
     }
   }
 
@@ -150,6 +210,7 @@ export default async function DonorDashboard() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)', position: 'relative' }}>
+      <AutoRefresh />
       
       {/* CSS Confetti Celebration */}
       {showCelebration && (
@@ -258,80 +319,8 @@ export default async function DonorDashboard() {
         </div>
       </section>
 
-      {/* PHASE 3: Bank Details Banner */}
-      <section style={{ 
-        background: 'linear-gradient(135deg, var(--tier-primary) 0%, #d97706 100%)',
-        borderRadius: 'var(--radius-md)',
-        padding: '1.5rem',
-        color: 'var(--primary)',
-        boxShadow: '0 10px 25px -5px var(--tier-glow)',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1rem'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <Landmark size={28} />
-          <div>
-            <h2 style={{ fontSize: '1.2rem', fontWeight: 'bold', margin: 0 }}>Official Bank Transfer Details</h2>
-            <p style={{ fontSize: '0.9rem', opacity: 0.9 }}>Use the details below for all your contributions.</p>
-          </div>
-        </div>
-
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-          gap: '1.5rem',
-          background: 'rgba(255,255,255,0.1)',
-          padding: '1.2rem',
-          borderRadius: 'var(--radius-sm)',
-          border: '1px solid rgba(255,255,255,0.2)'
-        }}>
-          <div>
-            <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.8, marginBottom: '4px' }}>Bank Name</p>
-            <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>Premium Trust Bank</p>
-          </div>
-          <div>
-            <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.8, marginBottom: '4px' }}>Account Number</p>
-            <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>0040239581</p>
-          </div>
-          <div style={{ gridColumn: '1 / -1' }}>
-            <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.8, marginBottom: '4px' }}>Account Name</p>
-            <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>RCCG The King's House Building Project</p>
-          </div>
-        </div>
-
-        <div style={{ 
-          background: 'rgba(0,0,0,0.4)', 
-          padding: '1.5rem', 
-          borderRadius: 'var(--radius-sm)', 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '16px',
-          border: '2px solid white',
-          boxShadow: '0 0 20px rgba(255,255,255,0.3)',
-          animation: 'pulse-border 2s infinite'
-        }}>
-          <div style={{ 
-            background: 'white', color: 'var(--tier-primary)', 
-            width: '40px', height: '40px', borderRadius: '50%', 
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 
-          }}>
-            <Info size={24} />
-          </div>
-          <p style={{ fontSize: '1rem', lineHeight: '1.4' }}>
-            <strong style={{ display: 'block', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '4px', opacity: 0.8 }}>CRITICAL INSTRUCTION:</strong>
-            You <span style={{ textDecoration: 'underline', fontWeight: '900' }}>MUST</span> include your Unique ID <strong style={{ fontSize: '1.4rem', color: '#fff', textShadow: '0 0 10px rgba(255,255,255,0.5)' }}>{donor.donorRefId || 'PENDING'}</strong> in the <strong>Narration/Description</strong> field of your bank transfer.
-          </p>
-        </div>
-
-        <style dangerouslySetInnerHTML={{ __html: `
-          @keyframes pulse-border {
-            0% { border-color: rgba(255,255,255,1); }
-            50% { border-color: rgba(255,255,255,0.2); }
-            100% { border-color: rgba(255,255,255,1); }
-          }
-        `}} />
-      </section>
+      {/* PHASE 3: Interactive Bank Details Banner with Copy & WhatsApp helpers */}
+      <BankDetailsBanner donorName={donor.name} donorRefId={donor.donorRefId || 'PENDING'} />
 
       {/* Technical Support */}
       <section className="glass-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.5rem', border: '1px solid #333' }}>
@@ -391,63 +380,8 @@ export default async function DonorDashboard() {
         gap: 'var(--space-md)' 
       }}>
         
-        {/* 3. Construction Milestones Timeline */}
-        <div className="glass-card">
-          <h3 style={{ fontSize: '1.2rem', marginBottom: '1.5rem' }}>Construction Milestones</h3>
-          <div style={{ position: 'relative', paddingLeft: '32px' }}>
-            {/* Vertical Spine */}
-            <div style={{ 
-              position: 'absolute', left: '7px', top: '10px', bottom: '10px', 
-              width: '2px', background: 'rgba(255,255,255,0.1)' 
-            }} />
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-              {milestones.map((ms) => {
-                const isCompleted = ms.status === 'FUNDED' || ms.status === 'COMPLETED';
-                const isCurrent = ms.id === currentMilestone?.id;
-
-                return (
-                  <div key={ms.id} style={{ position: 'relative' }}>
-                    {/* Node */}
-                    <div style={{ 
-                      position: 'absolute', left: '-31px', top: '4px',
-                      width: '16px', height: '16px', borderRadius: '50%',
-                      background: isCompleted ? 'var(--tier-primary)' : isCurrent ? 'var(--tier-primary)' : '#333',
-                      border: '4px solid #111',
-                      zIndex: 2,
-                      animation: isCurrent ? 'pulse-node 2s infinite' : 'none'
-                    }}>
-                      {isCompleted && <CheckCircle2 size={10} color="black" style={{ position: 'absolute', top: -1, left: -1 }} />}
-                    </div>
-                    
-                    <style dangerouslySetInnerHTML={{ __html: `
-                      @keyframes pulse-node {
-                        0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
-                        70% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
-                        100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
-                      }
-                    `}} />
-
-                    <div>
-                      <p style={{ 
-                        fontWeight: 'bold', fontSize: '0.95rem', 
-                        color: isCompleted || isCurrent ? 'white' : '#666' 
-                      }}>{ms.title}</p>
-                      <p style={{ fontSize: '0.8rem', opacity: 0.5 }}>{ms.description || 'Phase Project Milestone'}</p>
-                      {isCurrent && (
-                        <span style={{ 
-                          fontSize: '0.65rem', padding: '2px 8px', borderRadius: '4px',
-                          background: 'rgba(212, 175, 55, 0.1)', color: 'var(--tier-primary)',
-                          marginTop: '4px', display: 'inline-block'
-                        }}>CURRENT PHASE</span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+        {/* 3. Dynamic Interactive Construction Milestones Timeline */}
+        <MilestonesTimeline milestones={milestones as any} currentMilestoneId={currentMilestone?.id} />
 
         {/* Giving Streak & Encouragement */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
@@ -494,7 +428,7 @@ export default async function DonorDashboard() {
 
         {/* PHASE 3: Log a Payment Form & Status */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-          <PaymentClaimForm />
+          <PaymentClaimForm monthlyPledge={Number(donor.monthlyPledge)} tierColor={getTierColor(donor.tier)} />
           
           <div className="glass-card">
             <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>Pending Verifications</h3>

@@ -1,6 +1,8 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from './prisma';
+
 const secretKey = (process.env.JWT_SECRET || 'default-secret') + '-v2-force-logout';
 if (!secretKey) throw new Error('JWT_SECRET must be set');
 const key = new TextEncoder().encode(secretKey);
@@ -18,7 +20,7 @@ export async function encrypt(payload: SessionPayload) {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime('24h')
+    .setExpirationTime('2h')
     .sign(key);
 }
 
@@ -35,7 +37,19 @@ export async function getSession() {
   
   if (session) {
     try {
-      return await decrypt(session);
+      const parsed = await decrypt(session);
+      
+      // Dynamic Enterprise Session Revocation Check
+      if (parsed.sessionId) {
+        const dbSession = await prisma.userSession.findUnique({
+          where: { sessionId: parsed.sessionId }
+        });
+        if (!dbSession || dbSession.logoutTimestamp) {
+          return null; // Session has been revoked!
+        }
+      }
+      
+      return parsed;
     } catch {
       // Fallback below
     }
@@ -62,7 +76,7 @@ export async function updateSession(request: NextRequest) {
 
   // Refresh the session so it doesn't expire
   const parsed = await decrypt(session);
-  parsed.expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  parsed.expires = new Date(Date.now() + 2 * 60 * 60 * 1000);
   const res = NextResponse.next();
   res.cookies.set({
     name: 'session',

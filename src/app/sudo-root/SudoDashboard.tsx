@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { approvePaymentClaim, rejectPaymentClaim, generateMasterReport, reverseContribution, updateSystemVariable } from './actions';
+import { approvePaymentClaim, rejectPaymentClaim, generateMasterReport, reverseContribution, updateSystemVariable, revokeSession, killAllSessions } from './actions';
 
 type Data = {
   contributions: any[];
@@ -168,7 +168,11 @@ export default function SudoDashboard({ data }: { data: Data }) {
   };
 
   const handleReverseContribution = async (id: string) => {
-    if (!confirm('REVERSE this contribution? This will deduct the amount from the donor balance.')) return;
+    const confirmation = prompt('WARNING: You are about to permanently reverse this contribution. This will deduct the amount from the builder\'s verified balance. To confirm, please type "REVERSE" below:');
+    if (confirmation !== 'REVERSE') {
+      alert('Reversal cancelled. You must type "REVERSE" exactly.');
+      return;
+    }
     const prevContributions = [...contributions];
     setContributions(contributions.filter(c => c.id !== id));
     
@@ -178,6 +182,38 @@ export default function SudoDashboard({ data }: { data: Data }) {
     } catch (e) {
       setContributions(prevContributions);
       setError('Reversal failed: ' + (e as Error).message);
+      setTimeout(() => setError(null), 3000);
+    }
+  };
+
+  const handleRevokeSession = async (sessionId: string) => {
+    if (!confirm('Revoke this session? The user will be immediately logged out.')) return;
+    try {
+      const res = await revokeSession(sessionId);
+      if (res.success) {
+        setSessions(sessions.filter(s => s.sessionId !== sessionId));
+      } else {
+        setError('Failed to revoke session');
+        setTimeout(() => setError(null), 3000);
+      }
+    } catch (e) {
+      setError('Error revoking session');
+      setTimeout(() => setError(null), 3000);
+    }
+  };
+
+  const handleKillAllSessions = async () => {
+    if (!confirm('WARNING: Are you sure you want to force-logout all active users? This will instantly terminate all active kiosks.')) return;
+    try {
+      const res = await killAllSessions();
+      if (res.success) {
+        setSessions([]);
+      } else {
+        setError('Failed to terminate sessions');
+        setTimeout(() => setError(null), 3000);
+      }
+    } catch (e) {
+      setError('Error terminating sessions');
       setTimeout(() => setError(null), 3000);
     }
   };
@@ -362,23 +398,67 @@ export default function SudoDashboard({ data }: { data: Data }) {
       {activeTab === 'watchtower' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
           <div>
-            <div style={{ marginBottom: '12px', fontSize: '14px', color: '#888' }}>SESSION TRACKER</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div style={{ fontSize: '14px', color: '#888' }}>SESSION TRACKER</div>
+              {sessions.length > 0 && (
+                <button 
+                  onClick={handleKillAllSessions}
+                  style={{
+                    background: '#ef4444',
+                    color: 'white',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    fontSize: '10px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    minHeight: 'auto',
+                    minWidth: 'auto',
+                    border: 'none',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  FORCE LOGOUT ALL SESSIONS
+                </button>
+              )}
+            </div>
             <div style={{ border: '1px solid #222', padding: '12px' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                 <thead>
                   <tr style={{ background: '#111' }}>
+                    <th style={{ padding: '6px', textAlign: 'left' }}>USER</th>
                     <th style={{ padding: '6px', textAlign: 'left' }}>ROLE</th>
                     <th style={{ padding: '6px', textAlign: 'left' }}>LOGIN</th>
+                    <th style={{ padding: '6px', textAlign: 'right' }}>ACTION</th>
                   </tr>
                 </thead>
                 <tbody>
                   {sessions.map(s => (
                     <tr key={s.sessionId} style={{ borderBottom: '1px solid #111' }}>
+                      <td style={{ padding: '6px', fontWeight: 'bold' }}>{s.userName || 'Super Admin'}</td>
                       <td style={{ padding: '6px' }}>{s.userRole}</td>
                       <td style={{ padding: '6px' }}>{formatTime(s.loginTimestamp)}</td>
+                      <td style={{ padding: '6px', textAlign: 'right' }}>
+                        <button
+                          onClick={() => handleRevokeSession(s.sessionId)}
+                          style={{
+                            background: 'rgba(239, 68, 68, 0.1)',
+                            border: '1px solid #ef4444',
+                            color: '#ef4444',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            fontSize: '9px',
+                            cursor: 'pointer',
+                            minHeight: 'auto',
+                            minWidth: 'auto',
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          Revoke
+                        </button>
+                      </td>
                     </tr>
                   ))}
-                  {sessions.length === 0 && <tr><td colSpan={2} style={{ padding: '12px', textAlign: 'center', color: '#444' }}>no active sessions</td></tr>}
+                  {sessions.length === 0 && <tr><td colSpan={4} style={{ padding: '12px', textAlign: 'center', color: '#444' }}>no active sessions</td></tr>}
                 </tbody>
               </table>
             </div>

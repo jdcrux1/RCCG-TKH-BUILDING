@@ -9,8 +9,8 @@ export async function logActivity(action: string, details: Record<string, unknow
       data: {
         action,
         details: details as any, // Prisma Json field
-        userId: session?.userId || 'SYSTEM',
-        userName: session?.name || 'SYSTEM',
+        userId: (session as any)?.userId || 'SYSTEM',
+        userName: (session as any)?.name || 'SYSTEM',
       }
     });
   } catch (error: unknown) {

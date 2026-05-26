@@ -236,3 +236,78 @@ async function recalculateMilestones() {
     }
   }
 }
+
+export async function approvePaymentClaimAdmin(claimId: string) {
+  try {
+    const session = await requireAdmin();
+
+    await prisma.$transaction(async (tx) => {
+      const claim = await tx.paymentClaim.findUnique({
+        where: { id: claimId },
+        include: { donor: true }
+      });
+
+      if (!claim || claim.status !== 'PENDING') {
+        throw new Error('Claim not found or already processed');
+      }
+
+      // 1. Update PaymentClaim status
+      await tx.paymentClaim.update({
+        where: { id: claimId },
+        data: { status: 'APPROVED' }
+      });
+
+      // 2. Create verified Contribution ledger entry
+      await tx.contribution.create({
+        data: {
+          donorId: claim.donorId,
+          amount: claim.amount,
+          date: claim.date,
+          reference: `REF-${claim.donor.donorRefId}`,
+          narrative: `Bank Claim Approved: ${claim.bankName || 'N/A'}`
+        }
+      });
+
+      // 3. Update donor balance and active status
+      await tx.donor.update({
+        where: { id: claim.donorId },
+        data: {
+          totalContributed: { increment: claim.amount },
+          status: 'ACTIVE'
+        }
+      });
+    });
+
+    await logActivity('APPROVE_PAYMENT_CLAIM', { claimId, approvedBy: session.name });
+    await recalculateMilestones();
+
+    // Revalidate paths to update visual details across dashboards
+    revalidatePath('/admin/ledger');
+    revalidatePath('/admin/dashboard');
+    revalidatePath('/dashboard');
+    return { success: true };
+  } catch (error) {
+    console.error('Approve claim error:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to approve claim' };
+  }
+}
+
+export async function rejectPaymentClaimAdmin(claimId: string) {
+  try {
+    const session = await requireAdmin();
+
+    await prisma.paymentClaim.update({
+      where: { id: claimId },
+      data: { status: 'REJECTED' }
+    });
+
+    await logActivity('REJECT_PAYMENT_CLAIM', { claimId, rejectedBy: session.name });
+
+    revalidatePath('/admin/ledger');
+    revalidatePath('/dashboard');
+    return { success: true };
+  } catch (error) {
+    console.error('Reject claim error:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to reject claim' };
+  }
+}

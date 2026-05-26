@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { submitPaymentClaim } from './actions';
 
-export default function PaymentClaimForm() {
+export default function PaymentClaimForm({ monthlyPledge, tierColor }: { monthlyPledge?: number; tierColor?: string }) {
   const [loading, setLoading] = useState(false);
+  const [amount, setAmount] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -18,6 +20,8 @@ export default function PaymentClaimForm() {
     setLoading(false);
     if (result.success) {
       setMessage({ type: 'success', text: 'Payment claim submitted successfully! An admin will verify it soon.' });
+      setAmount('');
+      setDate(new Date().toISOString().split('T')[0]);
       (e.target as HTMLFormElement).reset();
     } else {
       setMessage({ type: 'error', text: result.error || 'Failed to submit claim.' });
@@ -49,15 +53,42 @@ export default function PaymentClaimForm() {
             type="number" 
             required 
             placeholder="e.g. 50000"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
             style={{
               padding: '0.8rem',
               background: 'rgba(255,255,255,0.05)',
               border: '1px solid var(--glass-border)',
               borderRadius: 'var(--radius-sm)',
               color: 'white',
-              outline: 'none'
+              outline: 'none',
+              marginBottom: monthlyPledge && monthlyPledge > 0 ? '4px' : '0'
             }}
           />
+          {monthlyPledge && monthlyPledge > 0 && (
+            <button 
+              type="button"
+              onClick={() => setAmount(Math.round(monthlyPledge / 100).toString())}
+              style={{
+                background: 'rgba(245, 158, 11, 0.1)',
+                color: 'var(--accent)',
+                border: '1px solid rgba(245, 158, 11, 0.2)',
+                borderRadius: 'var(--radius-sm)',
+                padding: '6px 12px',
+                fontSize: '0.8rem',
+                cursor: 'pointer',
+                alignSelf: 'flex-start',
+                minHeight: 'auto',
+                minWidth: 'auto',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                marginTop: '4px'
+              }}
+            >
+              Quick Select: ₦{Math.round(monthlyPledge / 100).toLocaleString()}
+            </button>
+          )}
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -66,6 +97,8 @@ export default function PaymentClaimForm() {
             name="date" 
             type="date" 
             required 
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
             style={{
               padding: '0.8rem',
               background: 'rgba(255,255,255,0.05)',
@@ -73,8 +106,10 @@ export default function PaymentClaimForm() {
               borderRadius: 'var(--radius-sm)',
               color: 'white',
               outline: 'none',
-              colorScheme: 'dark'
-            }}
+              colorScheme: 'dark',
+              '--tier-accent': tierColor,
+              '--tier-glow': tierColor ? `${tierColor}40` : undefined
+            } as React.CSSProperties}
           />
         </div>
 

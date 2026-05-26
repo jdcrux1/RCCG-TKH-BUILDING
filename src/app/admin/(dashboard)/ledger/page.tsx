@@ -1,7 +1,8 @@
 export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/prisma';
-import { CreditCard, ArrowRight, Calendar, Search } from 'lucide-react';
-import { logContribution } from '@/app/admin/actions';
+import { Calendar, CreditCard } from 'lucide-react';
+import PendingClaims from '@/components/PendingClaims';
+import LedgerEntryForm from '@/components/LedgerEntryForm';
 
 export default async function ManualLedger({ 
   searchParams 
@@ -14,12 +15,35 @@ export default async function ManualLedger({
   const PAGE_SIZE = 50;
   const skip = (page - 1) * PAGE_SIZE;
 
+  // Ensure central "General Congregation / One-Off Givers" donor profile exists in the DB so admins can always select it
+  await prisma.donor.upsert({
+    where: { phone: '08000000000' },
+    update: {},
+    create: {
+      phone: '08000000000',
+      pin: '0000',
+      name: 'General Congregation / One-Off Givers',
+      tier: 'Supporter',
+      monthlyPledge: 0,
+      totalPledged: 0,
+      role: 'DONOR',
+      status: 'ACTIVE',
+      donorRefId: 'KB-GEN'
+    }
+  });
+
   // Filter donors if search query exists
   const donorsWhere = query 
-    ? { role: 'DONOR', name: { contains: query, mode: 'insensitive' as const } }
+    ? { 
+        role: 'DONOR', 
+        OR: [
+          { name: { contains: query, mode: 'insensitive' as const } },
+          { phone: { contains: query } }
+        ]
+      }
     : { role: 'DONOR' };
 
-  const [donors, contributions, total] = await Promise.all([
+  const [donors, contributions, total, pendingClaims] = await Promise.all([
     prisma.donor.findMany({
       where: donorsWhere as any,
       orderBy: { name: 'asc' },
@@ -32,18 +56,12 @@ export default async function ManualLedger({
       include: { donor: true }
     }),
     prisma.contribution.count(),
+    prisma.paymentClaim.findMany({
+      where: { status: 'PENDING' },
+      include: { donor: true },
+      orderBy: { createdAt: 'desc' }
+    })
   ]);
-
-  const TIERS = [
-    { name: 'Cornerstone Partner', amount: 1000000 },
-    { name: 'Pillar Builder', amount: 500000 },
-    { name: 'Foundation Stone', amount: 200000 },
-    { name: 'Nehemiah Builder', amount: 100000 },
-    { name: 'Covenant Partners', amount: 50000 },
-    { name: 'Faithful Hand', amount: 20000 },
-    { name: 'Open-Heart', amount: 10000 },
-    { name: 'Willing Heart', amount: 5000 },
-  ];
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
@@ -51,87 +69,10 @@ export default async function ManualLedger({
     <div className="responsive-grid responsive-grid-2" style={{ gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 2fr)', animation: 'fadeIn 0.5s ease-out' }}>
       {/* Log Form Section */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-        <div className="glass-card" style={{ borderLeft: '4px solid var(--accent)' }}>
-          <h2 style={{ marginBottom: 'var(--space-md)', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '12px', fontWeight: '800' }}>
-            <CreditCard size={24} color="var(--accent)" /> Ledger Entry
-          </h2>
+        <LedgerEntryForm donors={donors} initialQuery={query} />
 
-          {/* Search Bar for Donors */}
-          <form method="GET" style={{ marginBottom: 'var(--space-md)', position: 'relative' }}>
-            <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
-            <input 
-              type="text" 
-              name="q" 
-              defaultValue={query}
-              placeholder="Search donor name..." 
-              className="responsive-input"
-              style={{ paddingLeft: '2.5rem' }}
-            />
-          </form>
-          
-          <form action={logContribution} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '0.75rem', opacity: 0.6, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Kingdom Builder</label>
-              <select 
-                name="donorId" 
-                required
-                className="responsive-input"
-              >
-                <option value="" disabled selected>Select from search results...</option>
-                {donors.map(d => (
-                  <option key={d.id} value={d.id} style={{ color: 'black' }}>{d.name} ({d.phone})</option>
-                ))}
-              </select>
-              {query && (
-                <p style={{ fontSize: '0.7rem', opacity: 0.5, marginTop: '4px' }}>
-                  Showing {donors.length} results matching &quot;{query}&quot;
-                </p>
-              )}
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '0.75rem', opacity: 0.6, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Donation Amount (Tier Level)</label>
-              <select 
-                name="amount" 
-                required
-                className="responsive-input"
-              >
-                <option value="" disabled selected>Select tier level...</option>
-                {TIERS.map(t => (
-                  <option key={t.name} value={t.amount} style={{ color: 'black' }}>
-                    {t.name} (₦{t.amount.toLocaleString()})
-                  </option>
-                ))}
-                <option value="custom" style={{ color: 'black' }}>Custom Amount...</option>
-              </select>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '0.75rem', opacity: 0.6, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bank Ref / Narrative</label>
-              <input 
-                type="text" 
-                name="reference" 
-                placeholder="Reference Number (Optional)" 
-                className="responsive-input"
-              />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '0.75rem', opacity: 0.6, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Contribution Date</label>
-              <input 
-                type="date" 
-                name="date" 
-                defaultValue={new Date().toISOString().split('T')[0]}
-                required
-                className="responsive-input"
-              />
-            </div>
-
-            <button type="submit" className="btn-primary" style={{ justifyContent: 'center', marginTop: 'var(--space-sm)', padding: '1rem' }}>
-              Authorize Payment <ArrowRight size={18} />
-            </button>
-          </form>
-        </div>
+        {/* Pending Claims Verification Panel */}
+        <PendingClaims initialClaims={pendingClaims as any} />
       </div>
 
       {/* Transaction History Section */}
