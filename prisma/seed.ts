@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   // CLEAN SLATE: Only one admin account as requested
-  const adminPhone = '08052039446'; 
+  const adminPhone = '+2348052039446'; 
   const adminPin = '0414'; 
   const hashedPin = await bcrypt.hash(adminPin, 10);
 
