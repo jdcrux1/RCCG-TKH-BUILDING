@@ -38,8 +38,8 @@ export async function POST(request: NextRequest) {
 
     // SUPERADMIN
     if (role === 'SUPERADMIN' || normalizedIdentifier.toLowerCase() === 'sudo') {
-      const superAdmin = await prisma.superAdmin.findFirst();
-      if (!superAdmin) {
+      const superAdmins = await prisma.superAdmin.findMany();
+      if (superAdmins.length === 0) {
         // First-time setup
         if (normalizedCredential.length < 3) {
           return NextResponse.json({ error: 'Passphrase too short for setup' }, { status: 400 });
@@ -64,14 +64,24 @@ export async function POST(request: NextRequest) {
         return response;
       }
 
-      // Verify passphrase
-      const isValid = await comparePassword(normalizedCredential.toLowerCase().replace(/\s+/g, ' '), superAdmin.passphrase);
-      if (!isValid) {
+      // Verify passphrase against all active super admin records
+      let matchedAdmin = null;
+      const cleanCredential = normalizedCredential.toLowerCase().replace(/\s+/g, ' ');
+
+      for (const sa of superAdmins) {
+        const isValid = await comparePassword(cleanCredential, sa.passphrase);
+        if (isValid) {
+          matchedAdmin = sa;
+          break;
+        }
+      }
+
+      if (!matchedAdmin) {
         return NextResponse.json({ error: 'Invalid passphrase' }, { status: 401 });
       }
 
       const userSession = await prisma.userSession.create({
-        data: { userRole: 'SUPERADMIN', userId: superAdmin.id },
+        data: { userRole: 'SUPERADMIN', userId: matchedAdmin.id },
       });
 
       const token = await new SignJWT({ role: 'SUPERADMIN', sessionId: userSession.sessionId })
