@@ -1,4 +1,5 @@
 import { Home, User, CreditCard } from 'lucide-react';
+import Link from 'next/link';
 import LogoutButton from '@/components/LogoutButton';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -89,8 +90,9 @@ export default async function DonorLayout({ children }: { children: React.ReactN
         ].map((item) => {
           const Icon = item.icon;
           return (
-            <div 
+            <Link 
               key={item.name}
+              href={item.href}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -99,16 +101,17 @@ export default async function DonorLayout({ children }: { children: React.ReactN
                 padding: '8px',
                 color: 'rgba(255,255,255,0.6)',
                 flex: 1,
-                fontSize: '0.65rem'
+                fontSize: '0.65rem',
+                transition: 'color 0.2s ease',
+                minHeight: '44px'
               }}
             >
               <Icon size={22} />
               {item.name}
-            </div>
+            </Link>
           );
         })}
       </nav>
-
 
     </div>
   );

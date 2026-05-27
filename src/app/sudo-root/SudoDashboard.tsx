@@ -275,7 +275,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
         <div style={{ border: '1px solid #222' }}>
           <div style={{ padding: '12px', background: '#111', fontSize: '14px', color: '#888', borderBottom: '1px solid #222' }}>PENDING PAYMENT VERIFICATIONS</div>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+            <div className="tableResponsive"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
               <thead>
                 <tr style={{ background: '#050505', color: '#666' }}>
                   <th style={{ padding: '12px', textAlign: 'left' }}>DONOR (ID)</th>
@@ -334,7 +334,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
                   </tr>
                 )}
               </tbody>
-            </table>
+            </table></div>
           </div>
         </div>
       )}
@@ -352,7 +352,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
           <div>
             <div style={{ marginBottom: '12px', fontSize: '14px', color: '#888' }}>LEDGER MANAGEMENT</div>
             <div style={{ overflowX: 'auto', border: '1px solid #222' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+              <div className="tableResponsive"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                 <thead>
                   <tr style={{ background: '#111' }}>
                     <th style={{ padding: '8px', textAlign: 'left' }}>DONOR</th>
@@ -460,13 +460,13 @@ export default function SudoDashboard({ data }: { data: Data }) {
                   ))}
                   {sessions.length === 0 && <tr><td colSpan={4} style={{ padding: '12px', textAlign: 'center', color: '#444' }}>no active sessions</td></tr>}
                 </tbody>
-              </table>
+              </table></div>
             </div>
           </div>
 
           <div>
             <div style={{ marginBottom: '12px', fontSize: '14px', color: '#888' }}>ACTION FEED</div>
-            <div style={{ border: '1px solid #222', padding: '12px', height: '400px', overflowY: 'auto', fontSize: '11px', background: '#050505', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div style={{ border: '1px solid #222', padding: '12px', height: '400px', overflowY: 'auto', overscrollBehaviorY: 'contain', fontSize: '11px', background: '#050505', display: 'flex', flexDirection: 'column', gap: '4px' }}>
               {actionLogs.map(log => (
                 <div key={log.logId} style={{ padding: '8px', borderLeft: '2px solid #333', background: '#0a0a0a', color: '#aaa', display: 'flex', justifyContent: 'space-between' }}>
                   <span>
@@ -520,7 +520,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
           <div>
             <div style={{ marginBottom: '12px', fontSize: '14px', color: '#888' }}>ACTIVE STAFF</div>
             <div style={{ border: '1px solid #222' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+              <div className="tableResponsive"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                 <thead>
                   <tr style={{ background: '#111' }}>
                     <th style={{ padding: '8px', textAlign: 'left' }}>USERNAME</th>
@@ -547,7 +547,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
                   ))}
                   {staff.length === 0 && <tr><td colSpan={4} style={{ padding: '12px', textAlign: 'center', color: '#444' }}>no staff accounts</td></tr>}
                 </tbody>
-              </table>
+              </table></div>
             </div>
           </div>
         </div>

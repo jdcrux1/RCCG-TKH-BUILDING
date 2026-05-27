@@ -32,8 +32,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <div style={{
         position: 'fixed',
-        bottom: '20px',
-        right: '20px',
+        bottom: `calc(env(safe-area-inset-bottom, 0px) + 20px)`,
+        right: `calc(env(safe-area-inset-right, 0px) + 20px)`,
         display: 'flex',
         flexDirection: 'column',
         gap: '8px',
@@ -44,6 +44,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             key={toast.id}
             style={{
               padding: '10px 16px',
+    minHeight: 'var(--touch-target)',
               background: toast.type === 'success' ? '#0f0' : '#f00',
               color: '#000',
               fontSize: '12px',

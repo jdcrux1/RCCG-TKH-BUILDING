@@ -41,7 +41,7 @@ export function DataTable({ headers, children }: {
 }) {
   return (
     <div style={{ width: '100%', overflowX: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <div className="tableResponsive"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead style={{ background: '#f9fafb' }}>
           <tr>
             {headers.map((header, i) => (
@@ -57,7 +57,7 @@ export function DataTable({ headers, children }: {
         <tbody style={{ background: 'white' }}>
           {children}
         </tbody>
-      </table>
+      </table></div>
     </div>
   );
 }

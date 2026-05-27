@@ -50,7 +50,7 @@ export default function TaxReceiptButton({ donorName, totalContributed }: { dono
         <div style={{ marginBottom: '30px' }}>
           <h2 style={{ color: '#111', borderBottom: '1px solid #eee', paddingBottom: '8px', fontSize: '1.3rem', fontWeight: 'bold', marginTop: '20px' }}>Official Contribution Receipt</h2>
           
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px', marginBottom: '20px' }}>
+          <div className="tableResponsive"><table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px', marginBottom: '20px' }}>
             <tbody>
               <tr style={{ borderBottom: '1px solid #f1f1f1' }}>
                 <td style={{ padding: '10px 0', fontWeight: 'bold', color: '#666', width: '180px', fontSize: '0.9rem' }}>Date Issued:</td>
@@ -69,7 +69,7 @@ export default function TaxReceiptButton({ donorName, totalContributed }: { dono
                 <td style={{ padding: '10px 0', color: '#d97706', fontSize: '1.35rem', fontWeight: 'bold' }}>₦{totalContributed.toLocaleString()}</td>
               </tr>
             </tbody>
-          </table>
+          </table></div>
 
           <p style={{ fontSize: '0.95rem', color: '#333', textIndent: '30px', marginTop: '25px', lineHeight: '1.6' }}>
             This document serves as an official receipt acknowledging that <strong>{donorName}</strong> has generously contributed a total verified sum of <strong>₦{totalContributed.toLocaleString()}</strong> towards the RCCG The King&apos;s House Building Project.

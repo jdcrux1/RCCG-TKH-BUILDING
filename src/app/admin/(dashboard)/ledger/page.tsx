@@ -76,7 +76,7 @@ export default async function ManualLedger({
       </div>
 
       {/* Transaction History Section */}
-      <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
+      <div className="glass-card tableResponsive">
         <div style={{ padding: '24px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '800' }}>Transaction Audit</h2>
@@ -87,7 +87,7 @@ export default async function ManualLedger({
           </div>
         </div>
 
-        <div style={{ overflowX: 'hidden' }}>
+        <div className="tableResponsive">
           <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead className="desktop-only">
               <tr style={{ background: 'rgba(255,255,255,0.02)' }}>

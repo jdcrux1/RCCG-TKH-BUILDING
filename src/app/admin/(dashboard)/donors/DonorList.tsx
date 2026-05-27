@@ -116,7 +116,7 @@ function DonorListComponent({
         </button>
       </form>
 
-      <div style={{ padding: 0, overflowX: 'hidden', background: 'transparent' }}>
+      <div className="tableResponsive">
         <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead className="desktop-only">
             <tr style={{ borderBottom: '1px solid var(--glass-border)' }}>

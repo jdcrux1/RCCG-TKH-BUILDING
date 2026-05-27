@@ -72,6 +72,7 @@
 .card {
   max-width: 420px;
   width: 100%;
+  min-height: 480px;
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -79,6 +80,10 @@
   border-radius: var(--radius-lg);
   padding: var(--space-xl) var(--space-lg);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: min-height 0.3s ease;
 }
 
 .header {

@@ -180,7 +180,7 @@ export default async function AdminDashboard() {
             <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '700' }}>Recent Enrollments</h3>
             <Link href="/admin/donors" style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 'bold' }}>VIEW ALL</Link>
           </div>
-          <div style={{ overflowX: 'auto' }}>
+          <div className="tableResponsive">
             <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
               <thead className="desktop-only">
                 <tr style={{ background: 'rgba(255,255,255,0.02)' }}>

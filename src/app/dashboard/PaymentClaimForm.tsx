@@ -74,16 +74,15 @@ export default function PaymentClaimForm({ monthlyPledge, tierColor }: { monthly
                 color: 'var(--accent)',
                 border: '1px solid rgba(245, 158, 11, 0.2)',
                 borderRadius: 'var(--radius-sm)',
-                padding: '6px 12px',
-                fontSize: '0.8rem',
+                padding: '10px 16px',
+                fontSize: '0.85rem',
                 cursor: 'pointer',
                 alignSelf: 'flex-start',
-                minHeight: 'auto',
-                minWidth: 'auto',
+                minHeight: '44px',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '4px',
-                marginTop: '4px'
+                marginTop: '6px'
               }}
             >
               Quick Select: ₦{Math.round(monthlyPledge / 100).toLocaleString()}
