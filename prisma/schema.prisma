@@ -66,6 +66,7 @@ model Donor {
   pin           String
   donorRefId    String?        @unique // e.g., 'KB-045'
   name          String
+  bankAccountName String?
   spouseName    String?
   email         String?
   birthday      String?        // MM-DD format
@@ -99,6 +100,7 @@ model Contribution {
   date        DateTime @default(now())
   reference  String?
   narrative  String?
+  isConcierge Boolean @default(false)
   donorId    String
   donor      Donor    @relation(fields: [donorId], references: [id], onDelete: Cascade)
 

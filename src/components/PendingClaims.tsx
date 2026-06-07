@@ -14,7 +14,7 @@ type Donor = {
 
 type PaymentClaim = {
   id: string;
-  amount: bigint;
+  amount: number;
   date: Date;
   bankName: string | null;
   status: string;

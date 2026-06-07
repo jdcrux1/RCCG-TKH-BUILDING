@@ -69,10 +69,18 @@ export default async function ManualLedger({
     <div className="responsive-grid responsive-grid-2" style={{ gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 2fr)', animation: 'fadeIn 0.5s ease-out' }}>
       {/* Log Form Section */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-        <LedgerEntryForm donors={donors} initialQuery={query} />
+        <LedgerEntryForm donors={donors.map(d => ({
+          ...d,
+          monthlyPledge: Number(d.monthlyPledge),
+          totalPledged: Number(d.totalPledged),
+          totalContributed: Number(d.totalContributed)
+        }))} initialQuery={query} />
 
         {/* Pending Claims Verification Panel */}
-        <PendingClaims initialClaims={pendingClaims as any} />
+        <PendingClaims initialClaims={pendingClaims.map(c => ({
+          ...c,
+          amount: Number(c.amount)
+        })) as any} />
       </div>
 
       {/* Transaction History Section */}
@@ -110,8 +118,13 @@ export default async function ManualLedger({
                       <Calendar size={14} style={{ opacity: 0.5 }} />
                       {new Date(c.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                     </div>
-                    <div style={{ fontSize: '0.75rem', opacity: 0.5, marginTop: '4px' }}>
-                      Ref: {c.reference || 'SYSTEM_LOG'}
+                    <div style={{ fontSize: '0.75rem', opacity: 0.5, marginTop: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span>Ref: {c.reference || 'SYSTEM_LOG'}</span>
+                      {c.isConcierge && (
+                        <span style={{ background: 'var(--accent)20', color: 'var(--accent)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: '700' }}>
+                          CONCIERGE
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td style={{ padding: '20px 24px', textAlign: 'right' }} data-label="Amount">

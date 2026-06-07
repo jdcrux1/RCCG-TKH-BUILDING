@@ -311,3 +311,97 @@ export async function rejectPaymentClaimAdmin(claimId: string) {
     return { success: false, error: error instanceof Error ? error.message : 'Failed to reject claim' };
   }
 }
+
+// CONCIERGE SEARCH - FUZZY MATCHING
+export async function searchDonorsForConcierge(query: string) {
+  try {
+    await requireAdmin();
+    
+    if (!query || query.trim().length < 2) {
+      return [];
+    }
+
+    const trimmedQuery = query.trim();
+
+    const donors = await prisma.donor.findMany({
+      where: {
+        role: 'DONOR',
+        OR: [
+          { name: { contains: trimmedQuery, mode: 'insensitive' } },
+          { bankAccountName: { contains: trimmedQuery, mode: 'insensitive' } },
+          { phone: { contains: trimmedQuery } },
+          { donorRefId: { contains: trimmedQuery, mode: 'insensitive' } }
+        ]
+      },
+      take: 10,
+      orderBy: { name: 'asc' }
+    });
+
+    return donors.map(d => ({
+      id: d.id,
+      name: d.name,
+      donorRefId: d.donorRefId,
+      phone: d.phone,
+      bankAccountName: d.bankAccountName
+    }));
+  } catch (error) {
+    console.error('Search donors error:', error);
+    return [];
+  }
+}
+
+// LOG CONCIERGE CONTRIBUTION
+export async function logConciergeContribution(formData: FormData) {
+  try {
+    const session = await requireAdmin();
+    
+    const donorId = formData.get('donorId') as string;
+    const amountStr = formData.get('amount') as string;
+    const dateStr = formData.get('date') as string;
+    const narrative = formData.get('narrative') as string;
+
+    if (!donorId || !amountStr || !dateStr) {
+      throw new Error('Missing required fields');
+    }
+
+    const amount = Number(amountStr);
+    if (isNaN(amount) || amount <= 0) {
+      throw new Error('Invalid amount');
+    }
+
+    const amountKobo = nairaToKobo(amount);
+
+    await prisma.$transaction([
+      prisma.contribution.create({
+        data: {
+          donorId,
+          amount: amountKobo,
+          reference: `CONCIERGE-${Date.now()}`,
+          narrative: narrative || `Concierge Reconciled by ${session.name}`,
+          isConcierge: true,
+          date: new Date(dateStr)
+        }
+      }),
+      prisma.donor.update({
+        where: { id: donorId },
+        data: {
+          totalContributed: { increment: amountKobo },
+          status: 'ACTIVE'
+        }
+      })
+    ]);
+
+    await logActivity('LOG_CONTRIBUTION', { donorId, amount: amountKobo, method: 'CONCIERGE', loggedBy: session.name });
+    await recalculateMilestones();
+
+    revalidatePath('/admin/ledger');
+    revalidatePath('/admin/dashboard');
+    revalidatePath('/admin/concierge');
+    revalidatePath('/dashboard');
+    
+    return { success: true };
+  } catch (error: unknown) {
+    console.error('Concierge contribution error:', error);
+    throw error;
+  }
+}

@@ -7,8 +7,8 @@ import { CheckCircle2, ChevronDown, ChevronUp, Flag, Award, Circle } from 'lucid
 type Milestone = {
   id: string;
   title: string;
-  targetAmount: bigint;
-  currentAmount: bigint;
+  targetAmount: number;
+  currentAmount: number;
   status: string;
   order: number;
 };
@@ -78,8 +78,8 @@ export default function MilestonesTimeline({
             const isCurrent = ms.id === currentMilestoneId;
             const isExpanded = expandedId === ms.id;
             
-            const fundedPercent = ms.targetAmount > BigInt(0)
-              ? Number((ms.currentAmount * BigInt(100)) / ms.targetAmount)
+            const fundedPercent = ms.targetAmount > 0
+              ? Number((ms.currentAmount * 100) / ms.targetAmount).toFixed(0)
               : 0;
 
             const outstanding = ms.targetAmount - ms.currentAmount;
@@ -192,8 +192,8 @@ export default function MilestonesTimeline({
                           </div>
                           <div style={{ gridColumn: '1 / -1', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '6px', marginTop: '2px' }}>
                             <span style={{ opacity: 0.5, display: 'block' }}>Outstanding Balance</span>
-                            <strong style={{ fontSize: '0.85rem', color: outstanding <= BigInt(0) ? 'var(--success)' : '#ff6b6b' }}>
-                              {outstanding <= BigInt(0) ? 'Fully Funded' : `₦${(Number(outstanding) / 100).toLocaleString()}`}
+                            <strong style={{ fontSize: '0.85rem', color: outstanding <= 0 ? 'var(--success)' : '#ff6b6b' }}>
+                              {outstanding <= 0 ? 'Fully Funded' : `₦${(Number(outstanding) / 100).toLocaleString()}`}
                             </strong>
                           </div>
                         </div>

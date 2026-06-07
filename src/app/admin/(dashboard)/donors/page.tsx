@@ -50,7 +50,11 @@ export default async function DonorManagement({ searchParams }: { searchParams: 
       </header>
 
       <DonorList 
-        donors={donors} 
+        donors={donors.map(d => ({
+          ...d,
+          monthlyPledge: Number(d.monthlyPledge),
+          totalPledged: Number(d.totalPledged)
+        }))} 
         total={total}
         page={page}
         totalPages={totalPages}

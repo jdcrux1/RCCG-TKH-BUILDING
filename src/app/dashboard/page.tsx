@@ -381,7 +381,14 @@ export default async function DonorDashboard() {
       }}>
         
         {/* 3. Dynamic Interactive Construction Milestones Timeline */}
-        <MilestonesTimeline milestones={milestones as any} currentMilestoneId={currentMilestone?.id} />
+        <MilestonesTimeline 
+          milestones={milestones.map(m => ({
+            ...m,
+            targetAmount: Number(m.targetAmount),
+            currentAmount: Number(m.currentAmount)
+          }))} 
+          currentMilestoneId={currentMilestone?.id} 
+        />
 
         {/* Giving Streak & Encouragement */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>

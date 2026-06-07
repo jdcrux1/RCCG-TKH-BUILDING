@@ -28,8 +28,8 @@ type Donor = {
   name: string;
   phone: string;
   tier: string;
-  monthlyPledge: bigint;
-  totalPledged: bigint;
+  monthlyPledge: number;
+  totalPledged: number;
   status: string;
 };
 
