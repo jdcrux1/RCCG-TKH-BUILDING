@@ -258,7 +258,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
       </div>
 
       <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', flexWrap: 'wrap' }}>
-        {['access', 'reconciliation', 'bulk', 'watchtower', 'team', 'system'].map(tab => (
+        {['access', 'reconciliation', 'bulk_donors', 'bulk_contributions', 'watchtower', 'team', 'system'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -545,6 +545,128 @@ export default function SudoDashboard({ data }: { data: Data }) {
         </>
       )}
     </div>
+  </div>
+)}
+
+      <input 
+        type="file" 
+        accept=".csv"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            complete: async (results) => {
+              const rows = results.data.map((row: any) => {
+                const keys = Object.keys(row);
+                const nameKey = keys.find(k => k.toLowerCase().includes('name'));
+                const phoneKey = keys.find(k => k.toLowerCase().includes('phone') || k.toLowerCase().includes('number') || k.toLowerCase().includes('contact'));
+                
+                return {
+                  name: nameKey ? row[nameKey] : '',
+                  phone: phoneKey ? row[phoneKey] : ''
+                };
+              }).filter((r: any) => r.name && r.phone);
+              
+              if (rows.length === 0) {
+                alert('No valid rows found. Please ensure the CSV has Name and Phone columns.');
+                return;
+              }
+
+              if (!confirm(`Found ${rows.length} valid donors. Create accounts now?`)) return;
+
+              setCsvStatus('Uploading donors...');
+              setIsProcessing(true);
+
+              try {
+                const res = await fetch('/api/sudo-bulk-upload-donors', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ donors: rows })
+                });
+                
+                const result = await res.json();
+                if (res.ok) {
+                  setCsvStatus(`Success! Created: ${result.successCount} | Duplicates Skipped: ${result.duplicateCount} | Errors: ${result.errorCount}`);
+                  setCsvData(result.results || []); // Store the success results (with PINs) in csvData to show table
+                } else {
+                  setCsvStatus(`Error: ${result.error}`);
+                }
+              } catch (err) {
+                setCsvStatus('Network Error during upload.');
+              }
+              setIsProcessing(false);
+            }
+          });
+        }}
+        style={{ padding: '12px', background: '#000', border: '1px dashed #444', width: '100%', color: '#fff', cursor: 'pointer' }}
+      />
+    </div>
+
+    {csvData.length > 0 && activeTab === 'bulk_donors' && (
+      <div style={{ background: '#111', padding: '16px', border: '1px solid #0f0' }}>
+        <h3 style={{ color: '#0f0', marginBottom: '16px' }}>Successfully Created ({csvData.length})</h3>
+        <p style={{ color: '#aaa', fontSize: '12px', marginBottom: '16px' }}>
+          <strong>WARNING:</strong> This is the ONLY time you will see these generated passwords. Do not refresh this page until you have sent the messages or downloaded the backup CSV.
+        </p>
+        
+        <button 
+          onClick={() => {
+            const csvRows = ['Name,Phone,DonorID,Password'];
+            csvData.forEach(d => csvRows.push(`"${d.name}","${d.phone}","${d.donorRefId}","${d.pin}"`));
+            const blob = new Blob([csvRows.join('\\n')], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `BulkDonors_Passwords_${new Date().getTime()}.csv`;
+            a.click();
+          }}
+          style={{ marginBottom: '16px', background: '#333', color: '#fff', border: '1px solid #555', padding: '8px 16px', cursor: 'pointer' }}
+        >
+          Download Passwords CSV Backup
+        </button>
+
+        <div className="tableResponsive" style={{ maxHeight: '500px', overflowY: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+            <thead style={{ position: 'sticky', top: 0, background: '#222' }}>
+              <tr>
+                <th style={{ padding: '8px', textAlign: 'left' }}>NAME</th>
+                <th style={{ padding: '8px', textAlign: 'left' }}>PHONE</th>
+                <th style={{ padding: '8px', textAlign: 'left' }}>DONOR ID</th>
+                <th style={{ padding: '8px', textAlign: 'left' }}>PIN</th>
+                <th style={{ padding: '8px', textAlign: 'center' }}>ACTION</th>
+              </tr>
+            </thead>
+            <tbody>
+              {csvData.map((donor, idx) => {
+                const message = `Hello ${donor.name.split(' ')[0]}, you've been invited to the RCCG TKH Kingdom Builders portal!\n\nYour unique Donor ID is: ${donor.donorRefId}\nYour secure login password is: ${donor.pin}\n\nPlease log in at: https://rccg-tkh-building.vercel.app/login`;
+                const waLink = `https://wa.me/${donor.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+                
+                return (
+                  <tr key={idx} style={{ borderBottom: '1px solid #222' }}>
+                    <td style={{ padding: '8px' }}>{donor.name}</td>
+                    <td style={{ padding: '8px' }}>{donor.phone}</td>
+                    <td style={{ padding: '8px', fontWeight: 'bold', color: 'var(--tier-primary)' }}>{donor.donorRefId}</td>
+                    <td style={{ padding: '8px', fontWeight: 'bold', color: '#f00', fontFamily: 'monospace' }}>{donor.pin}</td>
+                    <td style={{ padding: '8px', textAlign: 'center' }}>
+                      <a 
+                        href={waLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ display: 'inline-block', background: '#25D366', color: '#fff', padding: '6px 12px', textDecoration: 'none', borderRadius: '4px', fontWeight: 'bold' }}
+                      >
+                        Send WhatsApp
+                      </a>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )}
   </div>
 )}
 
