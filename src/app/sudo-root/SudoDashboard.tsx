@@ -36,7 +36,6 @@ export default function SudoDashboard({ data }: { data: Data }) {
   const [newStaffRole, setNewStaffRole] = useState('VOLUNTEER');
   const [editingVar, setEditingVar] = useState<string | null>(null);
   const [varValue, setVarValue] = useState('');
-  const [varValue, setVarValue] = useState('');
   const [error, setError] = useState<string | null>(null);
   
   // Bulk upload state

@@ -25,6 +25,18 @@ export default function Home() {
           <div className={styles.overlay} />
         </div>
 
+        {/* Foreground Rotating Image */}
+        <div className={styles.foregroundImageContainer}>
+          <Image 
+            src="/images/tkh-3d.jpg" 
+            alt="The King's House 3D Render" 
+            width={400}
+            height={400}
+            className={styles.rotatingImage}
+            priority
+          />
+        </div>
+
         {/* Content Section */}
         <div className={styles.content}>
           <span className={styles.label}>Building Project 2026-2028</span>
