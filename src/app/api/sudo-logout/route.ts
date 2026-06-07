@@ -7,10 +7,6 @@ import { verifySudoToken, endSession } from '@/lib/sudo-auth';
 const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'default-secret');
 
 export async function POST(request: NextRequest) {
-  if (!await verifySudoToken(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   const cookieStore = await import('next/headers').then(h => h.cookies());
   const token = cookieStore.get('sudo_token')?.value;
   
@@ -20,10 +16,13 @@ export async function POST(request: NextRequest) {
       if (payload.sessionId) {
         await endSession(payload.sessionId as string);
       }
-    } catch {}
+    } catch {
+      // Ignore token verification errors during logout, we still want to clear the cookie
+    }
   }
 
   const response = NextResponse.json({ success: true });
   response.cookies.set('sudo_token', '', { maxAge: 0, path: '/' });
+  response.cookies.set('tkh_session', '', { maxAge: 0, path: '/' });
   return response;
 }

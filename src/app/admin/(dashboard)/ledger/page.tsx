@@ -97,7 +97,7 @@ export default async function ManualLedger({
 
         <div className="tableResponsive">
           <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead className="desktop-only">
+            <thead>
               <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
                 <th style={{ padding: '16px 24px', fontSize: '0.75rem', opacity: 0.5, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Builder</th>
                 <th style={{ padding: '16px 24px', fontSize: '0.75rem', opacity: 0.5, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Details</th>

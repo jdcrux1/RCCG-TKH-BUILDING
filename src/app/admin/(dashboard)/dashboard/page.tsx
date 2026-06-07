@@ -182,7 +182,7 @@ export default async function AdminDashboard() {
           </div>
           <div className="tableResponsive">
             <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
-              <thead className="desktop-only">
+              <thead>
                 <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
                   <th style={{ padding: '12px 24px', opacity: 0.5, fontWeight: '500' }}>DONOR</th>
                   <th style={{ padding: '12px 24px', opacity: 0.5, fontWeight: '500' }}>TIER</th>

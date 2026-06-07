@@ -118,7 +118,7 @@ function DonorListComponent({
 
       <div className="tableResponsive">
         <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-          <thead className="desktop-only">
+          <thead>
             <tr style={{ borderBottom: '1px solid var(--glass-border)' }}>
               <th style={{ padding: '1rem' }}>Name</th>
               <th style={{ padding: '1rem' }}>Phone</th>
