@@ -78,8 +78,8 @@ export default function LogPaymentInstructionsButton() {
                   <FileText size={20} />
                 </div>
                 <div>
-                  <h4 style={{ fontWeight: 'bold', marginBottom: '4px' }}>1. Make Your Transfer</h4>
-                  <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>Transfer your contribution to the official Haggai Mortgage Bank account (0130430547). Save the screenshot or PDF receipt.</p>
+                  <h4 style={{ fontWeight: 'bold', marginBottom: '4px' }}>1. Sow Your Seed</h4>
+                  <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>Transfer your contribution to the official project account: <strong>RCCG The King&apos;s House (Haggai Mortgage Bank: 0130430547)</strong>. May the Lord bless your seed.</p>
                 </div>
               </div>
 
@@ -88,8 +88,8 @@ export default function LogPaymentInstructionsButton() {
                   <Upload size={20} />
                 </div>
                 <div>
-                  <h4 style={{ fontWeight: 'bold', marginBottom: '4px' }}>2. Upload Your Receipt</h4>
-                  <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>Scroll down to the "Log a New Payment Claim" section on your dashboard. Enter the exact amount, date, and upload your receipt.</p>
+                  <h4 style={{ fontWeight: 'bold', marginBottom: '4px' }}>2. Log Your Offering</h4>
+                  <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>Scroll down to the "Log a New Payment Claim" section. Faithfully enter the exact amount and date of your transfer so we can accurately account for your giving.</p>
                 </div>
               </div>
 
@@ -99,7 +99,7 @@ export default function LogPaymentInstructionsButton() {
                 </div>
                 <div>
                   <h4 style={{ fontWeight: 'bold', marginBottom: '4px' }}>3. Await Verification</h4>
-                  <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>The church admin will verify the payment against the bank statement. Once verified, it will instantly reflect on your dashboard!</p>
+                  <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>The church admin will verify your seed against the bank statement. Once confirmed, your Kingdom Builders dashboard will instantly reflect your impact!</p>
                 </div>
               </div>
             </div>
