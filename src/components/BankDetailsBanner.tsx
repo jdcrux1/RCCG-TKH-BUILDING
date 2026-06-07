@@ -8,9 +8,9 @@ export default function BankDetailsBanner({ donorName, donorRefId }: { donorName
   const { showToast } = useToast();
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
-  const bankName = "Premium Trust Bank";
-  const accountNumber = "0040239581";
-  const accountName = "RCCG The King's House Building Project";
+  const bankName = "HAGGAI MORTGAGE BANK";
+  const accountNumber = "0130430547";
+  const accountName = "RCCG The King's House";
   const uniqueId = donorRefId || "PENDING";
 
   const handleCopy = (text: string, fieldName: string) => {
