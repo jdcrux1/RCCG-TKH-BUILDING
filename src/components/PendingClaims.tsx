@@ -119,7 +119,7 @@ export default function PendingClaims({ initialClaims }: { initialClaims: Paymen
                   fontSize: '0.75rem',
                   fontWeight: '600',
                   gap: '4px',
-                  minHeight: '32px',
+                  minHeight: '44px',
                   cursor: 'pointer'
                 }}
               >
@@ -137,7 +137,7 @@ export default function PendingClaims({ initialClaims }: { initialClaims: Paymen
                   fontSize: '0.75rem',
                   fontWeight: '700',
                   gap: '4px',
-                  minHeight: '32px',
+                  minHeight: '44px',
                   cursor: 'pointer'
                 }}
               >

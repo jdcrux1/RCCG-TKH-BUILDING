@@ -81,7 +81,7 @@ export default async function DonorLayout({ children }: { children: React.ReactN
         padding: '8px 4px',
         justifyContent: 'space-around',
         zIndex: 100,
-        paddingBottom: 'max(8px, env(safe-area-inset-bottom))'
+        paddingBottom: 'max(16px, env(safe-area-inset-bottom))'
       }} className="mobile-only">
         {[
           { name: 'Home', icon: Home, href: '/dashboard' },

@@ -32,10 +32,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <div style={{
         position: 'fixed',
-        bottom: `calc(env(safe-area-inset-bottom, 0px) + 20px)`,
-        right: `calc(env(safe-area-inset-right, 0px) + 20px)`,
+        top: `max(20px, env(safe-area-inset-top))`,
+        right: `max(20px, env(safe-area-inset-right))`,
+        left: '20px', // give a little left padding for mobile screens
         display: 'flex',
         flexDirection: 'column',
+        alignItems: 'flex-end', // align right if space permits
         gap: '8px',
         zIndex: 9999
       }}>
@@ -43,13 +45,23 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div
             key={toast.id}
             style={{
-              padding: '10px 16px',
-    minHeight: 'var(--touch-target)',
-              background: toast.type === 'success' ? '#0f0' : '#f00',
-              color: '#000',
-              fontSize: '12px',
-              fontFamily: 'monospace',
-              border: '1px solid #333',
+              padding: '12px 20px',
+              minHeight: 'var(--touch-target)',
+              background: 'rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              color: '#fff',
+              fontSize: '14px',
+              fontFamily: 'var(--font-main)',
+              fontWeight: '500',
+              border: '1px solid rgba(245, 158, 11, 0.3)',
+              borderLeft: `4px solid ${toast.type === 'success' ? 'var(--success)' : 'var(--danger)'}`,
+              borderRadius: 'var(--radius-sm)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), 0 0 10px rgba(245, 158, 11, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              animation: 'fadeIn 0.3s ease-out',
+              maxWidth: '100%',
             }}
           >
             {toast.message}

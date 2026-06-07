@@ -307,7 +307,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
                               alert(res.error);
                             }
                           }}
-                          style={{ background: '#0f02', border: '1px solid #0f0', color: '#0f0', padding: '4px 12px', cursor: 'pointer', marginRight: '8px', fontSize: '10px' }}
+                          style={{ background: '#0f02', border: '1px solid #0f0', color: '#0f0', padding: '4px 12px', cursor: 'pointer', marginRight: '8px', fontSize: '10px', minHeight: '44px' }}
                         >
                           APPROVE
                         </button>
@@ -321,7 +321,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
                               alert(res.error);
                             }
                           }}
-                          style={{ background: '#f002', border: '1px solid #f00', color: '#f00', padding: '4px 12px', cursor: 'pointer', fontSize: '10px' }}
+                          style={{ background: '#f002', border: '1px solid #f00', color: '#f00', padding: '4px 12px', cursor: 'pointer', fontSize: '10px', minHeight: '44px' }}
                         >
                           REJECT
                         </button>
@@ -339,7 +339,40 @@ export default function SudoDashboard({ data }: { data: Data }) {
         </div>
       )}
 
-    {/* watchtower section temporarily removed for build */}
+{activeTab === 'access' && (
+  <div style={{ border: '1px solid #222' }}>
+    <div style={{ padding: '12px', background: '#111', fontSize: '14px', color: '#888', borderBottom: '1px solid #222' }}>STAFF ACCESS CONTROL</div>
+    <div style={{ overflowX: 'auto' }}>
+      <div className="tableResponsive"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+        <thead>
+          <tr style={{ background: '#111' }}>
+            <th style={{ padding: '8px', textAlign: 'left' }}>USERNAME</th>
+            <th style={{ padding: '8px', textAlign: 'left' }}>STATUS</th>
+            <th style={{ padding: '8px', textAlign: 'left' }}>ACTION</th>
+          </tr>
+        </thead>
+        <tbody>
+          {staff.map(s => (
+            <tr key={s.id} style={{ borderBottom: '1px solid #111' }}>
+              <td style={{ padding: '6px' }}>{s.username}</td>
+              <td style={{ padding: '6px', color: s.isActive ? '#0f0' : '#f00' }}>{s.isActive ? 'ACTIVE' : 'REVOKED'}</td>
+              <td style={{ padding: '6px' }}>
+                <button onClick={() => handleRevokeAccess(s.id, s.isActive)}
+                  style={{ background: 'transparent', border: '1px solid #333', color: s.isActive ? '#f00' : '#0f0', cursor: 'pointer', padding: '2px 8px', minHeight: '44px' }}>
+                  {s.isActive ? 'revoke' : 'restore'}
+                </button>
+              </td>
+            </tr>
+          ))}
+          {staff.length === 0 && (
+            <tr><td colSpan={3} style={{ padding: '12px', textAlign: 'center', color: '#444' }}>no staff accounts</td></tr>
+          )}
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+)}
+{/* watchtower section placeholder */}
 
       {activeTab === 'team' && (
         <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '20px' }}>
@@ -397,7 +430,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
                       <td style={{ padding: '6px' }}>
                         <button 
                           onClick={() => handleRevokeAccess(s.id, s.isActive)}
-                          style={{ background: 'transparent', border: '1px solid #333', color: s.isActive ? '#f00' : '#0f0', cursor: 'pointer', padding: '2px 8px' }}
+                          style={{ background: 'transparent', border: '1px solid #333', color: s.isActive ? '#f00' : '#0f0', cursor: 'pointer', padding: '2px 8px', minHeight: '44px' }}
                         >
                           {s.isActive ? 'revoke' : 'restore'}
                         </button>
@@ -427,8 +460,8 @@ export default function SudoDashboard({ data }: { data: Data }) {
                         onChange={e => setVarValue(e.target.value)}
                         style={{ flex: 1, padding: '4px', background: '#111', border: '1px solid #333', color: '#fff', fontFamily: 'monospace' }}
                       />
-                      <button onClick={() => handleUpdateSystemVar(key)} style={{ padding: '4px 8px', background: '#111', border: '1px solid #333', color: '#0f0', cursor: 'pointer' }}>ok</button>
-                      <button onClick={() => setEditingVar(null)} style={{ padding: '4px 8px', background: '#111', border: '1px solid #333', color: '#f00', cursor: 'pointer' }}>x</button>
+                      <button onClick={() => handleUpdateSystemVar(key)} style={{ padding: '4px 8px', background: '#111', border: '1px solid #333', color: '#0f0', cursor: 'pointer', minHeight: '44px' }}>ok</button>
+                      <button onClick={() => setEditingVar(null)} style={{ padding: '4px 8px', background: '#111', border: '1px solid #333', color: '#f00', cursor: 'pointer', minHeight: '44px' }}>x</button>
                     </div>
                   ) : (
                     <div 

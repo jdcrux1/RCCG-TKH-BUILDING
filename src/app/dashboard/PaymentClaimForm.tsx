@@ -62,6 +62,7 @@ export default function PaymentClaimForm({ monthlyPledge, tierColor }: { monthly
               borderRadius: 'var(--radius-sm)',
               color: 'white',
               outline: 'none',
+              width: '100%',
               marginBottom: monthlyPledge && monthlyPledge > 0 ? '4px' : '0'
             }}
           />
@@ -105,6 +106,7 @@ export default function PaymentClaimForm({ monthlyPledge, tierColor }: { monthly
               borderRadius: 'var(--radius-sm)',
               color: 'white',
               outline: 'none',
+              width: '100%',
               colorScheme: 'dark',
               '--tier-accent': tierColor,
               '--tier-glow': tierColor ? `${tierColor}40` : undefined
@@ -125,7 +127,8 @@ export default function PaymentClaimForm({ monthlyPledge, tierColor }: { monthly
               border: '1px solid var(--glass-border)',
               borderRadius: 'var(--radius-sm)',
               color: 'white',
-              outline: 'none'
+              outline: 'none',
+              width: '100%'
             }}
           />
         </div>
@@ -133,17 +136,16 @@ export default function PaymentClaimForm({ monthlyPledge, tierColor }: { monthly
         <button 
           type="submit" 
           disabled={loading}
+          className="btn-primary"
           style={{
             marginTop: '0.5rem',
-            padding: '1rem',
+            width: '100%',
             background: 'var(--tier-primary)',
             color: 'var(--primary)',
             border: 'none',
-            borderRadius: 'var(--radius-sm)',
-            fontWeight: '600',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            opacity: loading ? 0.7 : 1,
-            transition: 'all 0.2s ease'
+            opacity: loading ? 0.8 : 1,
+            transform: loading ? 'none' : undefined,
+            transition: 'all 0.2s ease',
           }}
         >
           {loading ? 'Submitting...' : 'Submit Payment Claim'}
