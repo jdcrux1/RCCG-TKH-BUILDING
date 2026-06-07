@@ -16,8 +16,8 @@ export default function Home() {
         {/* Background Image Container */}
         <div className={styles.background}>
           <Image 
-            src="/images/tkh-3d.jpg" 
-            alt="The King&apos;s House 3D Render" 
+            src="/images/hero-building.png" 
+            alt="The King&apos;s House Citadel" 
             fill
             className={styles.backgroundImg}
             priority
@@ -25,14 +25,14 @@ export default function Home() {
           <div className={styles.overlay} />
         </div>
 
-        {/* Foreground Rotating Image */}
+        {/* Foreground 3D Render Image */}
         <div className={styles.foregroundImageContainer}>
           <Image 
             src="/images/tkh-3d.jpg" 
             alt="The King's House 3D Render" 
-            width={400}
+            width={600}
             height={400}
-            className={styles.rotatingImage}
+            className={styles.heroRenderImage}
             priority
           />
         </div>
