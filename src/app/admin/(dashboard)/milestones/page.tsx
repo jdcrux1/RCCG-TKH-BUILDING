@@ -28,7 +28,7 @@ export default async function MilestoneManagement() {
               </div>
               <div>
                 <h3 style={{ fontSize: '1.1rem' }}>{m.title}</h3>
-                <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>Goal: ₦{m.targetAmount.toLocaleString()} • Current: ₦{m.currentAmount.toLocaleString()}</p>
+                <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>Goal: ₦{(Number(m.targetAmount) / 100).toLocaleString()} • Current: ₦{(Number(m.currentAmount) / 100).toLocaleString()}</p>
               </div>
             </div>
 
