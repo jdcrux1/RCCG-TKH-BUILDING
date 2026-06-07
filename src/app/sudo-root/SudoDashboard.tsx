@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Papa from 'papaparse';
 import { approvePaymentClaim, rejectPaymentClaim, generateMasterReport, reverseContribution, updateSystemVariable, revokeSession, killAllSessions } from './actions';
+import AddDonorModal from '@/components/AddDonorModal';
 
 type Data = {
   contributions: any[];
@@ -257,7 +258,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
         {['access', 'reconciliation', 'bulk_donors', 'bulk_contributions', 'watchtower', 'team', 'system'].map(tab => (
           <button
             key={tab}
@@ -275,6 +276,9 @@ export default function SudoDashboard({ data }: { data: Data }) {
             {tab}
           </button>
         ))}
+        <div style={{ marginLeft: 'auto' }}>
+          <AddDonorModal />
+        </div>
       </div>
 
       {activeTab === 'reconciliation' && (
