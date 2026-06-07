@@ -208,7 +208,7 @@ export async function updateDonorStatus(donorId: string, newStatus: string) {
 }
 
 // RECALCULATE MILESTONES
-async function recalculateMilestones() {
+export async function recalculateMilestones() {
   const sumResult = await prisma.contribution.aggregate({ _sum: { amount: true } });
   let remainingAmount = BigInt(sumResult._sum.amount || 0);
 

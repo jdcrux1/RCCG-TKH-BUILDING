@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Papa from 'papaparse';
 import { approvePaymentClaim, rejectPaymentClaim, generateMasterReport, reverseContribution, updateSystemVariable, revokeSession, killAllSessions } from './actions';
 
 type Data = {
@@ -35,7 +36,13 @@ export default function SudoDashboard({ data }: { data: Data }) {
   const [newStaffRole, setNewStaffRole] = useState('VOLUNTEER');
   const [editingVar, setEditingVar] = useState<string | null>(null);
   const [varValue, setVarValue] = useState('');
+  const [varValue, setVarValue] = useState('');
   const [error, setError] = useState<string | null>(null);
+  
+  // Bulk upload state
+  const [csvData, setCsvData] = useState<any[]>([]);
+  const [csvStatus, setCsvStatus] = useState<string>('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const router = useRouter();
 
@@ -251,8 +258,8 @@ export default function SudoDashboard({ data }: { data: Data }) {
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
-        {['access', 'reconciliation', 'watchtower', 'team', 'system'].map(tab => (
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', flexWrap: 'wrap' }}>
+        {['access', 'reconciliation', 'bulk', 'watchtower', 'team', 'system'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -372,6 +379,176 @@ export default function SudoDashboard({ data }: { data: Data }) {
     </div>
   </div>
 )}
+
+{activeTab === 'bulk' && (
+  <div style={{ border: '1px solid #222' }}>
+    <div style={{ padding: '12px', background: '#111', fontSize: '14px', color: '#888', borderBottom: '1px solid #222' }}>
+      BANK STATEMENT CSV UPLOAD (FRAUD & DUPLICATE PROTECTED)
+    </div>
+    <div style={{ padding: '24px' }}>
+      <div style={{ marginBottom: '20px' }}>
+        <p style={{ color: '#aaa', fontSize: '12px', marginBottom: '12px' }}>
+          Upload a bank statement in CSV format. The parser expects columns that can map to Date, Narrative/Description, and Amount.
+        </p>
+        <input 
+          type="file" 
+          accept=".csv"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            Papa.parse(file, {
+              header: true,
+              skipEmptyLines: true,
+              complete: (results) => {
+                const rows = results.data.map((row: any) => {
+                  // Attempt to find keys dynamically
+                  const keys = Object.keys(row);
+                  const dateKey = keys.find(k => k.toLowerCase().includes('date'));
+                  const amountKey = keys.find(k => k.toLowerCase().includes('amount') || k.toLowerCase().includes('credit') || k.toLowerCase().includes('value'));
+                  const narrativeKey = keys.find(k => k.toLowerCase().includes('narrative') || k.toLowerCase().includes('desc') || k.toLowerCase().includes('details') || k.toLowerCase().includes('remarks'));
+                  
+                  const narrative = narrativeKey ? row[narrativeKey] : '';
+                  
+                  // Auto-match donor
+                  let matchedDonorId = '';
+                  let matchedDonorName = '';
+                  for (const donor of donors) {
+                    const searchStr = (narrative || '').toLowerCase();
+                    if ((donor.name && searchStr.includes(donor.name.toLowerCase())) || 
+                        (donor.donorRefId && searchStr.includes(donor.donorRefId.toLowerCase()))) {
+                      matchedDonorId = donor.id;
+                      matchedDonorName = `${donor.name} (${donor.donorRefId})`;
+                      break;
+                    }
+                  }
+
+                  // Parse amount, strip commas/currency symbols
+                  let rawAmount = amountKey ? String(row[amountKey]) : '';
+                  rawAmount = rawAmount.replace(/[^0-9.]/g, '');
+                  
+                  return {
+                    originalDate: dateKey ? row[dateKey] : '',
+                    originalAmount: rawAmount,
+                    originalNarrative: narrative,
+                    matchedDonorId,
+                    matchedDonorName,
+                    include: true
+                  };
+                });
+                setCsvData(rows);
+              }
+            });
+          }}
+          style={{ padding: '12px', background: '#111', border: '1px dashed #444', width: '100%', color: '#fff', cursor: 'pointer' }}
+        />
+      </div>
+
+      {csvData.length > 0 && (
+        <>
+          <div className="tableResponsive" style={{ maxHeight: '400px', overflowY: 'auto', border: '1px solid #333', marginBottom: '20px' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+              <thead style={{ position: 'sticky', top: 0, background: '#111', zIndex: 10 }}>
+                <tr>
+                  <th style={{ padding: '8px', textAlign: 'left' }}>INC</th>
+                  <th style={{ padding: '8px', textAlign: 'left' }}>DATE</th>
+                  <th style={{ padding: '8px', textAlign: 'left' }}>NARRATIVE</th>
+                  <th style={{ padding: '8px', textAlign: 'right' }}>AMOUNT</th>
+                  <th style={{ padding: '8px', textAlign: 'left' }}>MATCHED DONOR (MANUAL SELECT)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {csvData.map((row, idx) => (
+                  <tr key={idx} style={{ borderBottom: '1px solid #222', background: row.matchedDonorId ? 'rgba(0, 255, 0, 0.05)' : 'transparent' }}>
+                    <td style={{ padding: '8px' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={row.include} 
+                        onChange={(e) => {
+                          const newData = [...csvData];
+                          newData[idx].include = e.target.checked;
+                          setCsvData(newData);
+                        }} 
+                      />
+                    </td>
+                    <td style={{ padding: '8px' }}>{row.originalDate}</td>
+                    <td style={{ padding: '8px' }}>{row.originalNarrative}</td>
+                    <td style={{ padding: '8px', textAlign: 'right', fontWeight: 'bold' }}>₦{Number(row.originalAmount).toLocaleString()}</td>
+                    <td style={{ padding: '8px' }}>
+                      <select 
+                        value={row.matchedDonorId}
+                        onChange={(e) => {
+                          const newData = [...csvData];
+                          newData[idx].matchedDonorId = e.target.value;
+                          setCsvData(newData);
+                        }}
+                        style={{ width: '100%', background: '#000', color: '#fff', border: '1px solid #333', padding: '4px' }}
+                      >
+                        <option value="">-- Select Donor --</option>
+                        {donors.map(d => (
+                          <option key={d.id} value={d.id}>{d.name} ({d.donorRefId})</option>
+                        ))}
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ color: csvStatus.includes('Error') ? '#f00' : '#0f0' }}>{csvStatus}</span>
+            <button 
+              disabled={isProcessing}
+              onClick={async () => {
+                const toProcess = csvData.filter(r => r.include && r.matchedDonorId && r.originalAmount && r.originalDate);
+                if (toProcess.length === 0) {
+                  setCsvStatus('Error: No valid rows selected with matched donors.');
+                  return;
+                }
+                
+                if (!confirm(`Are you sure you want to process ${toProcess.length} transactions to the live ledger?`)) return;
+                
+                setIsProcessing(true);
+                setCsvStatus('Processing...');
+                
+                try {
+                  const payload = {
+                    transactions: toProcess.map(r => ({
+                      date: new Date(r.originalDate).toISOString(),
+                      amount: Number(r.originalAmount),
+                      narrative: r.originalNarrative,
+                      donorId: r.matchedDonorId
+                    }))
+                  };
+                  
+                  const res = await fetch('/api/sudo-bulk-upload', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                  });
+                  
+                  const result = await res.json();
+                  if (res.ok) {
+                    setCsvStatus(`Success! Logged: ${result.successCount} | Duplicates Blocked: ${result.duplicateCount} | Errors: ${result.errorCount}`);
+                  } else {
+                    setCsvStatus(`Error: ${result.error}`);
+                  }
+                } catch (e) {
+                  setCsvStatus('Network Error');
+                }
+                setIsProcessing(false);
+              }}
+              style={{ background: isProcessing ? '#444' : '#10b981', color: '#000', fontWeight: 'bold', padding: '12px 24px', border: 'none', cursor: isProcessing ? 'not-allowed' : 'pointer' }}
+            >
+              {isProcessing ? 'PROCESSING...' : `COMMIT TO LEDGER (${csvData.filter(r => r.include && r.matchedDonorId).length} valid)`}
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  </div>
+)}
+
 {/* watchtower section placeholder */}
 
       {activeTab === 'team' && (
