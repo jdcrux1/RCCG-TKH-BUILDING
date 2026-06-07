@@ -1,110 +1,92 @@
 'use client';
 
 import { useState } from 'react';
-import { Landmark, X } from 'lucide-react';
+import { Landmark, Copy, CheckCircle } from 'lucide-react';
 
-export default function InstantDonate({ className }: { className?: string }) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function InstantDonate() {
+  const [copied, setCopied] = useState(false);
+  const accNumber = "0130430547";
 
-  if (!isOpen) {
-    return (
-      <button 
-        onClick={() => setIsOpen(true)}
-        className={className}
-        style={{ cursor: 'pointer', border: 'none' }}
-      >
-        <Landmark size={24} /> Instant Donation
-      </button>
-    );
-  }
+  const handleCopy = () => {
+    navigator.clipboard.writeText(accNumber);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0,0,0,0.9)',
-      backdropFilter: 'blur(10px)',
-      zIndex: 10000,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '1rem'
+    <div className="glass-card" style={{
+      marginTop: '2rem',
+      maxWidth: '500px',
+      width: '100%',
+      background: 'rgba(255, 255, 255, 0.05)',
+      backdropFilter: 'blur(16px)',
+      WebkitBackdropFilter: 'blur(16px)',
+      border: '1px solid rgba(255, 255, 255, 0.1)',
+      borderRadius: '16px',
+      padding: '1.5rem',
+      position: 'relative',
+      overflow: 'hidden',
+      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.3)'
     }}>
       <div style={{
-        background: '#111',
-        border: '1px solid #333',
-        borderRadius: 'var(--radius-lg)',
-        width: '100%',
-        maxWidth: '500px',
-        padding: '2rem',
-        position: 'relative',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
-      }}>
-        <button 
-          onClick={() => setIsOpen(false)}
-          style={{
-            position: 'absolute',
-            top: '1rem',
-            right: '1rem',
-            background: 'transparent',
-            border: 'none',
-            color: '#666',
-            cursor: 'pointer'
-          }}
-        >
-          <X size={24} />
-        </button>
+        position: 'absolute',
+        top: '-50px',
+        right: '-50px',
+        width: '150px',
+        height: '150px',
+        background: 'var(--accent)',
+        filter: 'blur(80px)',
+        opacity: 0.2,
+        borderRadius: '50%'
+      }} />
 
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div style={{ 
-            background: 'var(--tier-primary)', 
-            width: '60px', 
-            height: '60px', 
-            borderRadius: '50%', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            margin: '0 auto 1rem'
-          }}>
-            <Landmark size={32} color="black" />
-          </div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '8px' }}>Instant Bank Donation</h2>
-          <p style={{ opacity: 0.6, fontSize: '0.9rem' }}>Thank you for your seed towards the building project.</p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem' }}>
+        <div style={{ background: 'var(--accent)', padding: '8px', borderRadius: '8px' }}>
+          <Landmark size={20} color="black" />
         </div>
+        <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', margin: 0, color: 'white' }}>Quick Give (Bank Transfer)</h3>
+      </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div style={{ 
-            background: 'rgba(212, 175, 55, 0.05)', 
-            padding: '2rem', 
-            borderRadius: 'var(--radius-md)', 
-            border: '1px dashed var(--tier-primary)',
-            textAlign: 'center'
-          }}>
-            <Landmark size={48} color="var(--tier-primary)" style={{ opacity: 0.3, marginBottom: '1rem' }} />
-            <p style={{ fontWeight: '600', color: 'var(--tier-primary)', fontSize: '1.1rem' }}>Account Details Coming Soon</p>
-            <p style={{ opacity: 0.5, fontSize: '0.8rem', marginTop: '8px' }}>The project bank account is currently being finalized.</p>
-          </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <p style={{ opacity: 0.9, fontSize: '0.9rem', margin: 0, color: 'white' }}>Bank: <strong style={{ color: 'var(--accent)' }}>HAGGAI MORTGAGE BANK</strong></p>
+        <p style={{ opacity: 0.9, fontSize: '0.9rem', margin: 0, color: 'white' }}>Account Name: <strong>RCCG The King&apos;s House</strong></p>
+        
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          background: 'rgba(0,0,0,0.4)',
+          padding: '12px 16px',
+          borderRadius: '8px',
+          marginTop: '8px',
+          border: '1px solid rgba(255, 255, 255, 0.05)'
+        }}>
+          <span style={{ fontSize: '1.5rem', fontWeight: 'bold', letterSpacing: '2px', color: 'var(--accent)' }}>
+            {accNumber}
+          </span>
+          <button 
+            onClick={handleCopy}
+            style={{
+              background: 'transparent',
+              border: '1px solid rgba(255,255,255,0.2)',
+              color: 'white',
+              padding: '8px 12px',
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              cursor: 'pointer',
+              fontSize: '0.8rem',
+              transition: 'all 0.2s',
+              minHeight: '44px'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+            onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+          >
+            {copied ? <CheckCircle size={16} color="var(--success)" /> : <Copy size={16} />}
+            {copied ? 'Copied' : 'Copy'}
+          </button>
         </div>
-
-        <button 
-          onClick={() => setIsOpen(false)}
-          style={{
-            width: '100%',
-            padding: '1rem',
-            background: 'var(--tier-primary)',
-            color: 'black',
-            border: 'none',
-            borderRadius: 'var(--radius-md)',
-            fontWeight: 'bold',
-            marginTop: '2rem',
-            cursor: 'pointer'
-          }}
-        >
-          Close
-        </button>
       </div>
     </div>
   );

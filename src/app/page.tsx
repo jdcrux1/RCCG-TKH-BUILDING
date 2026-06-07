@@ -16,8 +16,8 @@ export default function Home() {
         {/* Background Image Container */}
         <div className={styles.background}>
           <Image 
-            src="/images/hero-building.png" 
-            alt="The King&apos;s House Citadel" 
+            src="/images/tkh-3d.jpg" 
+            alt="The King&apos;s House 3D Render" 
             fill
             className={styles.backgroundImg}
             priority
@@ -46,8 +46,9 @@ export default function Home() {
             <Link href="/login" className={styles.primaryBtn}>
               Kingdom Builder Login <ArrowRight size={24} />
             </Link>
-            <InstantDonate className={styles.primaryBtn} />
           </div>
+
+          <InstantDonate />
 
           <div className={styles.statsGrid}>
             <div className={styles.statItem}>
