@@ -4,6 +4,7 @@ import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { Target, Award, CheckCircle2, CalendarDays, Flame, Quote, Users, Landmark, Copy, Info } from 'lucide-react';
 import TaxReceiptButton from '@/components/TaxReceiptButton';
+import LogPaymentInstructionsButton from '@/components/LogPaymentInstructionsButton';
 import PaymentClaimForm from './PaymentClaimForm';
 import BankDetailsBanner from '@/components/BankDetailsBanner';
 import MilestonesTimeline from '@/components/MilestonesTimeline';
@@ -265,6 +266,7 @@ export default async function DonorDashboard() {
           <p style={{ opacity: 0.6 }}>Thank you for being a part of the Kingdom Builders family.</p>
         </div>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <LogPaymentInstructionsButton />
           {totalContributed > BigInt(0) && <TaxReceiptButton donorName={donor.name} totalContributed={Number(totalContributed)} />}
         </div>
       </section>
