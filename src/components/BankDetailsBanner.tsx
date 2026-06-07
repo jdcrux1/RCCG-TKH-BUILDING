@@ -71,9 +71,9 @@ export default function BankDetailsBanner({ donorName, donorRefId }: { donorName
       </div>
 
       <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', 
-        gap: '1.2rem',
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: '0.8rem',
         background: 'rgba(255,255,255,0.1)',
         padding: '1.2rem',
         borderRadius: 'var(--radius-sm)',
@@ -95,20 +95,6 @@ export default function BankDetailsBanner({ donorName, donorRefId }: { donorName
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.15)', padding: '10px 14px', borderRadius: '6px' }}>
           <div>
-            <p style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.8, marginBottom: '2px' }}>Account Number</p>
-            <p style={{ fontWeight: 'bold', fontSize: '1.05rem', fontFamily: 'monospace', margin: 0 }}>{accountNumber}</p>
-          </div>
-          <button 
-            onClick={() => handleCopy(accountNumber, "Account Number")}
-            style={{ background: 'transparent', color: 'inherit', padding: '6px', minWidth: 'auto', minHeight: 'auto', cursor: 'pointer' }}
-            title="Copy Account Number"
-          >
-            {copiedField === "Account Number" ? <Check size={16} color="#10b981" /> : <Copy size={16} style={{ opacity: 0.7 }} />}
-          </button>
-        </div>
-
-        <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.15)', padding: '10px 14px', borderRadius: '6px' }}>
-          <div>
             <p style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.8, marginBottom: '2px' }}>Account Name</p>
             <p style={{ fontWeight: 'bold', fontSize: '1rem', margin: 0 }}>{accountName}</p>
           </div>
@@ -118,6 +104,20 @@ export default function BankDetailsBanner({ donorName, donorRefId }: { donorName
             title="Copy Account Name"
           >
             {copiedField === "Account Name" ? <Check size={16} color="#10b981" /> : <Copy size={16} style={{ opacity: 0.7 }} />}
+          </button>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.15)', padding: '10px 14px', borderRadius: '6px' }}>
+          <div>
+            <p style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.8, marginBottom: '2px' }}>Account Number</p>
+            <p style={{ fontWeight: 'bold', fontSize: '1.2rem', fontFamily: 'monospace', margin: 0, color: 'white' }}>{accountNumber}</p>
+          </div>
+          <button 
+            onClick={() => handleCopy(accountNumber, "Account Number")}
+            style={{ background: 'transparent', color: 'inherit', padding: '6px', minWidth: 'auto', minHeight: 'auto', cursor: 'pointer' }}
+            title="Copy Account Number"
+          >
+            {copiedField === "Account Number" ? <Check size={16} color="#10b981" /> : <Copy size={16} style={{ opacity: 0.7 }} />}
           </button>
         </div>
       </div>
