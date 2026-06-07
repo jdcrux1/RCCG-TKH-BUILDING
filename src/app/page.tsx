@@ -27,42 +27,48 @@ export default function Home() {
           </div>
 
           <div className={styles.heroContent}>
-            <span className={styles.label}>Building Project 2026-2028</span>
-            
-            <h1 className={styles.title}>
-              Building a <br />
-              <span className="text-gold">Sanctuary of Faith</span><br />
-              Together.
-            </h1>
+            <div className={styles.heroLeft}>
+              <span className={styles.label}>Building Project 2026-2028</span>
+              
+              <h1 className={styles.title}>
+                Building a <br />
+                <span className="text-gold">Sanctuary of Faith</span><br />
+                Together.
+              </h1>
 
-            <p className={styles.subtitle}>
-              Join us in our mission to build a monument for Kingdom Advancement.
-            </p>
+              <p className={styles.subtitle}>
+                Join us in our mission to build a monument for Kingdom Advancement.
+              </p>
 
-            <div className={styles.cta}>
-              <Link href="/login" className={styles.primaryBtn}>
-                Kingdom Builder Login <ArrowRight size={24} />
-              </Link>
+              <div className={styles.cta}>
+                <Link href="/login" className={styles.primaryBtn}>
+                  Kingdom Builder Login <ArrowRight size={24} />
+                </Link>
+              </div>
+
+              <div className={styles.statsGrid}>
+                <div className={styles.statItem}>
+                  <span className={styles.statValue}>₦650M</span>
+                  <span className={styles.statLabel}>Campaign Goal</span>
+                </div>
+                <div className={styles.statItem}>
+                  <span className={styles.statValue}>1,000+</span>
+                  <span className={styles.statLabel}>Target Partners</span>
+                </div>
+                <div className={styles.statItem}>
+                  <span className={styles.statValue}>24</span>
+                  <span className={styles.statLabel}>Month Journey</span>
+                </div>
+              </div>
             </div>
 
-            <div className={styles.statsGrid}>
-              <div className={styles.statItem}>
-                <span className={styles.statValue}>₦650M</span>
-                <span className={styles.statLabel}>Campaign Goal</span>
-              </div>
-              <div className={styles.statItem}>
-                <span className={styles.statValue}>1,000+</span>
-                <span className={styles.statLabel}>Target Partners</span>
-              </div>
-              <div className={styles.statItem}>
-                <span className={styles.statValue}>24</span>
-                <span className={styles.statLabel}>Month Journey</span>
-              </div>
+            <div className={styles.heroRight}>
+              <InstantDonate />
             </div>
 
             <div className={styles.scrollIndicator}>
-              <span className={styles.scrollText}>Discover the Vision</span>
               <div className={styles.scrollLine}></div>
+              <span className={styles.scrollText}>Discover the Vision</span>
             </div>
           </div>
         </section>
@@ -79,10 +85,7 @@ export default function Home() {
                 premium first-floor facilities tailored for children and youth, and a dedicated basement ensuring ample parking for all members and guests.
               </p>
               
-              {/* Quick Give placed logically after the vision pitch */}
-              <div style={{ marginTop: '3rem' }}>
-                <InstantDonate />
-              </div>
+              {/* Quick Give now prominently displayed in Hero section */}
             </div>
             
             <div className={styles.visionImageWrapper}>

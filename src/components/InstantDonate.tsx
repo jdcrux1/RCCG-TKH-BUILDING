@@ -15,7 +15,6 @@ export default function InstantDonate() {
 
   return (
     <div className="glass-card" style={{
-      marginTop: '2rem',
       maxWidth: '500px',
       width: '100%',
       background: 'rgba(255, 255, 255, 0.05)',

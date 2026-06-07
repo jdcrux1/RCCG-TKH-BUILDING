@@ -60,6 +60,21 @@
   margin: 0 auto;
   padding-left: max(2rem, env(safe-area-inset-left));
   padding-right: max(2rem, env(safe-area-inset-right));
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4rem;
+}
+
+.heroLeft {
+  flex: 1;
+  max-width: 700px;
+}
+
+.heroRight {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .label {
@@ -147,26 +162,26 @@
 .scrollIndicator {
   position: absolute;
   bottom: 2rem;
-  left: max(2rem, env(safe-area-inset-left));
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  opacity: 0.6;
+  gap: 0.5rem;
+  opacity: 0.8;
+  z-index: 20;
 }
 
 .scrollText {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  transform: rotate(-90deg);
-  transform-origin: left center;
-  margin-bottom: 60px;
   white-space: nowrap;
 }
 
 .scrollLine {
   width: 1px;
-  height: 60px;
+  height: 40px;
   background: rgba(255, 255, 255, 0.3);
   position: relative;
   overflow: hidden;
@@ -291,6 +306,15 @@
 
 /* MOBILE RESPONSIVE */
 @media (max-width: 1024px) {
+  .heroContent {
+    flex-direction: column;
+    justify-content: center;
+    gap: 2rem;
+  }
+  .heroRight {
+    justify-content: flex-start;
+    width: 100%;
+  }
   .visionContent {
     flex-direction: column;
     gap: 4rem;
