@@ -21,7 +21,8 @@ export default function BankDetailsBanner({ donorName, donorRefId }: { donorName
   };
 
   const getWhatsAppLink = () => {
-    const text = `Hello RCCG TKH Committee, I have just completed my manual bank transfer contribution. Details:\n\n- *Name*: ${donorName}\n- *Donor ID*: ${uniqueId}\n- *Amount*: ₦\n- *Bank Transferred From*: \n- *Date*: ${new Date().toLocaleDateString()}\n\nI have uploaded the claim in the portal. Please verify. Thank you!`;
+    const formattedDate = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const text = `Hello RCCG TKH Building Committee, I have just completed my manual bank transfer contribution. Details:\n\n- *Name*: ${donorName}\n- *Donor ID*: ${uniqueId}\n- *Amount*: ₦\n- *Bank Transferred From*: \n- *Date*: ${formattedDate}\n\nI have uploaded the claim in the portal. Please verify. Thank you!`;
     return `https://wa.me/2348052039445?text=${encodeURIComponent(text)}`;
   };
 
