@@ -60,17 +60,26 @@ export default function LiveVelocityTracker({ currentRaised, targetGoal, monthly
       currentPaceFormatted = `${Math.ceil(monthlyVelocity).toLocaleString()}`;
     }
 
-    velocityElement = (
-      <div className={styles.predictiveBlock}>
-        <div className={styles.projectedDate}>Projected ₦650M Target: <span className={styles.highlightDate}>{monthName} {year}</span></div>
-        <div className={styles.paceSubtext}>Based on current pace of ₦{currentPaceFormatted}/mo</div>
-      </div>
-    );
+    if (year > 2100) {
+      velocityElement = (
+        <div className={styles.predictiveBlock}>
+          <div className={styles.projectedDate}>Projected ₦650M Target: <span className={styles.highlightDate}>Awaiting higher velocity...</span></div>
+          <div className={styles.paceSubtext}>Based on current pace of ₦{currentPaceFormatted}/mo</div>
+        </div>
+      );
+    } else {
+      velocityElement = (
+        <div className={styles.predictiveBlock}>
+          <div className={styles.projectedDate}>Projected ₦650M Target: <span className={styles.highlightDate}>{monthName}, Year {year}</span></div>
+          <div className={styles.paceSubtext}>Based on current pace of ₦{currentPaceFormatted}/mo</div>
+        </div>
+      );
+    }
   } else {
     velocityElement = (
       <div className={styles.predictiveBlock}>
-        <div className={styles.projectedDate}>Projected ₦650M Target: <span className={styles.highlightDate}>Action Required</span></div>
-        <div className={styles.paceSubtext}>Current 30-day velocity is ₦0</div>
+        <div className={styles.projectedDate}>Projected ₦650M Target: <span className={styles.highlightDate}>Awaiting first reconciliation</span></div>
+        <div className={styles.paceSubtext}>Current monthly velocity is ₦0</div>
       </div>
     );
   }

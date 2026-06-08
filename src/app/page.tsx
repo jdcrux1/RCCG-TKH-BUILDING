@@ -16,10 +16,32 @@ export default async function Home() {
   const totalContributions = await prisma.contribution.aggregate({ _sum: { amount: true } });
   const currentRaised = Number(totalContributions._sum.amount || 0) / 100;
 
-  // Calculate 30-day velocity
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  // Calculate Stable Velocity (28th-Reconciliation Rule)
+  const now = new Date();
+  const currentDay = now.getDate();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  let targetMonthStart: Date;
+  let targetMonthEnd: Date;
+
+  if (currentDay >= 28) {
+    // Use current month (from 1st to end of month)
+    targetMonthStart = new Date(currentYear, currentMonth, 1);
+    targetMonthEnd = new Date(currentYear, currentMonth + 1, 0, 23, 59, 59, 999);
+  } else {
+    // Use previous month (from 1st to end of month)
+    targetMonthStart = new Date(currentYear, currentMonth - 1, 1);
+    targetMonthEnd = new Date(currentYear, currentMonth, 0, 23, 59, 59, 999);
+  }
+
   const recentContributions = await prisma.contribution.aggregate({
-    where: { date: { gte: thirtyDaysAgo } },
+    where: { 
+      date: { 
+        gte: targetMonthStart,
+        lte: targetMonthEnd
+      } 
+    },
     _sum: { amount: true }
   });
   const monthlyVelocity = Number(recentContributions._sum.amount || 0) / 100;
