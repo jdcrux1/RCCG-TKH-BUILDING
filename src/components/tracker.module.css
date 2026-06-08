@@ -11,7 +11,7 @@
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 100px;
-  padding: 0.75rem 1.5rem;
+  padding: 1rem 2rem;
   display: inline-flex;
   align-items: center;
   gap: 2rem;
@@ -78,11 +78,12 @@
 @media (max-width: 768px) {
   .trackerShell {
     flex-direction: column;
-    border-radius: 16px;
-    align-items: flex-start;
+    border-radius: 20px;
+    align-items: center;
     gap: 1rem;
     padding: 1.5rem;
     width: 100%;
+    text-align: center;
   }
   
   .zoneDivider {

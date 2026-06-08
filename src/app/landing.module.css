@@ -7,13 +7,18 @@
 /* --- FLOATING PILL NAVIGATION --- */
 .navWrapper {
   position: fixed;
-  top: 20px;
+  top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  width: 100%;
+  height: 80px;
+  z-index: 50;
   display: flex;
   justify-content: center;
-  pointer-events: none; /* Let clicks pass through the wrapper */
+  align-items: center;
+  background: rgba(13, 15, 18, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .navPill {
@@ -83,12 +88,14 @@
 /* --- HERO SECTION --- */
 .heroSection {
   position: relative;
-  height: 100vh;
-  min-height: 800px;
+  min-height: 100vh;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  padding-top: 120px;
+  text-align: center;
   overflow: hidden;
-  padding-top: 120px; /* Offset for sticky header */
 }
 
 .background {
@@ -125,15 +132,19 @@
   margin: 0 auto;
   padding-left: max(2rem, env(safe-area-inset-left));
   padding-right: max(2rem, env(safe-area-inset-right));
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  text-align: center;
   gap: 4rem;
 }
 
 .heroLeft {
-  flex: 1;
-  max-width: 700px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .heroRight {
@@ -144,30 +155,30 @@
 
 .label {
   display: inline-block;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  color: var(--accent);
-  margin-bottom: 0.5rem;
-  opacity: 0.8;
+  color: var(--accent, #D4AF37);
+  margin-bottom: 1.5rem;
 }
 
 .title {
-  font-size: clamp(3rem, 7vw, 6.5rem);
-  font-weight: 900;
-  line-height: 1.05;
-  margin-bottom: 2rem;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.1;
   max-width: 800px;
+  color: #FFFFFF;
+  margin: 0 auto 2rem auto;
   letter-spacing: -0.03em;
   text-wrap: balance;
 }
 
 .subtitle {
-  font-size: clamp(1.1rem, 2vw, 1.4rem);
-  color: rgba(255, 255, 255, 0.75);
-  max-width: 550px;
-  margin-bottom: 3rem;
+  font-size: 1.1rem;
+  color: #D1D5DB;
+  max-width: 600px;
+  margin: 1.5rem auto 3rem auto;
   line-height: 1.6;
   text-wrap: pretty;
 }
@@ -175,8 +186,10 @@
 .cta {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 1.5rem;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .primaryBtn {
@@ -439,10 +452,18 @@
 }
 
 @media (max-width: 768px) {
+  .heroSection {
+    padding-top: 100px;
+  }
+
   .navWrapper {
     top: auto;
     bottom: 20px;
     padding: 0 20px;
+    height: auto;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
   
   .navPill {
