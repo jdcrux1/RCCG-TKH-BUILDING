@@ -32,7 +32,7 @@ export default function ExecutiveDashboardClient({ data }: { data: Data }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', paddingBottom: '24px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
         <div>
           <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#d4af37', margin: 0 }}>Executive Dashboard</h1>
-          <p style={{ color: '#888', margin: '4px 0 0 0', fontSize: '14px' }}>Welcome, {data.name}</p>
+          <p style={{ color: '#888', margin: '4px 0 0 0', fontSize: '14px' }}>Welcome, Pastor Ayotunde Olumide</p>
         </div>
         <button 
           onClick={handleLogout}
