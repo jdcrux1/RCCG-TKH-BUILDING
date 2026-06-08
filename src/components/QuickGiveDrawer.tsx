@@ -22,18 +22,18 @@ export default function QuickGiveDrawer() {
   return (
     <>
       <button className={styles.triggerBtn} onClick={() => setIsOpen(true)}>
-        <Heart size={20} color="#F59E0B" /> Quick Give
+        Quick Give (Transfer)
       </button>
 
-      <div className={`${styles.drawerOverlay} ${isOpen ? styles.open : ''}`} onClick={() => setIsOpen(false)}>
-        <div className={styles.drawerContent} onClick={(e) => e.stopPropagation()}>
-          <div className={styles.closeHeader}>
-            <button className={styles.closeBtn} onClick={() => setIsOpen(false)}>
-              <X size={20} />
-            </button>
-          </div>
-          <InstantDonate />
+      <div className={`${styles.drawerOverlay} ${isOpen ? styles.open : ''}`} onClick={() => setIsOpen(false)} />
+      
+      <div className={`${styles.drawerContent} ${isOpen ? styles.open : ''}`}>
+        <div className={styles.closeHeader}>
+          <button className={styles.closeBtn} onClick={() => setIsOpen(false)}>
+            <X size={20} />
+          </button>
         </div>
+        <InstantDonate />
       </div>
     </>
   );

@@ -2,14 +2,12 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 2000;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 100;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  display: flex;
-  justify-content: flex-end;
+  transition: opacity 0.4s ease;
 }
 
 .drawerOverlay.open {
@@ -18,21 +16,23 @@
 }
 
 .drawerContent {
-  width: 100%;
-  max-width: 450px;
+  position: fixed;
+  top: 0;
+  right: 0;
   height: 100vh;
+  width: 450px;
   background: #0D0F12;
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: -20px 0 60px rgba(0, 0, 0, 0.6);
-  transform: translateX(100%);
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  display: flex;
-  flex-direction: column;
-  padding: 2rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: -20px 0 50px rgba(0, 0, 0, 0.7);
+  z-index: 101;
+  padding: 3rem 2rem;
   overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.drawerOverlay.open .drawerContent {
+.drawerOverlay.open + .drawerContent, /* In case they are siblings */
+.drawerContent.open {
   transform: translateX(0);
 }
 
@@ -62,47 +62,46 @@
 }
 
 .triggerBtn {
-  background: rgba(255, 255, 255, 0.05);
-  color: #FFFFFF;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  border-radius: 8px;
+  color: #FFFFFF;
   padding: 1.25rem 2.5rem;
-  border-radius: 4px;
   font-weight: 700;
   font-size: 1.125rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s;
   display: flex;
   align-items: center;
   gap: 0.75rem;
   cursor: pointer;
-  backdrop-filter: blur(8px);
 }
 
 .triggerBtn:hover {
+  border-color: #D4AF37;
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
   background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(212, 175, 55, 0.8);
-  transform: scale(1.02);
-  color: #D4AF37;
 }
 
 /* Mobile: Bottom Sheet Drop */
 @media (max-width: 768px) {
-  .drawerOverlay {
-    align-items: flex-end;
-  }
-  
   .drawerContent {
-    max-width: 100%;
+    top: auto;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
     height: auto;
     max-height: 85vh;
     border-left: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 24px 24px 0 0;
     transform: translateY(100%);
   }
 
-  .drawerOverlay.open .drawerContent {
+  .drawerContent.open {
     transform: translateY(0);
   }
 
