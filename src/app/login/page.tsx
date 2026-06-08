@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, Lock, Key, ArrowRight, Loader2, ArrowLeft } from 'lucide-react';
+import { User, Lock, Key, ArrowRight, Loader2, ArrowLeft, Home } from 'lucide-react';
 import styles from './login.module.css';
 
 export default function UnifiedLogin() {
@@ -213,6 +213,16 @@ export default function UnifiedLogin() {
 
             <button type="submit" className={styles.button} disabled={isBusy}>
               {isBusy ? <Loader2 className="animate-spin" /> : <>Continue <ArrowRight size={18} /></>}
+            </button>
+
+            <button 
+              type="button" 
+              onClick={() => router.push('/')} 
+              className={styles.backBtn} 
+              disabled={isBusy}
+              style={{ marginTop: '8px' }}
+            >
+              <Home size={16} /> Return to Homepage
             </button>
           </form>
         ) : (
