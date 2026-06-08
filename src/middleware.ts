@@ -10,6 +10,7 @@ const ROLES = {
   ADMIN: 'ADMIN',
   ONBOARDER: 'ONBOARDER',
   DONOR: 'DONOR',
+  EXECUTIVE: 'EXECUTIVE',
 } as const;
 
 type Role = typeof ROLES[keyof typeof ROLES];
@@ -24,8 +25,10 @@ const PUBLIC_ROUTES = [
 const PUBLIC_API_ROUTES = [
   '/api/auth/identify',
   '/api/auth/verify',
+  '/api/auth/magic',
   '/api/cron/maintenance',
   '/api/sudo-refresh',
+  '/api/pledge-request',
 ];
 
 function isPublicRoute(path: string): boolean {
@@ -82,12 +85,12 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', origin));
   }
 
-  // 2. Handle session-based authentication
   let payload = null;
   if (session) {
     try {
       payload = await decrypt(session);
-    } catch {
+    } catch (e) {
+      console.error("Middleware Session Decrypt Error:", e);
       // Invalid session - clear and continue (will redirect below)
       const response = NextResponse.next();
       response.cookies.delete('session');
@@ -120,6 +123,9 @@ export default async function middleware(request: NextRequest) {
     }
     if (role === ROLES.DONOR) {
       return NextResponse.redirect(new URL('/dashboard', origin));
+    }
+    if (role === ROLES.EXECUTIVE) {
+      return NextResponse.redirect(new URL('/executive', origin));
     }
   }
 

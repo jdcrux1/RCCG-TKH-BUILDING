@@ -15,7 +15,11 @@ export default async function ExecutiveDashboard() {
   }
 
   const session = await decrypt(token);
+
+  console.log("Decrypted Session in /executive:", session);
+
   if (!session || session.role !== 'EXECUTIVE') {
+    console.error("Redirecting because session invalid or role mismatch:", session);
     redirect('/login');
   }
 
