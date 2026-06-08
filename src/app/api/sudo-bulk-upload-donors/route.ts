@@ -53,28 +53,30 @@ export async function POST(request: NextRequest) {
 
         currentCount++;
         const donorRefId = `KB-${currentCount.toString().padStart(3, '0')}`;
-        const plainPin = crypto.randomInt(1000, 10000).toString();
-        const hashedPin = await hashPin(plainPin);
+        const claimToken = crypto.randomBytes(32).toString('hex');
+        const claimTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
         await prisma.donor.create({
           data: {
             name: sanitizedName,
             phone: sanitizedPhone,
             donorRefId,
-            pin: hashedPin,
+            pin: null,
             tier: 'SUPPORTER',
             monthlyPledge: BigInt(0),
             totalPledged: BigInt(0),
             role: 'DONOR',
+            isClaimed: false,
+            claimToken,
+            claimTokenExpires
           }
         });
 
-        // Add to success results with plain PIN for WhatsApp
         results.push({
           name: sanitizedName,
           phone: sanitizedPhone,
           donorRefId,
-          pin: plainPin
+          claimToken
         });
 
         successCount++;

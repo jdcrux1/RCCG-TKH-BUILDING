@@ -51,8 +51,8 @@ export async function POST(request: NextRequest) {
       const currentCount = await prisma.donor.count();
       const donorRefId = `KB-${(currentCount + 1).toString().padStart(3, '0')}`;
       
-      const plainPin = crypto.randomInt(1000, 10000).toString();
-      const hashedPin = await hashPin(plainPin);
+      const claimToken = crypto.randomBytes(32).toString('hex');
+      const claimTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
       await prisma.$transaction([
         prisma.donor.create({
@@ -60,11 +60,14 @@ export async function POST(request: NextRequest) {
             name: pledge.name,
             phone: pledge.phone,
             donorRefId,
-            pin: hashedPin,
+            pin: null,
             tier: pledge.tier,
             monthlyPledge: monthlyPledgeKobo,
             totalPledged: monthlyPledgeKobo * BigInt(24),
             role: 'DONOR',
+            isClaimed: false,
+            claimToken,
+            claimTokenExpires
           }
         }),
         prisma.pledgeRequest.update({
@@ -82,7 +85,7 @@ export async function POST(request: NextRequest) {
           name: pledge.name,
           phone: pledge.phone,
           donorRefId,
-          pin: plainPin
+          claimToken
         }
       });
     }

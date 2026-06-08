@@ -533,8 +533,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
     <div style={{ marginBottom: '12px', fontSize: '14px', color: '#888' }}>BULK ONBOARD DONORS (CSV)</div>
     <div style={{ background: '#111', padding: '16px', border: '1px solid #333', marginBottom: '20px' }}>
       <p style={{ fontSize: '12px', color: '#aaa', marginBottom: '16px' }}>
-        Upload a CSV file containing at minimum `Name` and `Phone` columns. The system will automatically generate Donor IDs and secure random passwords.
-        <strong> Passwords will only be shown ONCE immediately after upload so you can send WhatsApp messages.</strong>
+        Upload a CSV file containing at minimum `Name` and `Phone` columns. The system will automatically generate Donor IDs and secure single-use claim links for the donors to set their own passwords.
       </p>
       <input 
         type="file" 
@@ -596,23 +595,24 @@ export default function SudoDashboard({ data }: { data: Data }) {
       <div style={{ background: '#111', padding: '16px', border: '1px solid #0f0' }}>
         <h3 style={{ color: '#0f0', marginBottom: '16px' }}>Successfully Created ({csvData.length})</h3>
         <p style={{ color: '#aaa', fontSize: '12px', marginBottom: '16px' }}>
-          <strong>WARNING:</strong> This is the ONLY time you will see these generated passwords. Do not refresh this page until you have sent the messages or downloaded the backup CSV.
+          <strong>ACTION REQUIRED:</strong> Please click the WhatsApp buttons below to send the highly secure one-time claim links to the donors so they can set up their own passwords.
         </p>
         
         <button 
           onClick={() => {
-            const csvRows = ['Name,Phone,DonorID,Password'];
-            csvData.forEach(d => csvRows.push(`"${d.name}","${d.phone}","${d.donorRefId}","${d.pin}"`));
+            const domain = window.location.origin;
+            const csvRows = ['Name,Phone,DonorID,ClaimLink'];
+            csvData.forEach(d => csvRows.push(`"${d.name}","${d.phone}","${d.donorRefId}","${domain}/claim?token=${d.claimToken}"`));
             const blob = new Blob([csvRows.join('\\n')], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `BulkDonors_Passwords_${new Date().getTime()}.csv`;
+            a.download = `BulkDonors_ClaimLinks_${new Date().getTime()}.csv`;
             a.click();
           }}
           style={{ marginBottom: '16px', background: '#333', color: '#fff', border: '1px solid #555', padding: '8px 16px', cursor: 'pointer' }}
         >
-          Download Passwords CSV Backup
+          Download Claim Links CSV Backup
         </button>
 
         <div className="tableResponsive" style={{ maxHeight: '500px', overflowY: 'auto' }}>
@@ -622,13 +622,13 @@ export default function SudoDashboard({ data }: { data: Data }) {
                 <th style={{ padding: '8px', textAlign: 'left' }}>NAME</th>
                 <th style={{ padding: '8px', textAlign: 'left' }}>PHONE</th>
                 <th style={{ padding: '8px', textAlign: 'left' }}>DONOR ID</th>
-                <th style={{ padding: '8px', textAlign: 'left' }}>PIN</th>
                 <th style={{ padding: '8px', textAlign: 'center' }}>ACTION</th>
               </tr>
             </thead>
             <tbody>
               {csvData.map((donor, idx) => {
-                const message = `Hello ${donor.name.split(' ')[0]}, you've been invited to the RCCG TKH Kingdom Builders portal!\n\nYour unique Donor ID is: ${donor.donorRefId}\nYour secure login password is: ${donor.pin}\n\nPlease log in at: https://rccg-tkh-building.vercel.app/login`;
+                const domain = typeof window !== 'undefined' ? window.location.origin : '';
+                const message = `Welcome to Kingdom Builders, ${donor.name.split(' ')[0]}! Thank you for your pledge. Please click this secure, one-time link to claim your dashboard and set up your private password: ${domain}/claim?token=${donor.claimToken}`;
                 const waLink = `https://wa.me/${donor.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
                 
                 return (
@@ -636,7 +636,6 @@ export default function SudoDashboard({ data }: { data: Data }) {
                     <td style={{ padding: '8px' }}>{donor.name}</td>
                     <td style={{ padding: '8px' }}>{donor.phone}</td>
                     <td style={{ padding: '8px', fontWeight: 'bold', color: 'var(--tier-primary)' }}>{donor.donorRefId}</td>
-                    <td style={{ padding: '8px', fontWeight: 'bold', color: '#f00', fontFamily: 'monospace' }}>{donor.pin}</td>
                     <td style={{ padding: '8px', textAlign: 'center' }}>
                       <a 
                         href={waLink}
@@ -696,19 +695,19 @@ export default function SudoDashboard({ data }: { data: Data }) {
                         if (res.ok) {
                           setPledgeRequests(pledgeRequests.filter((p: any) => p.id !== pledge.id));
                           // Show credentials temporarily
+                          const domain = window.location.origin;
                           const msg = encodeURIComponent(
                             `🕊️ *Grace and Peace to you, Church Family!* 🕊️\n\n` +
                             `Thank you for pledging to become a Kingdom Builder! Your account has been successfully created.\n\n` +
                             `1️⃣ Your unique *Donor ID*: ${data.donorInfo.donorRefId}\n` +
-                            `2️⃣ Your secure *Login PIN*: ${data.donorInfo.pin}\n` +
-                            `3️⃣ The *Direct Link*: https://rccg-tkh-building.vercel.app/login\n\n` +
+                            `2️⃣ Click this secure, one-time link to claim your dashboard and set up your private password: ${domain}/claim?token=${data.donorInfo.claimToken}\n\n` +
                             `"Let us rise up and build." (Nehemiah 2:18). God bless you abundantly! 🙌🏽⛪`
                           );
                           const waUrl = `https://wa.me/${pledge.phone.replace('+', '')}?text=${msg}`;
                           
                           // We open it in a new tab immediately
                           window.open(waUrl, '_blank');
-                          alert(`Account created!\nID: ${data.donorInfo.donorRefId}\nPIN: ${data.donorInfo.pin}\n\nA WhatsApp tab should have opened automatically.`);
+                          alert(`Account created!\nID: ${data.donorInfo.donorRefId}\n\nA WhatsApp tab should have opened automatically with their secure Claim Link.`);
                         } else {
                           alert(data.error);
                         }
