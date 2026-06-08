@@ -1,0 +1,156 @@
+.dashboardShell {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.mainTitle {
+  font-size: clamp(1.5rem, 5vw, 1.75rem);
+  font-weight: 600;
+  color: #FFFFFF;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.subtitle {
+  opacity: 0.6;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  color: #9CA3AF;
+}
+
+.bentoCard {
+  background: #0D0F12;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+}
+
+.successBentoCard {
+  background: #0D0F12;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 16px;
+  padding: 0;
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+
+.tableResponsiveWrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cleanTable {
+  width: 100%;
+  min-width: max-content;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.cleanTable th {
+  padding: 1rem 1.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9CA3AF;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  background: #0A0C0F;
+}
+
+.cleanTable td {
+  padding: 1rem 1.5rem;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tableRow {
+  transition: background 0.2s ease;
+}
+
+.tableRow:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.tableRow td:first-child {
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.whatsappButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #25D366;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  padding: 0 1rem;
+  min-height: 44px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.whatsappButton:hover {
+  opacity: 0.9;
+}
+
+.fileInputArea {
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 3rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.fileInputArea:hover {
+  border-color: rgba(16, 185, 129, 0.5);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.submitBtn {
+  margin-top: 1.5rem;
+  background: #FFFFFF;
+  color: #000000;
+  border: none;
+  border-radius: 8px;
+  padding: 0 2rem;
+  min-height: 44px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .dashboardShell {
+    padding: 8px;
+  }
+  .bentoCard {
+    padding: 1.25rem;
+    border-radius: 8px;
+  }
+}

@@ -1,0 +1,95 @@
+.trackerWrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(2rem, 4vw, 4rem);
+  width: 100%;
+}
+
+.trackerShell {
+  background: rgba(13, 15, 18, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 100px;
+  padding: 0.75rem 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 2rem;
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+}
+
+.zone {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.zoneDivider {
+  border-right: 1px solid rgba(255,255,255,0.1);
+  padding-right: 2rem;
+}
+
+.liveIndicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10B981;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.visionText {
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fundedText {
+  font-size: 0.95rem;
+  color: #E5E7EB;
+}
+
+.fundedPercentage {
+  font-weight: 700;
+  color: #F59E0B;
+}
+
+.velocityText {
+  font-size: 0.9rem;
+}
+
+.onTrack {
+  color: #10B981;
+  font-weight: 600;
+}
+
+.offTrack {
+  color: #F97316;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .trackerShell {
+    flex-direction: column;
+    border-radius: 16px;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    width: 100%;
+  }
+  
+  .zoneDivider {
+    border-right: none;
+    padding-right: 0;
+    width: 100%;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 1rem;
+  }
+}

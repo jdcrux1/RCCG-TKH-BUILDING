@@ -103,6 +103,7 @@ export async function POST(request: NextRequest) {
       const donor = await prisma.donor.findUnique({ where: { phone } });
       
       if (!donor) return NextResponse.json({ error: 'Account not found' }, { status: 404 });
+      if (!donor.pin) return NextResponse.json({ error: 'Account not setup. Please use your claim link.' }, { status: 401 });
       
       const isCorrectPin = await comparePin(normalizedCredential, donor.pin);
       if (!isCorrectPin) {

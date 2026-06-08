@@ -5,8 +5,24 @@ import styles from './landing.module.css';
 import InstantDonate from '@/components/InstantDonate';
 import PledgeForm from '@/components/PledgeForm';
 import RevealOnScroll from '@/components/RevealOnScroll';
+import LiveVelocityTracker from '@/components/LiveVelocityTracker';
+import { prisma } from '@/lib/prisma';
 
-export default function Home() {
+export default async function Home() {
+  const targetGoal = 650000000;
+  
+  // Calculate total raised
+  const totalContributions = await prisma.contribution.aggregate({ _sum: { amount: true } });
+  const currentRaised = Number(totalContributions._sum.amount || 0) / 100;
+
+  // Calculate 30-day velocity
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const recentContributions = await prisma.contribution.aggregate({
+    where: { date: { gte: thirtyDaysAgo } },
+    _sum: { amount: true }
+  });
+  const monthlyVelocity = Number(recentContributions._sum.amount || 0) / 100;
+
   return (
     <div className={styles.container}>
       {/* FLOATING PILL NAVIGATION */}
@@ -37,7 +53,6 @@ export default function Home() {
 
           <div className={styles.heroContent}>
             <div className={styles.heroLeft}>
-              <span className={styles.label}>Building Project 2026-2028</span>
               
               <RevealOnScroll>
                 <h1 className={styles.title}>
@@ -59,6 +74,14 @@ export default function Home() {
                     Kingdom Builder Login <ArrowRight size={24} />
                   </Link>
                 </div>
+              </RevealOnScroll>
+
+              <RevealOnScroll threshold={0.9}>
+                <LiveVelocityTracker 
+                  currentRaised={currentRaised} 
+                  targetGoal={targetGoal} 
+                  monthlyVelocity={monthlyVelocity} 
+                />
               </RevealOnScroll>
 
               <RevealOnScroll>

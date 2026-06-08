@@ -1,0 +1,34 @@
+=== EXECUTIVE & COMMITTEE MAGIC LINKS ===
+
+Account: Pastor Tosin Olalere (Role: COMMITTEE)
+Magic Login Link: https://rccg-tkh-building.vercel.app/api/auth/magic?token=85f272cb-0fe1-411e-b346-b431d113bf99
+--------------------------------------------------
+
+Account: Pastor Tunji Omotosho (Role: COMMITTEE)
+Magic Login Link: https://rccg-tkh-building.vercel.app/api/auth/magic?token=4a6ebcdf-6d38-4bad-8d90-a432403d7de6
+--------------------------------------------------
+
+Account: Mr. Matthew Johnson (Role: COMMITTEE)
+Magic Login Link: https://rccg-tkh-building.vercel.app/api/auth/magic?token=009a806e-6e68-43f0-8ef3-01e13d0cef34
+--------------------------------------------------
+
+Account: Mr. Micheal Adebayo (Role: COMMITTEE)
+Magic Login Link: https://rccg-tkh-building.vercel.app/api/auth/magic?token=7a247f8e-6c5d-436e-9a26-9e283479cdc2
+--------------------------------------------------
+
+Account: Mr. Femi Julius (Role: COMMITTEE)
+Magic Login Link: https://rccg-tkh-building.vercel.app/api/auth/magic?token=b62f9e5e-0548-46e4-a895-60326b91c7d1
+--------------------------------------------------
+
+Account: Mr. Falemi (Role: COMMITTEE)
+Magic Login Link: https://rccg-tkh-building.vercel.app/api/auth/magic?token=3e6528b9-771c-470a-b571-9494adaa62ae
+--------------------------------------------------
+
+Account: Prince (Role: COMMITTEE)
+Magic Login Link: https://rccg-tkh-building.vercel.app/api/auth/magic?token=d0e8ff1c-b495-477f-b9a3-48ad105d2953
+--------------------------------------------------
+
+Account: Pastor Ayotunde Olumide (Role: EXECUTIVE)
+Magic Login Link: https://rccg-tkh-building.vercel.app/api/auth/magic?token=98cc6847-188d-4c4a-b58c-ab27cb870e32
+--------------------------------------------------
+

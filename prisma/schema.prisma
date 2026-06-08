@@ -59,7 +59,7 @@ enum PledgeStatus {
 model Donor {
   id            String         @id @default(uuid())
   phone         String         @unique
-  pin           String
+  pin           String?
   donorRefId    String?        @unique // e.g., 'KB-045'
   name          String
   bankAccountName String?
@@ -77,6 +77,11 @@ model Donor {
   totalContributed BigInt        @default(0)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+
+  // Secure Claim Link Fields
+  isClaimed     Boolean        @default(false)
+  claimToken    String?        @unique
+  claimTokenExpires DateTime?
 
   // Indexes for fast lookups
   @@index([phone])
