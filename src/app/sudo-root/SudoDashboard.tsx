@@ -6,6 +6,7 @@ import Papa from 'papaparse';
 import { approvePaymentClaim, rejectPaymentClaim, generateMasterReport, reverseContribution, updateSystemVariable, revokeSession, killAllSessions } from './actions';
 import AddDonorModal from '@/components/AddDonorModal';
 import ConciergeLogger from './ConciergeLogger';
+import UnmanagedFundsLogger from './UnmanagedFundsLogger';
 
 type Data = {
   contributions: any[];
@@ -263,7 +264,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
       </div>
 
       <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
-        {['reconciliation', 'concierge', 'bulk_donors', 'bulk_contributions', 'watchtower', 'system', 'pledges'].map(tab => (
+        {['reconciliation', 'concierge', 'unmanaged_funds', 'bulk_donors', 'bulk_contributions', 'watchtower', 'system', 'pledges'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -356,6 +357,12 @@ export default function SudoDashboard({ data }: { data: Data }) {
       {activeTab === 'concierge' && (
         <div style={{ border: '1px solid #222', padding: '24px' }}>
           <ConciergeLogger />
+        </div>
+      )}
+
+      {activeTab === 'unmanaged_funds' && (
+        <div style={{ padding: '24px' }}>
+          <UnmanagedFundsLogger />
         </div>
       )}
 
