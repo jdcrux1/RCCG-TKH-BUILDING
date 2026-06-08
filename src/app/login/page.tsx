@@ -98,14 +98,12 @@ export default function UnifiedLogin() {
         <div className={styles.inputGroup}>
           <input
             type="password"
-            placeholder="Enter 4-Digit PIN"
+            placeholder="Enter your Password (or PIN)"
             value={credential}
             onChange={(e) => setCredential(e.target.value)}
             required
             className={styles.input}
-            style={{ paddingLeft: '1rem', textAlign: 'center', letterSpacing: '0.5rem', fontSize: '1.2rem' }}
-            maxLength={4}
-            pattern="\d{4}"
+            style={{ paddingLeft: '1rem', textAlign: 'center', fontSize: '1.2rem' }}
           />
         </div>
       );
@@ -150,7 +148,7 @@ export default function UnifiedLogin() {
   };
 
   const getRoleSubtitle = () => {
-    if (role === 'DONOR') return 'Enter your secure PIN to continue';
+    if (role === 'DONOR') return 'Enter your secure password to continue';
     if (role === 'SUPERADMIN') return 'Enter master passphrase';
     return 'Enter your password to continue';
   };
@@ -207,6 +205,9 @@ export default function UnifiedLogin() {
                 className={styles.input}
                 autoFocus
               />
+              <p style={{ fontSize: '0.8rem', color: 'var(--accent)', marginTop: '4px', opacity: 0.8 }}>
+                * Your username is the Phone Number you registered with
+              </p>
             </div>
 
             {error && <p className={styles.error}>{error}</p>}
