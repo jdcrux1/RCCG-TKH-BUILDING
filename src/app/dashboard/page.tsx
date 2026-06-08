@@ -261,7 +261,7 @@ export default async function DonorDashboard() {
               fontWeight: '600',
               boxShadow: '0 0 10px var(--tier-glow)'
             }}>
-              {donor.tier}
+              {donor.tier} {donor.monthlyPledge > BigInt(0) && `(₦${(Number(donor.monthlyPledge) / 100).toLocaleString()}/mo)`}
             </span>
           </h1>
           <p style={{ opacity: 0.6 }}>Thank you for being a part of the Kingdom Builders family.</p>

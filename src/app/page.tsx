@@ -6,6 +6,7 @@ import PledgeForm from '@/components/PledgeForm';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import LiveVelocityTracker from '@/components/LiveVelocityTracker';
 import QuickGiveModal from '@/components/QuickGiveModal';
+import PartnershipTiers from '@/components/PartnershipTiers';
 import { prisma } from '@/lib/prisma';
 
 export default async function Home() {
@@ -138,6 +139,9 @@ export default async function Home() {
             </RevealOnScroll>
           </div>
         </section>
+
+        {/* PARTNERSHIP TIERS SECTION */}
+        <PartnershipTiers />
 
         {/* PLEDGE CAPTURE SECTION */}
         <section id="pledge" className={styles.pledgeSection}>
