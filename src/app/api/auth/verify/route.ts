@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
         data: { userRole: donor.role, userId: donor.id }
       });
 
-      const expires = new Date(Date.now() + 2 * 60 * 60 * 1000);
+      const expires = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
       const sessionData = { 
         userId: donor.id, 
         role: donor.role, 
@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
       data: { userRole: staff.role, userId: staff.id }
     });
 
-    const expires = new Date(Date.now() + 2 * 60 * 60 * 1000);
+    const expires = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
     const sessionData = { 
       userId: staff.id, 
       role: staff.role, 

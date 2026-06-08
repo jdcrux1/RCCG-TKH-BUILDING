@@ -50,7 +50,7 @@ export async function claimAccount(token: string, pin: string) {
 
   const encryptedSession = await encrypt(sessionPayload);
   const cookieStore = await cookies();
-  cookieStore.set('session', encryptedSession, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 2 * 60 * 60 });
+  cookieStore.set('session', encryptedSession, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 90 * 24 * 60 * 60 });
 
   return { success: true };
 }
