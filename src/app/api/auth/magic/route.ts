@@ -7,35 +7,23 @@ import { comparePassword } from '@/lib/password';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  const token = request.nextUrl.searchParams.get('t');
+  const token = request.nextUrl.searchParams.get('token');
   
   if (!token) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
   try {
-    // Check if magic link exists in system variables
-    const magicLinkVar = await prisma.systemVariable.findUnique({
-      where: { key: 'pastor_magic_link_hash' }
+    // Validate token against Staff
+    const staff = await prisma.staff.findUnique({
+      where: { magicToken: token }
     });
 
-    if (!magicLinkVar) {
+    if (!staff) {
       return NextResponse.redirect(new URL('/login?error=Invalid_Link', request.url));
     }
 
-    // Verify token
-    const isValid = await comparePassword(token, magicLinkVar.value);
-    
-    if (!isValid) {
-      return NextResponse.redirect(new URL('/login?error=Invalid_Link', request.url));
-    }
-
-    // Get the pastor user
-    const staff = await prisma.staff.findUnique({ 
-      where: { username: 'leadpastor' } 
-    });
-
-    if (!staff || !staff.isActive) {
+    if (!staff.isActive) {
       return NextResponse.redirect(new URL('/login?error=Account_Disabled', request.url));
     }
 
@@ -44,7 +32,7 @@ export async function GET(request: NextRequest) {
       data: { userRole: staff.role, userId: staff.id }
     });
 
-    const expires = new Date(Date.now() + 12 * 60 * 60 * 1000); // 12 hours for pastor magic link
+    const expires = new Date(Date.now() + 12 * 60 * 60 * 1000); // 12 hours
     const sessionData = { 
       userId: staff.id, 
       role: staff.role, 
@@ -57,7 +45,12 @@ export async function GET(request: NextRequest) {
 
     await logActivity('LOGIN_SUCCESS', { userId: staff.id, role: staff.role, note: 'MAGIC_LINK_USED' });
 
-    const response = NextResponse.redirect(new URL('/executive', request.url));
+    let redirectUrl = '/admin/dashboard';
+    if (staff.role === 'EXECUTIVE') {
+      redirectUrl = '/executive';
+    }
+
+    const response = NextResponse.redirect(new URL(redirectUrl, request.url));
     response.cookies.set('session', sessionToken, { 
       expires, 
       httpOnly: true, 

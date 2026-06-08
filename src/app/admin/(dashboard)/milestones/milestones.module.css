@@ -1,0 +1,213 @@
+.dashboardShell {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.mainTitle {
+  font-size: clamp(1.5rem, 5vw, 1.75rem);
+  font-weight: 600;
+  color: #FFFFFF;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.subtitle {
+  opacity: 0.6;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  color: #9CA3AF;
+}
+
+/* Master Bento Wrapper */
+.milestonesBentoCard {
+  background: #0D0F12;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 0;
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+
+/* Grid-Based Row */
+.milestoneRow {
+  display: grid;
+  grid-template-columns: 1.5fr 2fr 1fr;
+  align-items: center;
+  gap: 2rem;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.2s ease;
+}
+
+.milestoneRow:last-child {
+  border-bottom: none;
+}
+
+.milestoneRow:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Column 1: Phase Name + Status Pill */
+.phaseInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.phaseName {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin: 0;
+}
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 100px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  min-height: 32px;
+}
+
+.statusPending {
+  background: rgba(255, 255, 255, 0.08);
+  color: #9CA3AF;
+}
+
+.statusActive {
+  background: rgba(234, 179, 8, 0.15);
+  color: #EAB308;
+}
+
+.statusFunded {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10B981;
+}
+
+/* Column 2: Visual Progress Bar */
+.progressColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.progressLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.progressTrack {
+  background: #1A1D24;
+  height: 8px;
+  border-radius: 100px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.6s ease;
+  min-width: 2px;
+}
+
+.fillDefault {
+  background: linear-gradient(90deg, #C5A55A, #E8D48B);
+}
+
+.fillFunded {
+  background: linear-gradient(90deg, #10B981, #34D399);
+}
+
+.fillActive {
+  background: linear-gradient(90deg, #EAB308, #FDE047);
+}
+
+/* Column 3: Typographic Stacking for Financials */
+.financials {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.currentAmount {
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #FFFFFF;
+}
+
+.goalAmount {
+  font-size: 0.85rem;
+  color: #9CA3AF;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Empty State */
+.emptyState {
+  padding: 4rem 2rem;
+  text-align: center;
+  color: #9CA3AF;
+  font-size: 0.95rem;
+}
+
+/* Responsive Overrides */
+@media (max-width: 1024px) {
+  .milestoneRow {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboardShell {
+    padding: 8px;
+    gap: 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .milestonesBentoCard {
+    border-radius: 8px;
+  }
+
+  .milestoneRow {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.25rem;
+  }
+
+  .progressLabel {
+    text-align: left;
+  }
+
+  .financials {
+    align-items: flex-start;
+  }
+}

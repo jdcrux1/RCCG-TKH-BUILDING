@@ -1,0 +1,123 @@
+.appHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem clamp(1.5rem, 5vw, 3rem);
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  min-height: 72px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brandCluster {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.homeIconWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(197, 160, 89, 0.1);
+  color: var(--primary-gold);
+  transition: background 0.2s ease;
+}
+
+.brandText {
+  font-weight: 700;
+  color: #FFFFFF;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.dashboardLayout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: clamp(2rem, 4vw, 4rem);
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
+.primaryColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.secondaryColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.paymentFormCard {
+  background: #11141A;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 3rem;
+}
+
+/* Ensure inputs are full width and min-height 48px */
+.paymentFormCard :global(input),
+.paymentFormCard :global(select),
+.paymentFormCard :global(button) {
+  min-height: 48px;
+  width: 100%;
+}
+
+.ledgerSection {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.milestoneTracker {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.quoteCard {
+  background: linear-gradient(145deg, #1A1A1A, #0D0F12);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.sectionHeader {
+  margin-bottom: 1.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.subText {
+  color: #9CA3AF;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+@media (max-width: 1024px) {
+  .dashboardLayout {
+    grid-template-columns: 1fr;
+  }
+}
+

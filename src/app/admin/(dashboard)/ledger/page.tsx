@@ -1,14 +1,19 @@
 export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/prisma';
-import { Calendar, CreditCard } from 'lucide-react';
-import PendingClaims from '@/components/PendingClaims';
+import { Calendar, CreditCard, Search, CalendarDays, Filter } from 'lucide-react';
 import LedgerEntryForm from '@/components/LedgerEntryForm';
+import { getSession } from '@/lib/auth';
+import styles from './ledger.module.css';
 
 export default async function ManualLedger({ 
   searchParams 
 }: { 
   searchParams: Promise<{ page?: string; q?: string }> 
 }) {
+  const session = await getSession();
+  const role = session?.role || '';
+  const isExecutive = role === 'LEAD_PASTOR' || role === 'COMMITTEE';
+
   const params = await searchParams;
   const page = parseInt(params.page || '1');
   const query = params.q || '';
@@ -43,7 +48,7 @@ export default async function ManualLedger({
       }
     : { role: 'DONOR' };
 
-  const [donors, contributions, total, pendingClaims] = await Promise.all([
+  const [donors, contributions, total, volumeAgg] = await Promise.all([
     prisma.donor.findMany({
       where: donorsWhere as any,
       orderBy: { name: 'asc' },
@@ -56,130 +61,143 @@ export default async function ManualLedger({
       include: { donor: true }
     }),
     prisma.contribution.count(),
-    prisma.paymentClaim.findMany({
-      where: { status: 'PENDING' },
-      include: { donor: true },
-      orderBy: { createdAt: 'desc' }
+    prisma.contribution.aggregate({
+      _sum: {
+        amount: true
+      }
     })
   ]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
+  const totalVolume = Number(volumeAgg._sum.amount || 0) / 100;
 
   return (
-    <div className="responsive-grid responsive-grid-2" style={{ gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 2fr)', animation: 'fadeIn 0.5s ease-out' }}>
-      {/* Log Form Section */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-        <LedgerEntryForm donors={donors.map(d => ({
-          ...d,
-          monthlyPledge: Number(d.monthlyPledge),
-          totalPledged: Number(d.totalPledged),
-          totalContributed: Number(d.totalContributed)
-        }))} initialQuery={query} />
-
-        {/* Pending Claims Verification Panel */}
-        <PendingClaims initialClaims={pendingClaims.map(c => ({
-          ...c,
-          amount: Number(c.amount)
-        })) as any} />
+    <div className={styles.dashboardShell}>
+      {/* Master Header Container */}
+      <div className={styles.headerWrapper}>
+        <div>
+          <h1 className={styles.mainTitle}>Transaction Audit</h1>
+          <p className={styles.subtitle}>Full chronological history of all campaign inflows</p>
+        </div>
+        <div className={styles.metricsStrip}>
+          <div className={styles.metricItem}>
+            <span className={styles.metricLabel}>Total Transactions</span>
+            <span className={styles.metricValue}>{total.toLocaleString()}</span>
+          </div>
+          <div className={styles.metricItem}>
+            <span className={styles.metricLabel}>Total Volume</span>
+            <span className={`${styles.metricValue} ${styles.metricAccent}`}>₦{totalVolume.toLocaleString()}</span>
+          </div>
+        </div>
       </div>
 
+      {/* Log Form Section */}
+      {!isExecutive && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+          <LedgerEntryForm donors={donors.map(d => ({
+            ...d,
+            monthlyPledge: Number(d.monthlyPledge),
+            totalPledged: Number(d.totalPledged),
+            totalContributed: Number(d.totalContributed)
+          }))} initialQuery={query} />
+        </div>
+      )}
+
       {/* Transaction History Section */}
-      <div className="glass-card tableResponsive">
-        <div style={{ padding: '24px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '800' }}>Transaction Audit</h2>
-            <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.5 }}>Full chronological history</p>
-          </div>
-          <div style={{ background: 'var(--success)20', color: 'var(--success)', padding: '4px 12px', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', fontWeight: '700' }} className="desktop-only">
-            {total} RECORDED
+      <div className={styles.ledgerBentoCard}>
+        <div className={styles.ledgerToolbar}>
+          <form className={styles.searchContainer} action="/admin/ledger">
+            <Search size={18} className={styles.searchIcon} />
+            <input 
+              name="q"
+              type="text" 
+              placeholder="Search by Donor Name or Phone..." 
+              defaultValue={query}
+              className={styles.searchInput}
+            />
+          </form>
+          <div className={styles.filterGroup}>
+            <div className={styles.filterPill}>
+              <CalendarDays size={14} />
+              <span>Date Range</span>
+            </div>
+            <div className={styles.filterPill}>
+              <Filter size={14} />
+              <span>Status: All</span>
+            </div>
           </div>
         </div>
 
-        <div className="tableResponsive">
-          <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <div className={styles.ledgerTableContainer}>
+          <table className={styles.fintechTable}>
             <thead>
-              <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
-                <th style={{ padding: '16px 24px', fontSize: '0.75rem', opacity: 0.5, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Builder</th>
-                <th style={{ padding: '16px 24px', fontSize: '0.75rem', opacity: 0.5, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Details</th>
-                <th style={{ padding: '16px 24px', fontSize: '0.75rem', opacity: 0.5, textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'right' }}>Amount</th>
+              <tr>
+                <th>Builder</th>
+                <th>Details</th>
+                <th>Status</th>
+                <th className={styles.amountHeader}>Amount</th>
               </tr>
             </thead>
             <tbody>
-              {contributions.map((c, idx) => (
-                <tr key={c.id} style={{ 
-                  borderBottom: idx === contributions.length - 1 ? 'none' : '1px solid var(--glass-border)',
-                }} className="animate-fade-in">
-                  <td style={{ padding: '20px 24px' }} data-label="Builder">
-                    <div style={{ fontWeight: '700', fontSize: '1rem' }}>{c.donor.name}</div>
-                    <div style={{ fontSize: '0.75rem', opacity: 0.4 }}>{c.donor.phone}</div>
+              {contributions.map((c) => (
+                <tr key={c.id} className={styles.tableRow}>
+                  <td data-label="Builder">
+                    <div className={styles.builderName}>{c.donor.name}</div>
+                    <div className={styles.builderPhone}>{c.donor.phone}</div>
                   </td>
-                  <td style={{ padding: '20px 24px' }} data-label="Details">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
+                  <td data-label="Details">
+                    <div className={styles.detailsDate}>
                       <Calendar size={14} style={{ opacity: 0.5 }} />
                       {new Date(c.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                     </div>
-                    <div style={{ fontSize: '0.75rem', opacity: 0.5, marginTop: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span>Ref: {c.reference || 'SYSTEM_LOG'}</span>
+                    <div>
+                      <span className={styles.monospaceRef}>Ref: {c.reference || 'SYSTEM_LOG'}</span>
                       {c.isConcierge && (
-                        <span style={{ background: 'var(--accent)20', color: 'var(--accent)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: '700' }}>
-                          CONCIERGE
-                        </span>
+                        <span className={styles.conciergePill}>CONCIERGE</span>
                       )}
                     </div>
                   </td>
-                  <td style={{ padding: '20px 24px', textAlign: 'right' }} data-label="Amount">
-                    <div style={{ color: 'var(--success)', fontWeight: '800', fontSize: '1.1rem' }}>
-                      +₦{(Number(c.amount) / 100).toLocaleString()}
-                    </div>
+                  <td data-label="Status">
+                    <span className={styles.statusApproved}>
+                      ● APPROVED
+                    </span>
+                  </td>
+                  <td data-label="Amount" className={styles.tabularAmount}>
+                    +₦{(Number(c.amount) / 100).toLocaleString()}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
           {contributions.length === 0 && (
-            <div style={{ padding: '60px', textAlign: 'center', opacity: 0.3 }}>
-              <CreditCard size={48} style={{ margin: '0 auto 16px' }} />
+            <div className={styles.emptyState}>
+              <CreditCard size={48} style={{ margin: '0 auto 16px', opacity: 0.3 }} />
               <p>No historical records found</p>
             </div>
           )}
         </div>
 
         {/* Pagination */}
-        <div style={{ padding: '24px', borderTop: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} className="responsive-header">
-          <span style={{ opacity: 0.4, fontSize: '0.8rem' }}>Page {page} of {totalPages}</span>
-          <div style={{ display: 'flex', gap: '8px' }}>
+        <div className={styles.paginationFooter}>
+          <span className={styles.paginationText}>
+            Showing {total === 0 ? 0 : skip + 1} to {Math.min(skip + PAGE_SIZE, total)} of {total} entries
+          </span>
+          <div className={styles.paginationControls}>
             <a 
               href={`/admin/ledger?page=${page - 1}${query ? `&q=${query}` : ''}`}
-              className="btn-primary"
-              style={{ 
-                padding: '8px 16px', 
-                background: page <= 1 ? 'rgba(255,255,255,0.05)' : 'var(--accent)', 
-                color: page <= 1 ? '#666' : 'var(--primary)', 
-                pointerEvents: page <= 1 ? 'none' : 'auto',
-                fontSize: '0.8rem',
-                minHeight: '44px'
-              }}
+              className={`${styles.ghostButton} ${page <= 1 ? styles.disabled : ''}`}
             >
-              Prev
+              PREV
             </a>
             <a 
               href={`/admin/ledger?page=${page + 1}${query ? `&q=${query}` : ''}`}
-              className="btn-primary"
-              style={{ 
-                padding: '8px 16px', 
-                background: page >= totalPages ? 'rgba(255,255,255,0.05)' : 'var(--accent)', 
-                color: page >= totalPages ? '#666' : 'var(--primary)', 
-                pointerEvents: page >= totalPages ? 'none' : 'auto',
-                fontSize: '0.8rem',
-                minHeight: '44px'
-              }}
+              className={`${styles.ghostButton} ${page >= totalPages ? styles.disabled : ''}`}
             >
-              Next
+              NEXT
             </a>
           </div>
         </div>
       </div>
-
     </div>
   );
 }

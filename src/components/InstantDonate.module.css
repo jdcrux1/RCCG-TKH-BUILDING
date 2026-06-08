@@ -1,0 +1,129 @@
+.quickGiveCard {
+  width: 100%;
+  max-width: 500px;
+  background: rgba(20, 20, 20, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
+  padding: 2.5rem;
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0.5rem;
+}
+
+.iconBox {
+  background: var(--accent);
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: white;
+}
+
+.scripture {
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.microCopy {
+  color: #D1D5DB;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detailRow {
+  opacity: 0.9;
+  font-size: 0.9rem;
+  margin: 0;
+  color: white;
+}
+
+.highlight {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.accountBox {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 8px;
+}
+
+.accountNumber {
+  letter-spacing: 2px;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--accent);
+}
+
+.copyBtn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+  min-height: 44px;
+}
+
+.copyBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.narrationNote {
+  font-style: italic;
+  color: #A1A1AA;
+  font-size: 0.85rem;
+  margin-top: 1.5rem;
+  display: block;
+}
+
+/* Background glow */
+.glow {
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 150px;
+  height: 150px;
+  background: var(--accent);
+  filter: blur(80px);
+  opacity: 0.15;
+  border-radius: 50%;
+  pointer-events: none;
+}

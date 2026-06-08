@@ -13,17 +13,17 @@ import { sanitizePhoneNumber, toTitleCase } from '@/lib/sanitize';
 import { z } from 'zod';
 import crypto from 'crypto';
 
-async function requireAdmin() {
+async function requireSuperAdmin() {
   const session = await getSession();
-  if (!session || (session.role !== 'ADMIN' && session.role !== 'SUPERADMIN')) {
+  if (!session || session.role !== 'SUPERADMIN') {
     throw new Error('Unauthorized');
   }
   return session;
 }
 
-async function requireAdminOrOnboarder() {
+async function requireVolunteerOrSuperAdmin() {
   const session = await getSession();
-  if (!session || (session.role !== 'ADMIN' && session.role !== 'ONBOARDER' && session.role !== 'SUPERADMIN' && session.role !== 'VOLUNTEER')) {
+  if (!session || (session.role !== 'VOLUNTEER' && session.role !== 'SUPERADMIN')) {
     throw new Error('Unauthorized');
   }
   return session;
@@ -67,7 +67,7 @@ async function generateDonorRefId() {
 // ADD DONOR
 export async function addDonor(formData: FormData) {
   try {
-    await requireAdminOrOnboarder();
+    await requireVolunteerOrSuperAdmin();
     const parsed = addDonorSchema.parse({
       name: formData.get('name'),
       phone: formData.get('phone'),
@@ -148,7 +148,7 @@ const logContributionSchema = z.object({
 
 export async function logContribution(formData: FormData) {
   try {
-    await requireAdmin();
+    await requireSuperAdmin();
     const parsed = logContributionSchema.parse({
       donorId: formData.get('donorId'),
       amount: formData.get('amount'),
@@ -190,7 +190,7 @@ export async function logContribution(formData: FormData) {
 // UPDATE DONOR STATUS (e.g., Welcome Sent)
 export async function updateDonorStatus(donorId: string, newStatus: string) {
   try {
-    await requireAdmin();
+    await requireSuperAdmin();
     
     await prisma.donor.update({
       where: { id: donorId },
@@ -239,7 +239,7 @@ export async function recalculateMilestones() {
 
 export async function approvePaymentClaimAdmin(claimId: string) {
   try {
-    const session = await requireAdmin();
+    const session = await requireSuperAdmin();
 
     await prisma.$transaction(async (tx) => {
       const claim = await tx.paymentClaim.findUnique({
@@ -294,7 +294,7 @@ export async function approvePaymentClaimAdmin(claimId: string) {
 
 export async function rejectPaymentClaimAdmin(claimId: string) {
   try {
-    const session = await requireAdmin();
+    const session = await requireSuperAdmin();
 
     await prisma.paymentClaim.update({
       where: { id: claimId },
@@ -315,7 +315,7 @@ export async function rejectPaymentClaimAdmin(claimId: string) {
 // CONCIERGE SEARCH - FUZZY MATCHING
 export async function searchDonorsForConcierge(query: string) {
   try {
-    await requireAdmin();
+    await requireSuperAdmin();
     
     if (!query || query.trim().length < 2) {
       return [];
@@ -353,7 +353,7 @@ export async function searchDonorsForConcierge(query: string) {
 // LOG CONCIERGE CONTRIBUTION
 export async function logConciergeContribution(formData: FormData) {
   try {
-    const session = await requireAdmin();
+    const session = await requireSuperAdmin();
     
     const donorId = formData.get('donorId') as string;
     const amountStr = formData.get('amount') as string;

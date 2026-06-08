@@ -10,6 +10,7 @@ import BankDetailsBanner from '@/components/BankDetailsBanner';
 import MilestonesTimeline from '@/components/MilestonesTimeline';
 import AutoRefresh from '@/components/AutoRefresh';
 import { getTierColor } from '@/lib/tiers';
+import styles from './dashboard.module.css';
 
 // Encouragement Messages
 const encouragements = [
@@ -271,68 +272,6 @@ export default async function DonorDashboard() {
         </div>
       </section>
 
-      {/* 1. Personal Fulfillment Metrics */}
-      <section className="glass-card" style={{ 
-        position: 'relative',
-        overflow: 'hidden',
-        border: isFulfilled ? '2px solid #D4AF37' : '1px solid var(--glass-border)',
-        background: isFulfilled ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(0,0,0,0) 100%)' : 'var(--glass-bg)'
-      }}>
-        {isFulfilled && (
-          <div style={{ 
-            position: 'absolute', top: '12px', right: '12px',
-            background: '#D4AF37', color: '#000', padding: '4px 12px',
-            borderRadius: 'var(--radius-full)', fontSize: '0.75rem', fontWeight: 'bold',
-            boxShadow: '0 0 15px rgba(212, 175, 55, 0.5)',
-            display: 'flex', alignItems: 'center', gap: '4px'
-          }}>
-            <Award size={14} /> PLEDGE COMPLETED
-          </div>
-        )}
-        
-        <h3 style={{ fontSize: '1.1rem', marginBottom: '1.5rem', opacity: 0.8 }}>Your Personal Kingdom Legacy</h3>
-        
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.9rem' }}>
-          <span>Pledge Fulfillment</span>
-          <span style={{ fontWeight: 'bold', color: isFulfilled ? '#D4AF37' : 'var(--tier-primary)' }}>{fulfillmentRate.toFixed(1)}%</span>
-        </div>
-        
-        <div style={{ 
-          height: '12px', width: '100%', background: 'rgba(255,255,255,0.05)', 
-          borderRadius: '6px', overflow: 'hidden', marginBottom: '1.5rem' 
-        }}>
-          <div style={{ 
-            height: '100%', width: `${Math.min(fulfillmentRate, 100)}%`, 
-            background: isFulfilled ? 'linear-gradient(90deg, #D4AF37, #F9D71C)' : 'var(--tier-primary)',
-            boxShadow: isFulfilled ? '0 0 10px #D4AF37' : 'none',
-            transition: 'width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
-          }} />
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-          <div>
-            <p style={{ fontSize: '0.75rem', opacity: 0.5, textTransform: 'uppercase' }}>Verified Giving</p>
-            <p style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>₦{(Number(totalContributed) / 100).toLocaleString()}</p>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <p style={{ fontSize: '0.75rem', opacity: 0.5, textTransform: 'uppercase' }}>24-Month Commitment</p>
-            <p style={{ fontSize: '1.4rem', fontWeight: 'bold', opacity: 0.9 }}>₦{(Number(donor.totalPledged) / 100).toLocaleString()}</p>
-          </div>
-        </div>
-      </section>
-
-      {/* PHASE 3: Interactive Bank Details Banner with Copy & WhatsApp helpers */}
-      <BankDetailsBanner donorName={donor.name} donorRefId={donor.donorRefId || 'PENDING'} />
-
-      {/* Technical Support */}
-      <section className="glass-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.5rem', border: '1px solid #333' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 10px #10b981' }} />
-          <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>Technical Support (WhatsApp/Text Only)</p>
-        </div>
-        <p style={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--tier-primary)' }}>08052039445</p>
-      </section>
-
       {/* Thank You / Prompt Banner */}
       {gaveThisMonth ? (
         <div className="glass-card" style={{ background: 'rgba(16, 185, 129, 0.1)', borderColor: 'rgba(16, 185, 129, 0.2)', color: 'var(--success)', display: 'flex', alignItems: 'center', gap: '12px', padding: '1rem var(--space-md)' }}>
@@ -344,147 +283,111 @@ export default async function DonorDashboard() {
         </div>
       )}
 
-      {/* 2. Global Vision Card */}
-      <section className="glass-card" style={{ 
-        background: 'linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(20,20,20,0.6) 100%)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        padding: '2rem'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
-          <div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '4px' }}>The Global Vision</h2>
-            <p style={{ opacity: 0.6 }}>Total Church-wide Contributions</p>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <p style={{ fontSize: '1.8rem', fontWeight: '900', color: 'var(--tier-primary)' }}>₦ {(Number(globalTotal) / 100).toLocaleString()}</p>
-            <p style={{ fontSize: '0.8rem', opacity: 0.4 }}>Target: ₦ {(Number(globalTarget) / 100).toLocaleString()}</p>
-          </div>
-        </div>
-
-        <div style={{ position: 'relative', height: '40px', background: 'rgba(255,255,255,0.03)', borderRadius: '20px', padding: '4px' }}>
-          <div style={{ 
-            height: '100%', width: `${globalProgress}%`, 
-            background: 'linear-gradient(90deg, var(--tier-primary) 0%, #fbbf24 100%)',
-            borderRadius: '16px',
-            boxShadow: '0 0 20px var(--tier-glow)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '0.8rem', fontWeight: 'bold', color: 'black',
-            transition: 'width 2s ease-out'
-          }}>
-            {globalProgress}%
-          </div>
-        </div>
-      </section>
-
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
-        gap: 'var(--space-md)' 
-      }}>
-        
-        {/* 3. Dynamic Interactive Construction Milestones Timeline */}
-        <MilestonesTimeline 
-          milestones={milestones.map(m => ({
-            ...m,
-            targetAmount: Number(m.targetAmount),
-            currentAmount: Number(m.currentAmount)
-          }))} 
-          currentMilestoneId={currentMilestone?.id} 
-        />
-
-        {/* Giving Streak & Encouragement */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-          <div className="glass-card" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ background: 'rgba(255,100,100,0.1)', padding: '12px', borderRadius: '50%' }}>
-              <Flame size={32} color={streak > 0 ? '#ff6b6b' : 'rgba(255,255,255,0.2)'} />
-            </div>
-            <div>
-              <h3 style={{ fontSize: '1.5rem', color: streak > 0 ? '#ff6b6b' : 'inherit' }}>{streak} Month Streak</h3>
-              <p style={{ fontSize: '0.8rem', opacity: 0.5 }}>Your faithfulness is inspiring.</p>
-            </div>
+      <div className={styles.dashboardLayout}>
+        {/* LEFT COLUMN: ACTION & HISTORY */}
+        <div className={styles.primaryColumn}>
+          {/* PHASE 3: Log a Payment Form & Status */}
+          <div className={styles.paymentFormCard}>
+            <h3 className={styles.sectionHeader}>
+              <Landmark size={20} color="var(--tier-primary)" />
+              Log a New Payment
+            </h3>
+            <PaymentClaimForm monthlyPledge={Number(donor.monthlyPledge)} tierColor={getTierColor(donor.tier)} />
           </div>
 
-          <div className="glass-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center' }}>
-            <Quote size={32} color="var(--tier-primary)" style={{ opacity: 0.3, marginBottom: '1rem', alignSelf: 'center' }} />
-            <p style={{ fontSize: '1.1rem', fontStyle: 'italic', opacity: 0.9 }}>&ldquo;{encouragement}&rdquo;</p>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'var(--space-md)' }}>
-        
-        {/* Contribution Timeline */}
-        <div className="glass-card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 'var(--space-md)' }}>
-            <CalendarDays size={20} color="var(--tier-primary)" />
-            <h3 style={{ fontSize: '1.2rem' }}>Recent Contributions</h3>
-          </div>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {sortedContributions.length > 0 ? sortedContributions.slice(0, 5).map((c, i) => (
-              <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '1rem', borderBottom: i < 4 ? '1px solid var(--glass-border)' : 'none' }}>
-                <div>
-                  <p style={{ fontWeight: '500' }}>₦{(Number(c.amount) / 100).toLocaleString()}</p>
-                  <p style={{ fontSize: '0.8rem', opacity: 0.5 }}>{new Date(c.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                </div>
-                <span style={{ fontSize: '0.7rem', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', padding: '4px 8px', borderRadius: '4px' }}>Logged</span>
+          <div className={styles.ledgerSection}>
+            {/* Contribution Timeline */}
+            <div className="glass-card">
+              <div className={styles.sectionHeader}>
+                <CalendarDays size={20} color="var(--tier-primary)" />
+                Recent Contributions
               </div>
-            )) : (
-              <p style={{ opacity: 0.5, textAlign: 'center', padding: '2rem 0' }}>No contributions recorded yet.</p>
-            )}
-          </div>
-        </div>
-
-        {/* PHASE 3: Log a Payment Form & Status */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-          <PaymentClaimForm monthlyPledge={Number(donor.monthlyPledge)} tierColor={getTierColor(donor.tier)} />
-          
-          <div className="glass-card">
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>Pending Verifications</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-              {donor.paymentClaims?.length > 0 ? donor.paymentClaims.map((claim) => (
-                <div key={claim.id} style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center', 
-                  padding: '10px',
-                  background: 'rgba(255,255,255,0.02)',
-                  borderRadius: 'var(--radius-sm)',
-                  border: '1px solid var(--glass-border)'
-                }}>
-                  <div>
-                    <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>₦{(Number(claim.amount) / 100).toLocaleString()}</p>
-                    <p style={{ fontSize: '0.75rem', opacity: 0.5 }}>{new Date(claim.date).toLocaleDateString()}</p>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {sortedContributions.length > 0 ? sortedContributions.slice(0, 5).map((c, i) => (
+                  <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '1rem', borderBottom: i < 4 ? '1px solid var(--glass-border)' : 'none' }}>
+                    <div>
+                      <p style={{ fontWeight: '500' }}>₦{(Number(c.amount) / 100).toLocaleString()}</p>
+                      <p style={{ fontSize: '0.8rem', opacity: 0.5 }}>{new Date(c.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    </div>
+                    <span style={{ fontSize: '0.7rem', background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)', padding: '4px 8px', borderRadius: '4px' }}>Logged</span>
                   </div>
-                  <span style={{ 
-                    fontSize: '0.65rem', 
-                    padding: '3px 8px', 
-                    borderRadius: '4px',
-                    background: claim.status === 'PENDING' ? 'rgba(245, 158, 11, 0.1)' : claim.status === 'APPROVED' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                    color: claim.status === 'PENDING' ? '#f59e0b' : claim.status === 'APPROVED' ? 'var(--success)' : '#ef4444',
-                    border: `1px solid ${claim.status === 'PENDING' ? '#f59e0b' : claim.status === 'APPROVED' ? 'var(--success)' : '#ef4444'}`
+                )) : (
+                  <p style={{ opacity: 0.5, textAlign: 'center', padding: '2rem 0' }}>No contributions recorded yet.</p>
+                )}
+              </div>
+            </div>
+
+            <div className="glass-card">
+              <h3 className={styles.sectionHeader}>Pending Verifications</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                {donor.paymentClaims?.length > 0 ? donor.paymentClaims.map((claim) => (
+                  <div key={claim.id} style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center', 
+                    padding: '10px',
+                    background: 'rgba(255,255,255,0.02)',
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px solid var(--glass-border)'
                   }}>
-                    {claim.status}
-                  </span>
-                </div>
-              )) : (
-                <p style={{ fontSize: '0.85rem', opacity: 0.5, textAlign: 'center' }}>No recent payment claims.</p>
-              )}
+                    <div>
+                      <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>₦{(Number(claim.amount) / 100).toLocaleString()}</p>
+                      <p style={{ fontSize: '0.75rem', opacity: 0.5 }}>{new Date(claim.date).toLocaleDateString()}</p>
+                    </div>
+                    <span style={{ 
+                      fontSize: '0.65rem', 
+                      padding: '3px 8px', 
+                      borderRadius: '4px',
+                      background: claim.status === 'PENDING' ? 'rgba(245, 158, 11, 0.1)' : claim.status === 'APPROVED' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                      color: claim.status === 'PENDING' ? '#f59e0b' : claim.status === 'APPROVED' ? 'var(--success)' : '#ef4444',
+                      border: `1px solid ${claim.status === 'PENDING' ? '#f59e0b' : claim.status === 'APPROVED' ? 'var(--success)' : '#ef4444'}`
+                    }}>
+                      {claim.status}
+                    </span>
+                  </div>
+                )) : (
+                  <p style={{ fontSize: '0.85rem', opacity: 0.5, textAlign: 'center' }}>No recent payment claims.</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Weekly Encouragement */}
-        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: '3rem 2rem', background: 'linear-gradient(135deg, rgba(255,255,255,0.02) 0%, var(--tier-glow) 100%)' }}>
-          <Quote size={40} color="var(--tier-primary)" style={{ opacity: 0.5, marginBottom: '1rem' }} />
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '500', lineHeight: 1.4, marginBottom: '1rem' }}>
-            &ldquo;{encouragement}&rdquo;
-          </h2>
-          <p style={{ opacity: 0.6, fontSize: '0.9rem' }}>A word for you this week.</p>
+        {/* RIGHT COLUMN: VISION & QUOTES */}
+        <div className={styles.secondaryColumn}>
+          {/* Dynamic Interactive Construction Milestones Timeline */}
+          <div className={styles.milestoneTracker}>
+            <MilestonesTimeline 
+              milestones={milestones.map(m => ({
+                ...m,
+                targetAmount: Number(m.targetAmount),
+                currentAmount: Number(m.currentAmount)
+              }))} 
+              currentMilestoneId={currentMilestone?.id} 
+            />
+          </div>
+
+          {/* Giving Streak & Encouragement */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div className="glass-card" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ background: 'rgba(255,100,100,0.1)', padding: '12px', borderRadius: '50%' }}>
+                <Flame size={32} color={streak > 0 ? '#ff6b6b' : 'rgba(255,255,255,0.2)'} />
+              </div>
+              <div>
+                <h3 style={{ fontSize: '1.5rem', color: streak > 0 ? '#ff6b6b' : 'inherit' }}>{streak} Month Streak</h3>
+                <p style={{ fontSize: '0.8rem', opacity: 0.5 }}>Your faithfulness is inspiring.</p>
+              </div>
+            </div>
+
+            <div className={styles.quoteCard}>
+              <Quote size={32} color="var(--tier-primary)" style={{ opacity: 0.3, marginBottom: '1rem' }} />
+              <p style={{ fontSize: '1.1rem', fontStyle: 'italic', opacity: 0.9 }}>&ldquo;{encouragement}&rdquo;</p>
+              <p className={styles.subText} style={{ marginTop: '1rem' }}>A word for you this week.</p>
+            </div>
+          </div>
         </div>
-
       </div>
-
     </div>
   );
 }

@@ -4,13 +4,21 @@ import { ArrowRight } from 'lucide-react';
 import styles from './landing.module.css';
 import InstantDonate from '@/components/InstantDonate';
 import PledgeForm from '@/components/PledgeForm';
+import RevealOnScroll from '@/components/RevealOnScroll';
 
 export default function Home() {
   return (
     <div className={styles.container}>
-      {/* Brand Logo */}
-      <div className={styles.brand}>
-        RCCG THE KING&apos;S HOUSE
+      {/* FLOATING PILL NAVIGATION */}
+      <div className={styles.navWrapper}>
+        <nav className={styles.navPill}>
+          <Link href="/" className={styles.brand}>
+            TKH
+          </Link>
+          <a href="#vision" className={styles.pillLink}>The Vision</a>
+          <a href="#pledge" className={styles.pillLink}>Pledge Now</a>
+          <Link href="/login" className={styles.pillLogin}>Login</Link>
+        </nav>
       </div>
 
       <main>
@@ -31,36 +39,44 @@ export default function Home() {
             <div className={styles.heroLeft}>
               <span className={styles.label}>Building Project 2026-2028</span>
               
-              <h1 className={styles.title}>
-                Building a <br />
-                <span className="text-gold">Sanctuary of Faith</span><br />
-                Together.
-              </h1>
+              <RevealOnScroll>
+                <h1 className={styles.title}>
+                  Building a <br />
+                  <span className="text-gold">Sanctuary of Faith</span><br />
+                  Together.
+                </h1>
+              </RevealOnScroll>
 
-              <p className={styles.subtitle}>
-                Join us in our mission to build a monument for Kingdom Advancement.
-              </p>
+              <RevealOnScroll threshold={0.5}>
+                <p className={styles.subtitle}>
+                  Join us in our mission to build a monument for Kingdom Advancement.
+                </p>
+              </RevealOnScroll>
 
-              <div className={styles.cta}>
-                <Link href="/login" className={styles.primaryBtn}>
-                  Kingdom Builder Login <ArrowRight size={24} />
-                </Link>
-              </div>
+              <RevealOnScroll threshold={0.8}>
+                <div className={styles.cta}>
+                  <Link href="/login" className={`${styles.primaryBtn} magneticButton`}>
+                    Kingdom Builder Login <ArrowRight size={24} />
+                  </Link>
+                </div>
+              </RevealOnScroll>
 
-              <div className={styles.statsGrid}>
-                <div className={styles.statItem}>
-                  <span className={styles.statValue}>₦650M</span>
-                  <span className={styles.statLabel}>Campaign Goal</span>
+              <RevealOnScroll>
+                <div className={styles.statsGrid}>
+                  <div className={`${styles.statItem} liftCard`}>
+                    <span className={styles.statValue}>₦650M</span>
+                    <span className={styles.statLabel}>Campaign Goal</span>
+                  </div>
+                  <div className={`${styles.statItem} liftCard`}>
+                    <span className={styles.statValue}>1,000+</span>
+                    <span className={styles.statLabel}>Target Partners</span>
+                  </div>
+                  <div className={`${styles.statItem} liftCard`}>
+                    <span className={styles.statValue}>24</span>
+                    <span className={styles.statLabel}>Month Journey</span>
+                  </div>
                 </div>
-                <div className={styles.statItem}>
-                  <span className={styles.statValue}>1,000+</span>
-                  <span className={styles.statLabel}>Target Partners</span>
-                </div>
-                <div className={styles.statItem}>
-                  <span className={styles.statValue}>24</span>
-                  <span className={styles.statLabel}>Month Journey</span>
-                </div>
-              </div>
+              </RevealOnScroll>
             </div>
 
             <div className={styles.heroRight}>
@@ -75,38 +91,39 @@ export default function Home() {
         </section>
 
         {/* VISION SECTION (SCROLLYTELLING) */}
-        <section className={styles.visionSection}>
+        <section id="vision" className={styles.visionSection}>
           <div className={styles.visionContent}>
-            <div className={styles.visionTextWrapper}>
+            <RevealOnScroll className={styles.visionTextWrapper}>
               <span className={styles.label}>The Blueprint</span>
               <h2 className={styles.visionTitle}>The Future Citadel.</h2>
-              <p className={styles.visionText}>
-                By 2028, The King&apos;s House will open its doors to a state-of-the-art sanctuary. 
-                Designed for absolute excellence, the new citadel features an expansive ground-floor auditorium for worship, 
-                premium first-floor facilities tailored for children and youth, and a dedicated basement ensuring ample parking for all members and guests.
-              </p>
-              
-              {/* Quick Give now prominently displayed in Hero section */}
-            </div>
+              <div className={styles.visionText}>
+                <p style={{ marginBottom: '1.5rem', fontStyle: 'italic', opacity: 0.9 }}>
+                  &quot;Unless the Lord builds the house, the builders labor in vain.&quot; &mdash; Psalm 127:1
+                </p>
+                <p>
+                  By God&apos;s grace and our collective faith, we are praying toward opening the doors of our new sanctuary by 2028. Relying entirely on Him, this state-of-the-art citadel is being built with divine purpose: an expansive ground-floor auditorium for powerful worship encounters, premium first-floor facilities to equip our youth for the future, and a dedicated basement ensuring seamless hospitality for every member and guest.
+                </p>
+              </div>
+            </RevealOnScroll>
             
-            <div className={styles.visionImageWrapper}>
+            <RevealOnScroll className={styles.visionImageWrapper} threshold={0.3}>
               <Image 
                 src="/images/tkh-3d.jpg" 
                 alt="The King&apos;s House 3D Render" 
                 width={900}
                 height={700}
-                className={styles.visionImage}
+                className={`${styles.visionImage} liftCard`}
                 quality={100}
               />
-            </div>
+            </RevealOnScroll>
           </div>
         </section>
 
         {/* PLEDGE CAPTURE SECTION */}
-        <section style={{ padding: '6rem 2rem', background: '#050505', display: 'flex', justifyContent: 'center' }}>
-          <div style={{ width: '100%', maxWidth: '600px' }}>
+        <section id="pledge" className={styles.pledgeSection}>
+          <RevealOnScroll style={{ width: '100%', maxWidth: '600px' }}>
             <PledgeForm />
-          </div>
+          </RevealOnScroll>
         </section>
       </main>
 

@@ -1,0 +1,257 @@
+/* The Layout Shell */
+.dashboardShell {
+  display: grid;
+  gap: 1.5rem;
+  padding: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* Header Area */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.breadcrumb {
+  font-size: 0.85rem;
+  color: #9CA3AF;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.mainTitle {
+  font-size: clamp(1.5rem, 5vw, 1.75rem);
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
+}
+
+.targetPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+  min-height: 44px;
+}
+
+.targetLabel {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.targetAmount {
+  font-weight: 700;
+  color: #10b981;
+}
+
+/* The Materials - Universal Bento Card */
+.bentoCard {
+  background: #0D0F12;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Top Row: KPI Strip */
+.kpiStrip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.kpiLabel {
+  color: #9CA3AF;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.kpiValue {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-weight: 700;
+  margin: 0.5rem 0;
+  color: #ffffff;
+}
+
+.kpiTrend {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: auto;
+}
+
+.kpiPositive {
+  color: #10b981;
+}
+
+.kpiNegative {
+  color: #ef4444;
+}
+
+/* Middle Row: Analytics */
+.analyticsRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+.chartContainer {
+  min-height: 350px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* Faint dashed grid lines can be achieved within the chart component, but we add basic styling here */
+.chartWrapper {
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+  flex: 1;
+  position: relative;
+}
+
+.radialWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  text-align: center;
+}
+
+/* Bottom Row: Data Tables */
+.dataTablesRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* Table Specifics */
+.cleanTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.cleanTable th {
+  padding: 0 0 1rem 0;
+  font-size: 0.75rem;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.cleanTable td {
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.cleanTable tr:last-child td {
+  border-bottom: none;
+}
+
+.tierBadge {
+  background: rgba(99, 102, 241, 0.1);
+  color: #818cf8;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: inline-block;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+/* Progress Bars */
+.progressRow {
+  margin-bottom: 1rem;
+}
+
+.progressLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.progressTierName {
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.progressCount {
+  font-weight: 700;
+  color: #f59e0b;
+}
+
+.progressTrack {
+  height: 6px;
+  background: #1A1D24;
+  border-radius: 9999px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.progressFill {
+  height: 100%;
+  background: #f59e0b;
+  border-radius: 9999px;
+  transition: width 0.5s ease;
+}
+
+/* Responsive Overrides */
+@media (max-width: 1024px) {
+  .kpiStrip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .analyticsRow {
+    grid-template-columns: 1fr;
+  }
+  .dataTablesRow {
+    grid-template-columns: 1fr;
+  }
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboardShell {
+    padding: 8px;
+    gap: 1rem;
+  }
+  
+  .kpiStrip {
+    grid-template-columns: 1fr;
+  }
+  
+  .bentoCard {
+    padding: 1.25rem;
+    border-radius: 8px;
+  }
+
+  .cleanTable th, .cleanTable td {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}

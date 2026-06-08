@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { memo, useState, useTransition, useCallback, useRef } from 'react';
 import { Search } from 'lucide-react';
+import styles from './donors.module.css';
 
 const TIER_COLORS: Record<string, { bg: string; text: string }> = {
   'Cornerstone Partner': { bg: '#713f12', text: '#fbbf24' },
@@ -83,87 +84,70 @@ function DonorListComponent({
   };
 
   return (
-    <>
-      <form onSubmit={handleSearch} style={{ 
-        marginBottom: 'var(--space-md)', 
-        padding: '12px', 
-        display: 'flex', 
-        gap: 'var(--space-md)',
-        background: 'var(--glass)',
-        backdropFilter: 'blur(12px)',
-        border: '1px solid var(--glass-border)',
-        borderRadius: 'var(--radius-md)'
-      }} className="responsive-header">
-        <div style={{ position: 'relative', flex: 1 }}>
-          <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }} />
+    <div className={styles.tableBentoCard}>
+      <form onSubmit={handleSearch} className={styles.tableToolbar}>
+        <div className={styles.searchContainer}>
+          <Search size={18} className={styles.searchIcon} />
           <input 
             type="text" 
             placeholder="Search by name..." 
             value={search}
             onChange={handleSearchChange}
-            style={{
-              width: '100%',
-              padding: '0.6rem 0.6rem 0.6rem 2.5rem',
-              minHeight: '44px'
-            }}
+            className={styles.searchInput}
           />
         </div>
-        <button type="submit" className="btn-primary" style={{ 
-          whiteSpace: 'nowrap',
-          minHeight: '44px'
-        }}>
-          Search
-        </button>
       </form>
 
-      <div className="tableResponsive">
-        <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+      <div className={styles.tableContainer}>
+        <table className={styles.fintechTable}>
           <thead>
-            <tr style={{ borderBottom: '1px solid var(--glass-border)' }}>
-              <th style={{ padding: '1rem' }}>Name</th>
-              <th style={{ padding: '1rem' }}>Phone</th>
-              <th style={{ padding: '1rem' }}>Tier</th>
-              <th style={{ padding: '1rem' }}>Monthly Pledge</th>
-              <th style={{ padding: '1rem' }}>Total (24m)</th>
-              <th style={{ padding: '1rem' }}>Status</th>
+            <tr>
+              <th>Name</th>
+              <th>Phone & Contact</th>
+              <th>Tier</th>
+              <th className={styles.currencyHeader}>Monthly Pledge</th>
+              <th className={styles.currencyHeader}>Total (24m)</th>
+              <th className={styles.statusHeader}>Status</th>
             </tr>
           </thead>
           <tbody>
             {donors.map((donor) => (
-              <tr key={donor.id} style={{ borderBottom: '1px solid var(--glass-border)' }} className="animate-fade-in">
-                <td style={{ padding: '1rem' }} data-label="Name">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontWeight: '600' }}>{donor.name}</span>
+              <tr key={donor.id} className={styles.tableRow}>
+                <td>
+                  <span className={styles.donorName}>{donor.name}</span>
+                </td>
+                <td>
+                  <div className={styles.phoneCell}>
+                    <span>{donor.phone}</span>
                     <a 
                       href={formatWhatsAppLink(donor.phone, donor.name)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ color: '#25D366', opacity: 0.8, minHeight: 'auto' }}
+                      className={styles.whatsappLink}
                       title="Invite via WhatsApp"
                     >
                       <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.445 0 .081 5.391.079 11.99c0 2.112.553 4.177 1.601 6.011L0 24l6.149-1.613a11.815 11.815 0 005.9 1.532h.005c6.605 0 11.97-5.391 11.972-11.991a11.821 11.821 0 00-3.575-8.472"></path></svg>
                     </a>
                   </div>
                 </td>
-                <td style={{ padding: '1rem', opacity: 0.7 }} data-label="Phone">{donor.phone}</td>
-                <td style={{ padding: '1rem' }} data-label="Tier">
-                  <span style={{ 
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    padding: '2px 10px',
-                    borderRadius: '9999px',
-                    fontSize: '0.7rem',
-                    fontWeight: '700',
-                    background: TIER_COLORS[donor.tier]?.bg || TIER_COLORS['Supporter'].bg,
-                    color: TIER_COLORS[donor.tier]?.text || TIER_COLORS['Supporter'].text,
-                  }}>
+                <td>
+                  <span 
+                    className={styles.tierBadge}
+                    style={{ 
+                      background: TIER_COLORS[donor.tier]?.bg || TIER_COLORS['Supporter'].bg,
+                      color: TIER_COLORS[donor.tier]?.text || TIER_COLORS['Supporter'].text,
+                    }}
+                  >
                     {donor.tier}
                   </span>
                 </td>
-                <td style={{ padding: '1rem' }} data-label="Monthly">₦{(Number(donor.monthlyPledge) / 100).toLocaleString()}</td>
-                <td style={{ padding: '1rem' }} data-label="Total (24m)">₦{(Number(donor.totalPledged) / 100).toLocaleString()}</td>
-                <td style={{ padding: '1rem' }} data-label="Status">
-                  <span style={{ color: 'var(--success)', fontSize: '0.8rem', fontWeight: '600' }}>● {donor.status}</span>
+                <td className={styles.currencyCell}>₦{(Number(donor.monthlyPledge) / 100).toLocaleString()}</td>
+                <td className={styles.currencyCell}>₦{(Number(donor.totalPledged) / 100).toLocaleString()}</td>
+                <td className={styles.statusCell}>
+                  <span className={styles.statusIndicator}>
+                    <div className={styles.statusDot} />
+                    {donor.status}
+                  </span>
                 </td>
               </tr>
             ))}
@@ -171,33 +155,21 @@ function DonorListComponent({
         </table>
       </div>
 
-      <div style={{ marginTop: '16px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--glass)', borderRadius: 'var(--radius-md)', border: '1px solid var(--glass-border)' }} className="responsive-header">
-        <span style={{ opacity: 0.6, fontSize: '0.85rem' }}>Showing {donors.length} of {total}</span>
-        <div style={{ display: 'flex', gap: '8px' }}>
+      <div className={styles.tablePagination}>
+        <span className={styles.paginationText}>Showing {donors.length} of {total}</span>
+        <div className={styles.paginationControls}>
           <button 
             onClick={() => goToPage(page - 1)} 
             disabled={page <= 1}
-            className="btn-primary"
-            style={{ 
-              padding: '8px 16px', 
-              background: page <= 1 ? 'rgba(255,255,255,0.05)' : 'var(--accent)', 
-              color: page <= 1 ? '#666' : 'var(--primary)',
-              minHeight: '44px'
-            }}
+            className={styles.ghostButton}
           >
             Prev
           </button>
-          <div style={{ display: 'flex', alignItems: 'center', padding: '0 12px', opacity: 0.6, fontSize: '0.9rem' }}>{page} / {totalPages}</div>
+          <span className={styles.pageIndicator}>{page} / {totalPages}</span>
           <button 
             onClick={() => goToPage(page + 1)} 
             disabled={page >= totalPages}
-            className="btn-primary"
-            style={{ 
-              padding: '8px 16px', 
-              background: page >= totalPages ? 'rgba(255,255,255,0.05)' : 'var(--accent)', 
-              color: page >= totalPages ? '#666' : 'var(--primary)',
-              minHeight: '44px'
-            }}
+            className={styles.ghostButton}
           >
             Next
           </button>
@@ -205,11 +177,11 @@ function DonorListComponent({
       </div>
 
       {donors.length === 0 && (
-        <div style={{ padding: '3rem', textAlign: 'center', background: 'var(--glass)', borderRadius: 'var(--radius-md)', border: '1px solid var(--glass-border)', opacity: 0.5 }}>
+        <div className={styles.emptyState}>
           No donors found. Click &quot;Add Donor&quot; to get started.
         </div>
       )}
-    </>
+    </div>
   );
 }
 

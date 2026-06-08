@@ -158,7 +158,7 @@ export default function UnifiedLogin() {
   const isBusy = loading || isPending;
 
   return (
-    <div className={styles.container}>
+    <div className={styles.loginWrapper}>
       <div className={styles.leftPanel}>
         <div className={styles.brand}>The King&apos;s House</div>
         <h1 className={styles.heading}>Building a Legacy Together</h1>
@@ -167,19 +167,19 @@ export default function UnifiedLogin() {
           Your generous contributions are instrumental in transforming this vision into reality. 
           Log in to track your pledges, view milestones, and see the impact of your support.
         </p>
-        <div className={styles.stats}>
-          <div className={styles.statItem}>
-            <span className={styles.statValue}>₦650 Million</span>
-            <span className={styles.statLabel}>Target Goal</span>
+        <div className={styles.metricsGrid}>
+          <div className={styles.metricItem}>
+            <span className={styles.metricNumber}>₦650 Million</span>
+            <span className={styles.metricLabel}>Target Goal</span>
           </div>
-          <div className={styles.statItem}>
-            <span className={styles.statValue}>100%</span>
-            <span className={styles.statLabel}>Commitment</span>
+          <div className={styles.metricItem}>
+            <span className={styles.metricNumber}>100%</span>
+            <span className={styles.metricLabel}>Commitment</span>
           </div>
         </div>
       </div>
 
-      <div className={styles.card}>
+      <div className={styles.loginCard}>
         <div className={styles.header}>
           <div className={styles.iconWrapper} data-role={role || 'DEFAULT'}>
             {role === 'SUPERADMIN' ? <Key size={30} color="white" /> : 

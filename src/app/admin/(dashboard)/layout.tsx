@@ -109,9 +109,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <main style={{ 
           flex: 1, 
           marginLeft: '260px', 
-          padding: 'var(--space-md)',
+          padding: '0',
           background: 'rgba(15, 23, 42, 0.5)',
-          minHeight: '100vh'
+          minHeight: '100vh',
+          width: 'calc(100% - 260px)'
         }} className="main-content">
           {children}
         </main>

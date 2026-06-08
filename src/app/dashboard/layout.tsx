@@ -4,6 +4,7 @@ import LogoutButton from '@/components/LogoutButton';
 import { getSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { getTierColor } from '@/lib/tiers';
+import styles from './dashboard.module.css';
 import { redirect } from 'next/navigation';
 
 export default async function DonorLayout({ children }: { children: React.ReactNode }) {
@@ -32,36 +33,15 @@ export default async function DonorLayout({ children }: { children: React.ReactN
       } as React.CSSProperties}
     >
       {/* Top Nav */}
-      <header style={{
-        padding: '1rem var(--space-md)',
-        borderBottom: '1px solid var(--glass-border)',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        background: 'rgba(15, 23, 42, 0.8)',
-        backdropFilter: 'blur(10px)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ 
-            background: 'var(--tier-primary)', 
-            padding: '8px', 
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 0 15px var(--tier-glow)'
-          }} className="hide-mobile">
-            <Home size={20} color="var(--primary)" />
+      <header className={styles.appHeader}>
+        <div className={styles.brandCluster}>
+          <div className={`${styles.homeIconWrapper} hide-mobile`}>
+            <Home size={20} color="var(--primary-gold)" />
           </div>
-          <h2 style={{ fontSize: '1rem', fontWeight: '700', margin: 0 }}>Kingdom Builders</h2>
+          <h2 className={styles.brandText}>Kingdom Builders</h2>
         </div>
 
-        <div style={{ display: 'flex', gap: 'var(--space-md)', alignItems: 'center' }}>
-          <LogoutButton />
-        </div>
+        <LogoutButton />
       </header>
 
       <main style={{ padding: 'var(--space-md)', maxWidth: '1200px', margin: '0 auto', flex: 1, width: '100%' }} className="main-content">

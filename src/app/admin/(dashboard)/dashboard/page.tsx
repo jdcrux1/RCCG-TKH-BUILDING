@@ -2,25 +2,26 @@ export const dynamic = 'force-dynamic';
 import { prisma } from '@/lib/prisma';
 import { Users, TrendingUp, Target, CreditCard, Activity, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
-import AreaChartCSS, { ProgressRing, ProgressBar } from '@/components/GrowthChart';
+import AreaChartCSS, { ProgressRing } from '@/components/GrowthChart';
 import Link from 'next/link';
+import styles from './dashboard.module.css';
 
 async function getStats() {
-  const [totalDonors, contributionsSum, milestones, recentDonors] = await Promise.all([
+  const TARGET_KOBO = BigInt(65000000000);
+
+  const [totalDonors, contributionsSum, recentClaims] = await Promise.all([
     prisma.donor.count({ where: { role: 'DONOR' } }),
     prisma.contribution.aggregate({ _sum: { amount: true } }),
-    prisma.milestone.findMany({ orderBy: { order: 'asc' } }),
-    prisma.donor.findMany({ 
-      where: { role: 'DONOR' }, 
-      orderBy: { createdAt: 'desc' }, 
+    prisma.paymentClaim.findMany({
+      where: { status: { in: ['PENDING', 'APPROVED'] } },
+      orderBy: { createdAt: 'desc' },
       take: 5,
-      select: { id: true, name: true, phone: true, tier: true, createdAt: true, monthlyPledge: true }
+      include: { donor: { select: { name: true, phone: true, tier: true } } }
     })
   ]);
 
   const totalRaised = BigInt(contributionsSum._sum.amount || 0);
-  const target = milestones.reduce((sum, m) => sum + BigInt(m.targetAmount), BigInt(0)) || BigInt(650000000);
-  const progressPercent = target > BigInt(0) ? (Number(totalRaised) / Number(target)) * 100 : 0;
+  const progressPercent = (Number(totalRaised) / Number(TARGET_KOBO)) * 100;
 
   // Monthly Trends (Last 6 Months)
   const monthlyData = [];
@@ -40,29 +41,68 @@ async function getStats() {
     });
   }
 
-  // Projection
-  const last3Months = monthlyData.slice(-3);
-  const avgMonthly = last3Months.reduce((sum, m) => sum + m.amount, 0) / 3;
-  const remaining = target - totalRaised;
-  const monthsToGoal = avgMonthly > 0 ? Math.ceil(Number(remaining) / avgMonthly) : Infinity;
-
-  // Tier breakdown
-  const tierCounts: Record<string, number> = {};
-  const allDonors = await prisma.donor.findMany({ where: { role: 'DONOR' }, select: { tier: true } });
-  allDonors.forEach(d => {
-    tierCounts[d.tier] = (tierCounts[d.tier] || 0) + 1;
+  // Tier Breakdown Analytics (including Unmanaged/Anonymous)
+  const allContributions = await prisma.contribution.findMany({
+    include: { donor: { select: { tier: true } } }
   });
+
+  const tierTotals: Record<string, bigint> = {};
+  let unmanagedTotal = BigInt(0);
+
+  allContributions.forEach(c => {
+    if (c.isConcierge) {
+      unmanagedTotal += BigInt(c.amount);
+    } else {
+      const tier = c.donor?.tier || 'Unknown';
+      tierTotals[tier] = (tierTotals[tier] || BigInt(0)) + BigInt(c.amount);
+    }
+  });
+
+  if (unmanagedTotal > BigInt(0)) {
+    tierTotals['Unmanaged/Anonymous'] = unmanagedTotal;
+  }
+
+  // Calculate 30-day velocity
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const velocitySum = await prisma.contribution.aggregate({
+    where: { date: { gte: thirtyDaysAgo } },
+    _sum: { amount: true }
+  });
+  const currentMonthlyVelocity = BigInt(velocitySum._sum.amount || 0);
+  const remainingBalance = TARGET_KOBO - totalRaised;
+
+  let monthsToTargetStr = '';
+  let velocitySubtext = '';
+  let velocityPositive = true;
+
+  if (currentMonthlyVelocity === BigInt(0)) {
+    monthsToTargetStr = 'Stalled';
+    velocitySubtext = 'Requires Action (₦0 this month)';
+    velocityPositive = false;
+  } else {
+    // Prevent negative remaining balance returning negative months
+    if (remainingBalance <= BigInt(0)) {
+      monthsToTargetStr = 'Goal Reached!';
+      velocitySubtext = `Based on ₦${(Number(currentMonthlyVelocity) / 100).toLocaleString()} raised this month`;
+    } else {
+      const months = Number(remainingBalance) / Number(currentMonthlyVelocity);
+      monthsToTargetStr = `${Math.ceil(months)} Months`;
+      velocitySubtext = `Based on ₦${(Number(currentMonthlyVelocity) / 100).toLocaleString()} raised this month`;
+    }
+  }
 
   return { 
     totalDonors, 
     totalRaised, 
     progressPercent, 
-    tierCounts, 
-    target, 
+    tierTotals, 
+    target: TARGET_KOBO, 
     monthlyData, 
-    monthsToGoal, 
-    recentDonors,
-    milestones 
+    monthsToTargetStr,
+    velocitySubtext,
+    velocityPositive,
+    recentClaims
   };
 }
 
@@ -70,178 +110,139 @@ export default async function AdminDashboard() {
   const stats = await getStats();
 
   const statCards = [
-    { title: 'Total Donors', value: stats.totalDonors, icon: Users, color: '#3b82f6', trend: '+12% this month', positive: true },
-    { title: 'Total Raised', value: `₦${(Number(stats.totalRaised) / 100000000).toFixed(1)}M`, icon: TrendingUp, color: '#10b981', trend: '+8.4% growth', positive: true },
+    { title: 'Total Donors', value: stats.totalDonors, icon: Users, color: '#3b82f6', trend: 'Active participants', positive: true },
+    { title: 'Total Raised', value: `₦${(Number(stats.totalRaised) / 100000000).toFixed(1)}M`, icon: TrendingUp, color: '#10b981', trend: 'Global accumulation', positive: true },
     { title: 'Goal Progress', value: `${stats.progressPercent.toFixed(1)}%`, icon: Target, color: '#f59e0b', trend: 'Approaching milestone', positive: true },
-    { title: 'Est. Time', value: stats.monthsToGoal === Infinity ? 'TBD' : `${stats.monthsToGoal} Mo`, icon: CreditCard, color: '#8b5cf6', trend: 'Based on velocity', positive: true },
+    { title: 'Est. Time to Goal', value: stats.monthsToTargetStr, icon: CreditCard, color: '#8b5cf6', trend: stats.velocitySubtext, positive: stats.velocityPositive },
   ];
 
   return (
-    <div className="animate-fade-in">
-      <header style={{ 
-        marginBottom: 'var(--space-lg)', 
-        background: 'linear-gradient(90deg, rgba(30,41,59,0.5) 0%, rgba(30,41,59,0) 100%)',
-        padding: '20px',
-        borderRadius: 'var(--radius-md)',
-        borderLeft: '4px solid var(--accent)'
-      }} className="responsive-header">
+    <div className={styles.dashboardShell}>
+      {/* Header Section */}
+      <header className={styles.header}>
         <div>
-          <h1 style={{ fontWeight: '800', letterSpacing: '-0.025em', margin: 0 }}>Executive Intelligence</h1>
-          <p style={{ opacity: 0.6, fontSize: '0.9rem', marginTop: '4px' }}>Kingdom Builders Campaign Strategy & Analytics</p>
+          <div className={styles.breadcrumb}>Kingdom Builders / Campaign Analytics</div>
+          <h1 className={styles.mainTitle}>Executive Overview</h1>
         </div>
-        <div style={{ textAlign: 'left' }} className="mobile-only">
-           <div style={{ marginTop: '1rem', padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
-              <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>TARGET: </span>
-              <span style={{ fontWeight: 'bold', color: 'var(--accent)' }}>₦650,000,000</span>
-           </div>
-        </div>
-        <div style={{ textAlign: 'right' }} className="desktop-only">
-          <div style={{ fontSize: '0.75rem', opacity: 0.5, fontWeight: 'bold', textTransform: 'uppercase' }}>Current Target</div>
-          <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--accent)' }}>₦650,000,000</div>
+        <div className={styles.targetPill}>
+          <span className={styles.targetLabel}>Current Target</span>
+          <span className={styles.targetAmount}>₦650,000,000</span>
         </div>
       </header>
 
       {/* Primary Stats Grid */}
-      <div className="responsive-grid responsive-grid-2 responsive-grid-4" style={{ marginBottom: 'var(--space-lg)' }}>
+      <div className={styles.kpiStrip}>
         {statCards.map((card, i) => {
           const Icon = card.icon;
           return (
-            <div key={i} className="glass-card" style={{ 
-              position: 'relative', 
-              overflow: 'hidden',
-              cursor: 'default'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div>
-                  <p style={{ fontSize: '0.75rem', opacity: 0.6, marginBottom: '4px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{card.title}</p>
-                  <h3 style={{ fontWeight: '800', margin: 0 }}>{card.value}</h3>
-                </div>
-                <div style={{ 
-                  background: `${card.color}20`, 
-                  padding: '10px', 
-                  borderRadius: '12px',
-                  color: card.color
-                }}>
-                  <Icon size={24} />
-                </div>
-              </div>
-              <div style={{ 
-                marginTop: '16px', 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '4px',
-                fontSize: '0.75rem',
-                color: card.positive ? '#10b981' : '#ef4444'
-              }}>
+            <div key={i} className={styles.bentoCard}>
+              <div className={styles.kpiLabel}>{card.title}</div>
+              <div className={styles.kpiValue}>{card.value}</div>
+              <div className={`${styles.kpiTrend} ${card.positive ? styles.kpiPositive : styles.kpiNegative}`}>
                 {card.positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                <span style={{ fontWeight: '600' }}>{card.trend}</span>
+                <span>{card.trend}</span>
               </div>
             </div>
           );
         })}
       </div>
 
-      <div className="responsive-grid responsive-grid-2" style={{ gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: 'var(--space-md)', marginBottom: 'var(--space-lg)' }}>
+      <div className={styles.analyticsRow}>
         {/* Growth Analytics */}
-        <div className="glass-card" style={{ padding: '24px', minWidth: 0 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <div className={styles.bentoCard}>
+          <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <h3 style={{ margin: 0, fontWeight: '700' }}>Fulfillment Velocity</h3>
-              <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.5 }}>Net contributions analyzed over 6 months</p>
+              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: '#fff' }}>Fulfillment Velocity</h3>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#9CA3AF' }}>Net contributions analyzed over 6 months</p>
             </div>
-            <Activity size={20} style={{ opacity: 0.3 }} />
+            <Activity size={18} style={{ color: '#9CA3AF' }} />
           </div>
-          <div style={{ height: '300px' }}>
-            <AreaChartCSS data={stats.monthlyData} />
+          <div className={styles.chartContainer}>
+            <div className={styles.chartWrapper}>
+              <AreaChartCSS data={stats.monthlyData} />
+            </div>
           </div>
         </div>
 
         {/* Goal Progress Ring */}
-        <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center' }}>
-          <h3 style={{ marginBottom: '24px', fontSize: '1.1rem', fontWeight: '700' }}>Overall Milestone Progress</h3>
-          <ProgressRing percentage={stats.progressPercent} size={160} strokeWidth={12} />
-          <div style={{ marginTop: '24px' }}>
-            <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>₦{(Number(stats.totalRaised) / 100).toLocaleString()}</div>
-          </div>
-          <div style={{ width: '100%', marginTop: '24px' }}>
-             <ProgressBar percentage={stats.progressPercent} height={10} />
-             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', marginTop: '8px', opacity: 0.5 }}>
-               <span>START</span>
-               <span>TARGET: ₦650M</span>
-             </div>
+        <div className={styles.bentoCard}>
+          <h3 style={{ margin: '0 0 1.5rem 0', fontSize: '1rem', fontWeight: '600', color: '#fff', textAlign: 'center' }}>Milestone Progress</h3>
+          <div className={styles.radialWrapper}>
+            <ProgressRing percentage={stats.progressPercent} size={180} strokeWidth={14} />
+            <div style={{ marginTop: '1.5rem' }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#fff' }}>₦{(Number(stats.totalRaised) / 100).toLocaleString()}</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="responsive-grid responsive-grid-2">
-        {/* Recent Enrollments */}
-        <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
-          <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '700' }}>Recent Enrollments</h3>
-            <Link href="/admin/donors" style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 'bold' }}>VIEW ALL</Link>
+      <div className={styles.dataTablesRow}>
+        {/* Recent Transactions */}
+        <div className={styles.bentoCard}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '600', color: '#fff' }}>Recent Transactions</h3>
+            <Link href="/admin/ledger" style={{ fontSize: '0.8rem', color: '#10b981', fontWeight: '600', textDecoration: 'none' }}>VIEW LEDGER</Link>
           </div>
-          <div className="tableResponsive">
-            <table className="responsive-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
-              <thead>
-                <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
-                  <th style={{ padding: '12px 24px', opacity: 0.5, fontWeight: '500' }}>DONOR</th>
-                  <th style={{ padding: '12px 24px', opacity: 0.5, fontWeight: '500' }}>TIER</th>
-                  <th style={{ padding: '12px 24px', opacity: 0.5, fontWeight: '500' }}>DATE</th>
+          <table className={styles.cleanTable}>
+            <thead>
+              <tr>
+                <th>Donor</th>
+                <th>Status</th>
+                <th>Amount</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats.recentClaims.map((claim) => (
+                <tr key={claim.id}>
+                  <td>
+                    <div style={{ fontWeight: '600', color: '#fff' }}>{claim.donor.name}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#9CA3AF' }}>{claim.donor.tier}</div>
+                  </td>
+                  <td>
+                    <span className={styles.tierBadge} style={{ 
+                      background: claim.status === 'APPROVED' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                      color: claim.status === 'APPROVED' ? '#10b981' : '#f59e0b',
+                      border: claim.status === 'APPROVED' ? '1px solid rgba(16, 185, 129, 0.2)' : '1px solid rgba(245, 158, 11, 0.2)'
+                    }}>{claim.status}</span>
+                  </td>
+                  <td style={{ color: '#fff', fontWeight: '600', fontSize: '0.9rem' }}>
+                    ₦{(Number(claim.amount) / 100).toLocaleString()}
+                  </td>
+                  <td style={{ color: '#9CA3AF', fontSize: '0.85rem' }}>
+                    {format(new Date(claim.createdAt), 'MMM dd, yyyy')}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {stats.recentDonors.map((donor, idx) => (
-                  <tr key={donor.id} style={{ borderBottom: idx === stats.recentDonors.length - 1 ? 'none' : '1px solid var(--glass-border)' }}>
-                    <td style={{ padding: '16px 24px' }} data-label="DONOR">
-                      <div style={{ fontWeight: '600' }}>{donor.name}</div>
-                      <div style={{ fontSize: '0.75rem', opacity: 0.5 }}>{donor.phone}</div>
-                    </td>
-                    <td style={{ padding: '16px 24px' }} data-label="TIER">
-                      <span style={{ 
-                        background: 'rgba(99,102,241,0.1)', 
-                        color: 'var(--accent)', 
-                        padding: '4px 8px', 
-                        borderRadius: '6px', 
-                        fontSize: '0.75rem',
-                        fontWeight: '700'
-                      }}>
-                        {donor.tier}
-                      </span>
-                    </td>
-                    <td style={{ padding: '16px 24px', opacity: 0.7 }} data-label="DATE">
-                      {format(new Date(donor.createdAt), 'MMM dd, yyyy')}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         {/* Tier Intelligence */}
-        <div className="glass-card" style={{ padding: '24px' }}>
-          <h3 style={{ marginBottom: '20px', fontSize: '1.1rem', fontWeight: '700' }}>Tier Analytics</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {Object.entries(stats.tierCounts)
-              .sort(([, a], [, b]) => b - a)
-              .map(([tier, count]) => (
-              <div key={tier}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                  <span style={{ fontSize: '0.85rem', fontWeight: '500' }}>{tier}</span>
-                  <span style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--accent)' }}>{count}</span>
-                </div>
-                <div style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '3px', overflow: 'hidden' }}>
-                  <div style={{ 
-                    width: `${(count / stats.totalDonors) * 100}%`, 
-                    height: '100%', 
-                    background: 'var(--accent)',
-                    borderRadius: '3px'
-                  }} />
-                </div>
-              </div>
-            ))}
-            {Object.keys(stats.tierCounts).length === 0 && (
-              <p style={{ opacity: 0.5, fontSize: '0.9rem', textAlign: 'center', padding: '40px 0' }}>Data initialization pending...</p>
+        <div className={styles.bentoCard}>
+          <h3 style={{ margin: '0 0 1.5rem 0', fontSize: '1rem', fontWeight: '600', color: '#fff' }}>Tier Analytics</h3>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {Object.entries(stats.tierTotals)
+              .sort(([, a], [, b]) => Number(b) - Number(a))
+              .map(([tier, amount]) => {
+                const percentage = stats.totalRaised > BigInt(0) ? (Number(amount) / Number(stats.totalRaised)) * 100 : 0;
+                return (
+                  <div key={tier} className={styles.progressRow}>
+                    <div className={styles.progressLabel}>
+                      <span className={styles.progressTierName}>{tier}</span>
+                      <span className={styles.progressCount}>₦{(Number(amount) / 100).toLocaleString()} ({percentage.toFixed(1)}%)</span>
+                    </div>
+                    <div className={styles.progressTrack}>
+                      <div 
+                        className={styles.progressFill}
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+            })}
+            {Object.keys(stats.tierTotals).length === 0 && (
+              <p style={{ color: '#9CA3AF', fontSize: '0.9rem', textAlign: 'center', padding: '2rem 0' }}>Data initialization pending...</p>
             )}
           </div>
         </div>

@@ -1,0 +1,19 @@
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  height: 44px;
+  padding: 0 1rem;
+  border-radius: 8px;
+  color: #A1A1AA;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.logoutBtn:hover {
+  background: rgba(220, 38, 38, 0.1);
+  color: #FCA5A5;
+}

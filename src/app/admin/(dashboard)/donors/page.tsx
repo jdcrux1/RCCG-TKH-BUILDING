@@ -4,10 +4,16 @@ import { prisma } from '@/lib/prisma';
 import { UserPlus, Search, Download } from 'lucide-react';
 import AddDonorModal from '@/components/AddDonorModal';
 import DonorList from './DonorList';
+import { getSession } from '@/lib/auth';
+import styles from './donors.module.css';
 
 const PAGE_SIZE = 50;
 
 export default async function DonorManagement({ searchParams }: { searchParams: Promise<{ page?: string; q?: string }> }) {
+  const session = await getSession();
+  const role = session?.role || '';
+  const isExecutive = role === 'LEAD_PASTOR' || role === 'COMMITTEE';
+
   const params = await searchParams;
   const page = parseInt(params.page || '1');
   const query = params.q || '';
@@ -31,21 +37,14 @@ export default async function DonorManagement({ searchParams }: { searchParams: 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div>
-      <header style={{ 
-        marginBottom: 'var(--space-lg)', 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-end',
-        flexWrap: 'wrap',
-        gap: '16px'
-      }} className="responsive-header">
+    <div className={styles.dashboardShell}>
+      <header className={styles.header}>
         <div>
-          <h1 style={{ fontSize: '1.8rem', marginBottom: '4px' }}>Donor Management</h1>
-          <p style={{ opacity: 0.6 }}>Manage Kingdom Builders profiles and pledges</p>
+          <h1 className={styles.mainTitle}>Donor Intelligence</h1>
+          <p className={styles.subtitle}>Executive read-only view of all campaign partners and pledges.</p>
         </div>
-        <div style={{ display: 'flex', gap: 'var(--space-sm)', width: 'auto' }} className="header-actions">
-          <AddDonorModal />
+        <div className={styles.headerActions}>
+          {!isExecutive && <AddDonorModal />}
         </div>
       </header>
 

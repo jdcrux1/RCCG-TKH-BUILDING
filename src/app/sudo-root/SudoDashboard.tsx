@@ -23,7 +23,7 @@ type Data = {
 };
 
 export default function SudoDashboard({ data }: { data: Data }) {
-  const [activeTab, setActiveTab] = useState('access');
+  const [activeTab, setActiveTab] = useState('concierge');
   const [contributions, setContributions] = useState(data.contributions);
   const [donors] = useState(data.donors);
   const [sessions, setSessions] = useState(data.sessions);
@@ -262,7 +262,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
       </div>
 
       <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
-        {['access', 'reconciliation', 'bulk_donors', 'bulk_contributions', 'watchtower', 'team', 'system', 'pledges'].map(tab => (
+        {['reconciliation', 'concierge', 'bulk_donors', 'bulk_contributions', 'watchtower', 'system', 'pledges'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -352,39 +352,11 @@ export default function SudoDashboard({ data }: { data: Data }) {
         </div>
       )}
 
-{activeTab === 'access' && (
-  <div style={{ border: '1px solid #222' }}>
-    <div style={{ padding: '12px', background: '#111', fontSize: '14px', color: '#888', borderBottom: '1px solid #222' }}>STAFF ACCESS CONTROL</div>
-    <div style={{ overflowX: 'auto' }}>
-      <div className="tableResponsive"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
-        <thead>
-          <tr style={{ background: '#111' }}>
-            <th style={{ padding: '8px', textAlign: 'left' }}>USERNAME</th>
-            <th style={{ padding: '8px', textAlign: 'left' }}>STATUS</th>
-            <th style={{ padding: '8px', textAlign: 'left' }}>ACTION</th>
-          </tr>
-        </thead>
-        <tbody>
-          {staff.map(s => (
-            <tr key={s.id} style={{ borderBottom: '1px solid #111' }}>
-              <td style={{ padding: '6px' }}>{s.username}</td>
-              <td style={{ padding: '6px', color: s.isActive ? '#0f0' : '#f00' }}>{s.isActive ? 'ACTIVE' : 'REVOKED'}</td>
-              <td style={{ padding: '6px' }}>
-                <button onClick={() => handleRevokeAccess(s.id, s.isActive)}
-                  style={{ background: 'transparent', border: '1px solid #333', color: s.isActive ? '#f00' : '#0f0', cursor: 'pointer', padding: '2px 8px', minHeight: '44px' }}>
-                  {s.isActive ? 'revoke' : 'restore'}
-                </button>
-              </td>
-            </tr>
-          ))}
-          {staff.length === 0 && (
-            <tr><td colSpan={3} style={{ padding: '12px', textAlign: 'center', color: '#444' }}>no staff accounts</td></tr>
-          )}
-        </tbody>
-      </table></div>
-    </div>
-  </div>
-)}
+      {activeTab === 'concierge' && (
+        <div style={{ border: '1px solid #222', padding: '24px' }}>
+          <ConciergeLogger />
+        </div>
+      )}
 
 {activeTab === 'bulk' && (
   <div style={{ border: '1px solid #222' }}>
@@ -778,78 +750,6 @@ export default function SudoDashboard({ data }: { data: Data }) {
 )}
 
 {/* watchtower section placeholder */}
-
-      {activeTab === 'team' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '20px' }}>
-          <div>
-            <div style={{ marginBottom: '12px', fontSize: '14px', color: '#888' }}>PROVISION STAFF</div>
-            <div style={{ border: '1px solid #222', padding: '12px' }}>
-              <input 
-                value={newStaffUser} 
-                onChange={e => setNewStaffUser(e.target.value)} 
-                placeholder="username" 
-                style={{ display: 'block', width: '100%', marginBottom: '8px', padding: '6px', background: '#111', border: '1px solid #222', color: '#fff', fontFamily: 'monospace' }} 
-              />
-              <input 
-                type="password"
-                value={newStaffPass} 
-                onChange={e => setNewStaffPass(e.target.value)} 
-                placeholder="password" 
-                style={{ display: 'block', width: '100%', marginBottom: '8px', padding: '6px', background: '#111', border: '1px solid #222', color: '#fff', fontFamily: 'monospace' }} 
-              />
-              <select 
-                value={newStaffRole} 
-                onChange={e => setNewStaffRole(e.target.value)}
-                style={{ display: 'block', width: '100%', marginBottom: '8px', padding: '6px', background: '#111', border: '1px solid #222', color: '#fff', fontFamily: 'monospace' }}
-              >
-                <option value="VOLUNTEER">Volunteer</option>
-                <option value="ADMIN">Admin</option>
-                <option value="EXECUTIVE">Executive (Read-Only)</option>
-              </select>
-              <button 
-                onClick={handleCreateStaff}
-                style={{ width: '100%', padding: '8px', background: '#111', border: '1px solid #333', color: '#fff', cursor: 'pointer', fontFamily: 'monospace' }}
-              >
-                create
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <div style={{ marginBottom: '12px', fontSize: '14px', color: '#888' }}>ACTIVE STAFF</div>
-            <div style={{ border: '1px solid #222' }}>
-              <div className="tableResponsive"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
-                <thead>
-                  <tr style={{ background: '#111' }}>
-                    <th style={{ padding: '8px', textAlign: 'left' }}>USERNAME</th>
-                    <th style={{ padding: '8px', textAlign: 'left' }}>ROLE</th>
-                    <th style={{ padding: '8px', textAlign: 'left' }}>STATUS</th>
-                    <th style={{ padding: '8px', textAlign: 'left' }}>ACTION</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {staff.map(s => (
-                    <tr key={s.id} style={{ borderBottom: '1px solid #111' }}>
-                      <td style={{ padding: '6px' }}>{s.username}</td>
-                      <td style={{ padding: '6px' }}>{s.role}</td>
-                      <td style={{ padding: '6px', color: s.isActive ? '#0f0' : '#f00' }}>{s.isActive ? 'ACTIVE' : 'REVOKED'}</td>
-                      <td style={{ padding: '6px' }}>
-                        <button 
-                          onClick={() => handleRevokeAccess(s.id, s.isActive)}
-                          style={{ background: 'transparent', border: '1px solid #333', color: s.isActive ? '#f00' : '#0f0', cursor: 'pointer', padding: '2px 8px', minHeight: '44px' }}
-                        >
-                          {s.isActive ? 'revoke' : 'restore'}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  {staff.length === 0 && <tr><td colSpan={4} style={{ padding: '12px', textAlign: 'center', color: '#444' }}>no staff accounts</td></tr>}
-                </tbody>
-              </table></div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {activeTab === 'system' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>

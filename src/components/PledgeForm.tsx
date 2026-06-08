@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { VALID_TIERS } from '@/lib/tiers';
+import styles from './PledgeForm.module.css';
 
 export default function PledgeForm() {
   const [name, setName] = useState('');
@@ -44,9 +45,9 @@ export default function PledgeForm() {
 
   if (success) {
     return (
-      <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid #10b981', padding: '24px', borderRadius: '16px', textAlign: 'center' }}>
-        <h3 style={{ color: '#10b981', fontSize: '20px', marginBottom: '12px' }}>Request Received!</h3>
-        <p style={{ color: '#aaa', fontSize: '14px' }}>
+      <div className={styles.successBox}>
+        <h3 className={styles.successTitle}>Request Received!</h3>
+        <p className={styles.successText}>
           Thank you for joining the Kingdom Builders! Your request has been sent to our team. You will receive a WhatsApp message shortly with your login credentials.
         </p>
       </div>
@@ -54,79 +55,47 @@ export default function PledgeForm() {
   }
 
   return (
-    <div style={{ 
-      background: 'rgba(255, 255, 255, 0.03)', 
-      backdropFilter: 'blur(10px)', 
-      border: '1px solid rgba(255, 255, 255, 0.1)', 
-      padding: '32px', 
-      borderRadius: '24px',
-      boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)'
-    }}>
-      <h3 style={{ fontSize: '24px', color: '#fff', marginBottom: '8px', textAlign: 'center' }}>Become a Kingdom Builder</h3>
-      <p style={{ color: '#aaa', fontSize: '14px', marginBottom: '24px', textAlign: 'center' }}>
+    <div className={styles.formContainer}>
+      <h3 className={styles.heading}>Become a Kingdom Builder</h3>
+      <p className={styles.subheading}>
         Fill out this form to request your unique Donor ID and start your monthly pledge.
       </p>
 
-      {error && <div style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '14px', border: '1px solid rgba(239, 68, 68, 0.3)' }}>{error}</div>}
+      {error && <div className={styles.errorBox}>{error}</div>}
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div>
-          <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px', textTransform: 'uppercase' }}>Full Name</label>
+      <form onSubmit={handleSubmit}>
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Full Name</label>
           <input 
             type="text" 
             value={name}
             onChange={e => setName(e.target.value)}
             placeholder="John Doe"
-            style={{ 
-              width: '100%', 
-              padding: '16px', 
-              background: 'rgba(0,0,0,0.5)', 
-              border: '1px solid rgba(255,255,255,0.1)', 
-              borderRadius: '8px',
-              color: '#fff',
-              fontSize: '16px'
-            }}
+            className={styles.input}
           />
         </div>
 
-        <div>
-          <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px', textTransform: 'uppercase' }}>WhatsApp Number</label>
+        <div className={styles.formGroup}>
+          <label className={styles.label}>WhatsApp Number</label>
           <input 
             type="tel" 
             value={phone}
             onChange={e => setPhone(e.target.value)}
             placeholder="+234 800 000 0000"
-            style={{ 
-              width: '100%', 
-              padding: '16px', 
-              background: 'rgba(0,0,0,0.5)', 
-              border: '1px solid rgba(255,255,255,0.1)', 
-              borderRadius: '8px',
-              color: '#fff',
-              fontSize: '16px'
-            }}
+            className={styles.input}
           />
         </div>
 
-        <div>
-          <label style={{ display: 'block', fontSize: '12px', color: '#888', marginBottom: '8px', textTransform: 'uppercase' }}>Select Your Tier</label>
+        <div className={styles.formGroup}>
+          <label className={styles.label}>Select Your Tier</label>
           <select 
             value={tier}
             onChange={e => setTier(e.target.value)}
-            style={{ 
-              width: '100%', 
-              padding: '16px', 
-              background: 'rgba(0,0,0,0.5)', 
-              border: '1px solid rgba(255,255,255,0.1)', 
-              borderRadius: '8px',
-              color: '#fff',
-              fontSize: '16px',
-              appearance: 'none'
-            }}
+            className={styles.input}
           >
             <option value="" disabled>-- Select a Tier --</option>
             {VALID_TIERS.map(t => (
-              <option key={t} value={t} style={{ background: '#111' }}>{t}</option>
+              <option key={t} value={t}>{t}</option>
             ))}
           </select>
         </div>
@@ -134,18 +103,7 @@ export default function PledgeForm() {
         <button 
           type="submit" 
           disabled={isSubmitting}
-          style={{ 
-            marginTop: '8px',
-            background: isSubmitting ? '#444' : '#fff', 
-            color: '#000', 
-            padding: '16px', 
-            borderRadius: '8px', 
-            border: 'none', 
-            fontSize: '16px', 
-            fontWeight: 'bold', 
-            cursor: isSubmitting ? 'not-allowed' : 'pointer',
-            transition: 'background 0.3s ease'
-          }}
+          className={`${styles.submitBtn} magneticButton`}
         >
           {isSubmitting ? 'SUBMITTING...' : 'JOIN THE VISION'}
         </button>

@@ -7,10 +7,9 @@ import { jwtVerify } from 'jose';
 const ROLES = {
   SUPERADMIN: 'SUPERADMIN',
   VOLUNTEER: 'VOLUNTEER',
-  ADMIN: 'ADMIN',
-  ONBOARDER: 'ONBOARDER',
+  LEAD_PASTOR: 'LEAD_PASTOR',
+  COMMITTEE: 'COMMITTEE',
   DONOR: 'DONOR',
-  EXECUTIVE: 'EXECUTIVE',
 } as const;
 
 type Role = typeof ROLES[keyof typeof ROLES];
@@ -116,17 +115,11 @@ export default async function middleware(request: NextRequest) {
   if (path === '/login' && payload) {
     const role = payload.role;
     
-    if (role === ROLES.ADMIN || role === ROLES.VOLUNTEER) {
+    if (role === ROLES.LEAD_PASTOR || role === ROLES.COMMITTEE || role === ROLES.VOLUNTEER) {
       return NextResponse.redirect(new URL('/admin/dashboard', origin));
-    }
-    if (role === ROLES.ONBOARDER) {
-      return NextResponse.redirect(new URL('/admin/onboard', origin));
     }
     if (role === ROLES.DONOR) {
       return NextResponse.redirect(new URL('/dashboard', origin));
-    }
-    if (role === ROLES.EXECUTIVE) {
-      return NextResponse.redirect(new URL('/executive', origin));
     }
   }
 
@@ -145,8 +138,8 @@ export default async function middleware(request: NextRequest) {
       if (role === ROLES.SUPERADMIN) {
         return NextResponse.next();
       }
-      // Admin can access all admin routes
-      if (role === ROLES.ADMIN) {
+      // Lead Pastor and Committee can access read-only admin routes
+      if (role === ROLES.LEAD_PASTOR || role === ROLES.COMMITTEE) {
         return NextResponse.next();
       }
       // Volunteer (strictly restricted to onboarding as requested)
@@ -155,13 +148,6 @@ export default async function middleware(request: NextRequest) {
           return NextResponse.next();
         }
         // Otherwise redirect to onboarding page
-        return NextResponse.redirect(new URL('/admin/onboard', origin));
-      }
-      // ONBOARDER can only access onboard
-      if (role === ROLES.ONBOARDER) {
-        if (path === '/admin/onboard') {
-          return NextResponse.next();
-        }
         return NextResponse.redirect(new URL('/admin/onboard', origin));
       }
       // DONOR cannot access admin - redirect to donor dashboard
@@ -176,7 +162,7 @@ export default async function middleware(request: NextRequest) {
         return NextResponse.next();
       }
       // Non-donors redirect to their appropriate dashboard
-      if (role === ROLES.ADMIN || role === ROLES.VOLUNTEER || role === ROLES.ONBOARDER) {
+      if (role === ROLES.VOLUNTEER || role === ROLES.LEAD_PASTOR || role === ROLES.COMMITTEE) {
         return NextResponse.redirect(new URL('/admin/dashboard', origin));
       }
       if (role === ROLES.SUPERADMIN) {

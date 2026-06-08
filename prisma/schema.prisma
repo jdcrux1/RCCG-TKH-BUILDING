@@ -13,20 +13,10 @@ datasource db {
 // ENUMS - Strict type safety for fixed-value fields
 // ═══════════════════════════════════════════════════════════════
 
-enum DonorRole {
-  DONOR
-  ADMIN
-}
-
 enum DonorStatus {
   ACTIVE
   INACTIVE
   SUSPENDED
-}
-
-enum UserRole {
-  VOLUNTEER
-  SUPERADMIN
 }
 
 enum ActionType {
@@ -185,8 +175,9 @@ model Staff {
   id        String    @id @default(uuid())
   username  String    @unique
   password  String    // Hashed password
-  role      String  @default("VOLUNTEER")
+  role      String    @default("VOLUNTEER")
   isActive  Boolean   @default(true)
+  magicToken String?  @unique
   createdAt DateTime  @default(now())
 
   @@index([username])
