@@ -2,7 +2,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import styles from './landing.module.css';
-import InstantDonate from '@/components/InstantDonate';
 import PledgeForm from '@/components/PledgeForm';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import LiveVelocityTracker from '@/components/LiveVelocityTracker';
