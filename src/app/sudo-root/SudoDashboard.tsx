@@ -19,6 +19,7 @@ type Data = {
     groundFloorTarget: string;
   };
   paymentClaims: any[];
+  pledgeRequests: any[];
 };
 
 export default function SudoDashboard({ data }: { data: Data }) {
@@ -29,6 +30,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
   const [actionLogs, setActionLogs] = useState(data.actionLogs);
   const [staff, setStaff] = useState(data.staff);
   const [paymentClaims, setPaymentClaims] = useState(data.paymentClaims);
+  const [pledgeRequests, setPledgeRequests] = useState(data.pledgeRequests || []);
   const [systemVars, setSystemVars] = useState(data.systemVariables);
   const [editId, setEditId] = useState<string | null>(null);
   const [editAmount, setEditAmount] = useState('');
@@ -51,6 +53,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
       const res = await fetch('/api/sudo-refresh').then(r => r.json());
       if (res.sessions) setSessions(res.sessions);
       if (res.actionLogs) setActionLogs(res.actionLogs);
+      if (res.pledgeRequests) setPledgeRequests(res.pledgeRequests);
     };
 
     fetchData();
@@ -259,7 +262,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
       </div>
 
       <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
-        {['access', 'reconciliation', 'bulk_donors', 'bulk_contributions', 'watchtower', 'team', 'system'].map(tab => (
+        {['access', 'reconciliation', 'bulk_donors', 'bulk_contributions', 'watchtower', 'team', 'system', 'pledges'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -552,6 +555,14 @@ export default function SudoDashboard({ data }: { data: Data }) {
   </div>
 )}
 
+{activeTab === 'bulk_donors' && (
+  <div style={{ maxWidth: '1000px' }}>
+    <div style={{ marginBottom: '12px', fontSize: '14px', color: '#888' }}>BULK ONBOARD DONORS (CSV)</div>
+    <div style={{ background: '#111', padding: '16px', border: '1px solid #333', marginBottom: '20px' }}>
+      <p style={{ fontSize: '12px', color: '#aaa', marginBottom: '16px' }}>
+        Upload a CSV file containing at minimum `Name` and `Phone` columns. The system will automatically generate Donor IDs and secure random passwords.
+        <strong> Passwords will only be shown ONCE immediately after upload so you can send WhatsApp messages.</strong>
+      </p>
       <input 
         type="file" 
         accept=".csv"
@@ -674,6 +685,98 @@ export default function SudoDashboard({ data }: { data: Data }) {
   </div>
 )}
 
+{activeTab === 'pledges' && (
+  <div style={{ border: '1px solid #222' }}>
+    <div style={{ padding: '12px', background: '#111', fontSize: '14px', color: '#888', borderBottom: '1px solid #222' }}>PENDING WEBSITE PLEDGES</div>
+    {pledgeRequests.length === 0 ? (
+      <div style={{ padding: '24px', textAlign: 'center', color: '#666' }}>No pending pledges from the website.</div>
+    ) : (
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+          <thead>
+            <tr style={{ background: '#050505', color: '#666' }}>
+              <th style={{ padding: '12px', textAlign: 'left' }}>NAME</th>
+              <th style={{ padding: '12px', textAlign: 'left' }}>PHONE</th>
+              <th style={{ padding: '12px', textAlign: 'left' }}>TIER</th>
+              <th style={{ padding: '12px', textAlign: 'left' }}>DATE</th>
+              <th style={{ padding: '12px', textAlign: 'right' }}>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pledgeRequests.map((pledge: any) => (
+              <tr key={pledge.id} style={{ borderBottom: '1px solid #222' }}>
+                <td style={{ padding: '12px' }}>{pledge.name}</td>
+                <td style={{ padding: '12px' }}>{pledge.phone}</td>
+                <td style={{ padding: '12px' }}>{pledge.tier}</td>
+                <td style={{ padding: '12px', color: '#888' }}>{new Date(pledge.createdAt).toLocaleDateString()}</td>
+                <td style={{ padding: '12px', textAlign: 'right' }}>
+                  <button
+                    onClick={async () => {
+                      if (!confirm('Approve this pledge and create their account?')) return;
+                      try {
+                        const res = await fetch('/api/sudo-approve-pledge', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ pledgeId: pledge.id, action: 'APPROVE' })
+                        });
+                        const data = await res.json();
+                        if (res.ok) {
+                          setPledgeRequests(pledgeRequests.filter((p: any) => p.id !== pledge.id));
+                          // Show credentials temporarily
+                          const msg = encodeURIComponent(
+                            `🕊️ *Grace and Peace to you, Church Family!* 🕊️\n\n` +
+                            `Thank you for pledging to become a Kingdom Builder! Your account has been successfully created.\n\n` +
+                            `1️⃣ Your unique *Donor ID*: ${data.donorInfo.donorRefId}\n` +
+                            `2️⃣ Your secure *Login PIN*: ${data.donorInfo.pin}\n` +
+                            `3️⃣ The *Direct Link*: https://rccg-tkh-building.vercel.app/login\n\n` +
+                            `"Let us rise up and build." (Nehemiah 2:18). God bless you abundantly! 🙌🏽⛪`
+                          );
+                          const waUrl = `https://wa.me/${pledge.phone.replace('+', '')}?text=${msg}`;
+                          
+                          // We open it in a new tab immediately
+                          window.open(waUrl, '_blank');
+                          alert(`Account created!\nID: ${data.donorInfo.donorRefId}\nPIN: ${data.donorInfo.pin}\n\nA WhatsApp tab should have opened automatically.`);
+                        } else {
+                          alert(data.error);
+                        }
+                      } catch (e) {
+                        alert('Network error');
+                      }
+                    }}
+                    style={{ background: '#10b981', color: '#000', border: 'none', padding: '4px 12px', cursor: 'pointer', marginRight: '8px', fontWeight: 'bold' }}
+                  >
+                    APPROVE
+                  </button>
+                  <button
+                    onClick={async () => {
+                      if (!confirm('Reject this pledge? This cannot be undone.')) return;
+                      try {
+                        const res = await fetch('/api/sudo-approve-pledge', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ pledgeId: pledge.id, action: 'REJECT' })
+                        });
+                        if (res.ok) {
+                          setPledgeRequests(pledgeRequests.filter((p: any) => p.id !== pledge.id));
+                        }
+                      } catch (e) {
+                        alert('Network error');
+                      }
+                    }}
+                    style={{ background: '#ef4444', color: '#fff', border: 'none', padding: '4px 12px', cursor: 'pointer' }}
+                  >
+                    REJECT
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </div>
+)}
+
 {/* watchtower section placeholder */}
 
       {activeTab === 'team' && (
@@ -701,6 +804,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
               >
                 <option value="VOLUNTEER">Volunteer</option>
                 <option value="ADMIN">Admin</option>
+                <option value="EXECUTIVE">Executive (Read-Only)</option>
               </select>
               <button 
                 onClick={handleCreateStaff}

@@ -167,6 +167,7 @@ export async function POST(request: NextRequest) {
 
     let redirectUrl = '/admin/dashboard';
     if (staff.role === 'VOLUNTEER') redirectUrl = '/admin/onboard'; // Or donors depending on logic, user requested onboard
+    if (staff.role === 'EXECUTIVE') redirectUrl = '/executive';
 
     const response = NextResponse.json({ success: true, redirectUrl });
     response.cookies.set('session', sessionToken, { 

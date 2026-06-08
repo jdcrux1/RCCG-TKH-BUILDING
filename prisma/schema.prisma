@@ -56,6 +56,12 @@ enum PaymentStatus {
   REJECTED
 }
 
+enum PledgeStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 // ═══════════════════════════════════════════════════════════════
 // DONOR TABLE
 // ═════════════════════════════════════════════════════════════==
@@ -244,6 +250,23 @@ model PaymentClaim {
   createdAt DateTime      @default(now())
 
   @@index([donorId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PLEDGE REQUEST (Lead Capture)
+// ═════════════════════════════════════════════════════════════==
+
+model PledgeRequest {
+  id        String       @id @default(cuid())
+  name      String
+  phone     String       @unique
+  tier      String
+  status    PledgeStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
   @@index([status])
   @@index([createdAt])
 }

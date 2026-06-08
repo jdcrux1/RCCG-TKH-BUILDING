@@ -2,7 +2,7 @@ import { randomInt } from 'crypto';
 
 // Tier thresholds in NAIRA (not kobo)
 // getTier receives amount in NAIRA, converts to kobo internally for storage
-const TIERS = [
+export const TIERS = [
   { name: 'Cornerstone Partner', min: 1000000 },
   { name: 'Pillar Builder', min: 500000 },
   { name: 'Foundation Stone', min: 200000 },

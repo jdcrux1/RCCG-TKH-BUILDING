@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import styles from './landing.module.css';
 import InstantDonate from '@/components/InstantDonate';
+import PledgeForm from '@/components/PledgeForm';
 
 export default function Home() {
   return (
@@ -98,6 +99,13 @@ export default function Home() {
                 quality={100}
               />
             </div>
+          </div>
+        </section>
+
+        {/* PLEDGE CAPTURE SECTION */}
+        <section style={{ padding: '6rem 2rem', background: '#050505', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: '100%', maxWidth: '600px' }}>
+            <PledgeForm />
           </div>
         </section>
       </main>

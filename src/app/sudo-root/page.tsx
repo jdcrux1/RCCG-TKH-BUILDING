@@ -20,20 +20,26 @@ async function verifySudo(): Promise<boolean> {
 }
 
 async function getData() {
-  const [contributions, donors, sessions, actionLogs, staff, milestones, paymentClaims] = await Promise.all([
-    prisma.contribution.findMany({ 
-      include: { donor: true },
-      orderBy: { date: 'desc' },
-    }),
+  const [
+    contributions,
+    donors,
+    sessions,
+    actionLogs,
+    staff,
+    milestones,
+    systemVars,
+    paymentClaims,
+    pledgeRequests
+  ] = await Promise.all([
+    prisma.contribution.findMany({ include: { donor: true }, orderBy: { date: 'desc' } }),
     prisma.donor.findMany({ orderBy: { createdAt: 'desc' } }),
     getActiveSessions(),
     getActionLogs(100),
     prisma.staff.findMany({ orderBy: { createdAt: 'desc' } }),
     prisma.milestone.findMany({ orderBy: { order: 'asc' } }),
-    prisma.paymentClaim.findMany({
-      include: { donor: true },
-      orderBy: { createdAt: 'desc' }
-    }),
+    prisma.systemVariable.findMany(),
+    prisma.paymentClaim.findMany({ include: { donor: true }, orderBy: { createdAt: 'desc' } }),
+    prisma.pledgeRequest.findMany({ where: { status: 'PENDING' }, orderBy: { createdAt: 'desc' } })
   ]);
 
   const totalTarget = await prisma.systemVariable.findUnique({ where: { key: 'totalTarget' } });
@@ -48,6 +54,7 @@ async function getData() {
     staff,
     milestones,
     paymentClaims,
+    pledgeRequests,
     systemVariables: {
       totalTarget: totalTarget?.value || '500000000',
       basementTarget: basementTarget?.value || '150000000',

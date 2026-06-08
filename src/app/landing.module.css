@@ -328,6 +328,9 @@
 @media (max-width: 768px) {
   .heroSection {
     min-height: 100svh;
+    height: auto;
+    align-items: flex-start;
+    padding-top: 120px;
   }
   
   .overlay {
@@ -335,8 +338,8 @@
   }
   
   .heroContent {
-    justify-content: flex-end;
-    padding-bottom: 8rem;
+    justify-content: flex-start;
+    padding-bottom: 4rem;
   }
   
   .statsGrid {
