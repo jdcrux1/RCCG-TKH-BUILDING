@@ -73,7 +73,7 @@ export default function LiveVelocityTracker({ currentRaised, targetGoal, monthly
 
     velocityElement = (
       <span className={styles.offTrack}>
-        Pace Required: {paceFormatted}/month to hit 2028
+        Required Pace: {paceFormatted}/month to reach ₦650M Goal
       </span>
     );
   }

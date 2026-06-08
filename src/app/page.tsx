@@ -6,6 +6,7 @@ import InstantDonate from '@/components/InstantDonate';
 import PledgeForm from '@/components/PledgeForm';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import LiveVelocityTracker from '@/components/LiveVelocityTracker';
+import QuickGiveDrawer from '@/components/QuickGiveDrawer';
 import { prisma } from '@/lib/prisma';
 
 export default async function Home() {
@@ -73,6 +74,7 @@ export default async function Home() {
                   <Link href="/login" className={`${styles.primaryBtn} magneticButton`}>
                     Kingdom Builder Login <ArrowRight size={24} />
                   </Link>
+                  <QuickGiveDrawer />
                 </div>
               </RevealOnScroll>
 
@@ -100,10 +102,6 @@ export default async function Home() {
                   </div>
                 </div>
               </RevealOnScroll>
-            </div>
-
-            <div className={styles.heroRight}>
-              <InstantDonate />
             </div>
 
             <div className={styles.scrollIndicator}>
