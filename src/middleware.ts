@@ -18,6 +18,7 @@ type Role = typeof ROLES[keyof typeof ROLES];
 const PUBLIC_ROUTES = [
   '/',
   '/login',
+  '/claim',
 ];
 
 // API routes that are always public
