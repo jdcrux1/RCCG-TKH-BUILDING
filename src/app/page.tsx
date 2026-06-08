@@ -5,7 +5,7 @@ import styles from './landing.module.css';
 import PledgeForm from '@/components/PledgeForm';
 import RevealOnScroll from '@/components/RevealOnScroll';
 import LiveVelocityTracker from '@/components/LiveVelocityTracker';
-import QuickGiveDrawer from '@/components/QuickGiveDrawer';
+import QuickGiveModal from '@/components/QuickGiveModal';
 import { prisma } from '@/lib/prisma';
 
 export default async function Home() {
@@ -73,7 +73,7 @@ export default async function Home() {
                   <Link href="/login" className={`${styles.primaryBtn} magneticButton`}>
                     Kingdom Builder Login <ArrowRight size={24} />
                   </Link>
-                  <QuickGiveDrawer />
+                  <QuickGiveModal />
                 </div>
               </RevealOnScroll>
 
