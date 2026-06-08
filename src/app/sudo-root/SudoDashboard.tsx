@@ -756,7 +756,85 @@ export default function SudoDashboard({ data }: { data: Data }) {
   </div>
 )}
 
-{/* watchtower section placeholder */}
+{activeTab === 'watchtower' && (
+  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+    {/* LEFT PANE: ACTIVE SESSIONS */}
+    <div style={{ border: '1px solid #222' }}>
+      <div style={{ padding: '12px', background: '#111', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #222' }}>
+        <span style={{ fontSize: '14px', color: '#888' }}>LIVE ACTIVE SESSIONS ({sessions.length})</span>
+        {sessions.length > 0 && (
+          <button 
+            onClick={handleKillAllSessions}
+            style={{ background: '#f003', border: '1px solid #f00', color: '#f00', padding: '4px 12px', cursor: 'pointer', fontSize: '10px' }}
+          >
+            KILL ALL SESSIONS
+          </button>
+        )}
+      </div>
+      <div style={{ maxHeight: '600px', overflowY: 'auto', padding: '12px' }}>
+        {sessions.length === 0 ? (
+          <div style={{ color: '#666', textAlign: 'center', padding: '20px' }}>No active sessions</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {sessions.map(session => (
+              <div key={session.sessionId} style={{ background: '#0a0a0a', border: '1px solid #333', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ color: '#0f0', fontWeight: 'bold', fontSize: '12px', marginBottom: '4px' }}>
+                    ROLE: {session.userRole}
+                  </div>
+                  <div style={{ color: '#aaa', fontSize: '11px' }}>
+                    User ID: {session.userId || 'N/A'}
+                  </div>
+                  <div style={{ color: '#666', fontSize: '10px', marginTop: '4px' }}>
+                    Logged in: {formatTime(session.loginTimestamp)}
+                  </div>
+                </div>
+                <button 
+                  onClick={() => handleRevokeSession(session.sessionId)}
+                  style={{ background: 'transparent', border: '1px solid #f00', color: '#f00', padding: '4px 8px', cursor: 'pointer', fontSize: '10px', minHeight: '44px' }}
+                >
+                  REVOKE
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+
+    {/* RIGHT PANE: AUDIT TRAIL / ACTION LOGS */}
+    <div style={{ border: '1px solid #222' }}>
+      <div style={{ padding: '12px', background: '#111', fontSize: '14px', color: '#888', borderBottom: '1px solid #222' }}>
+        SYSTEM AUDIT TRAIL (LAST 100)
+      </div>
+      <div style={{ maxHeight: '600px', overflowY: 'auto', padding: '12px' }}>
+        {actionLogs.length === 0 ? (
+          <div style={{ color: '#666', textAlign: 'center', padding: '20px' }}>No logs recorded</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {actionLogs.map(log => (
+              <div key={log.logId} style={{ background: '#0a0a0a', border: '1px solid #333', padding: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span style={{ color: '#0f0', fontWeight: 'bold', fontSize: '12px' }}>{log.actionType}</span>
+                  <span style={{ color: '#666', fontSize: '10px' }}>{formatTime(log.timestamp)}</span>
+                </div>
+                <div style={{ display: 'flex', gap: '12px', fontSize: '11px', color: '#aaa', marginBottom: '8px' }}>
+                  <span>User: {log.userRole}</span>
+                  {log.targetRecordId && <span>Target: {log.targetRecordId.substring(0,8)}...</span>}
+                </div>
+                {log.details && (
+                  <pre style={{ margin: 0, padding: '8px', background: '#050505', border: '1px solid #222', fontSize: '10px', color: '#888', overflowX: 'auto' }}>
+                    {log.details}
+                  </pre>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+)}
 
       {activeTab === 'system' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
