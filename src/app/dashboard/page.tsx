@@ -248,7 +248,7 @@ export default async function DonorDashboard() {
       )}
 
       {/* Header & Quick Actions */}
-      <section style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
+      <section id="profile" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
         <div>
           <h1 style={{ fontSize: '2rem', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             Welcome back, {donor.name}
@@ -290,14 +290,14 @@ export default async function DonorDashboard() {
           <div className={styles.paymentFormCard}>
             <h3 className={styles.sectionHeader}>
               <Landmark size={20} color="var(--tier-primary)" />
-              Log a New Payment
+              Log your Seed
             </h3>
             <PaymentClaimForm monthlyPledge={Number(donor.monthlyPledge)} tierColor={getTierColor(donor.tier)} />
           </div>
 
           <div className={styles.ledgerSection}>
             {/* Contribution Timeline */}
-            <div className="glass-card">
+            <div id="history" className="glass-card">
               <div className={styles.sectionHeader}>
                 <CalendarDays size={20} color="var(--tier-primary)" />
                 Recent Contributions

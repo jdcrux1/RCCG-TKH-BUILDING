@@ -7,7 +7,7 @@ export const TIERS = [
   { name: 'Pillar Builder', min: 500000 },
   { name: 'Foundation Stone', min: 200000 },
   { name: 'Nehemiah Builder', min: 100000 },
-  { name: 'Covenant Partners', min: 50000 },
+  { name: 'Covenant Partner', min: 50000 },
   { name: 'Faithful Hand', min: 20000 },
   { name: 'Open-Heart', min: 10000 },
   { name: 'Willing Heart', min: 5000 },

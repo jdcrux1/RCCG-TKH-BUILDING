@@ -19,7 +19,7 @@ export default function PaymentClaimForm({ monthlyPledge, tierColor }: { monthly
 
     setLoading(false);
     if (result.success) {
-      setMessage({ type: 'success', text: 'Payment claim submitted successfully! An admin will verify it soon.' });
+      setMessage({ type: 'success', text: 'Seed claim submitted successfully! An admin will verify it soon.' });
       setAmount('');
       setDate(new Date().toISOString().split('T')[0]);
       (e.target as HTMLFormElement).reset();
@@ -30,7 +30,7 @@ export default function PaymentClaimForm({ monthlyPledge, tierColor }: { monthly
 
   return (
     <div className="glass-card" style={{ marginTop: 'var(--space-md)' }}>
-      <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>Log a New Payment</h3>
+      <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>Log your Seed</h3>
       
       {message && (
         <div style={{ 
@@ -148,7 +148,7 @@ export default function PaymentClaimForm({ monthlyPledge, tierColor }: { monthly
             transition: 'all 0.2s ease',
           }}
         >
-          {loading ? 'Submitting...' : 'Submit Payment Claim'}
+          {loading ? 'Submitting...' : 'Submit Seed Claim'}
         </button>
       </form>
     </div>

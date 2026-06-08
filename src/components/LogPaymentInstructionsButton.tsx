@@ -26,7 +26,7 @@ export default function LogPaymentInstructionsButton() {
         onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)'}
         onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'}
       >
-        <Info size={16} /> How to Log Payments
+        <Info size={16} /> How to Log your Seed
       </button>
 
       {isOpen && (
@@ -69,7 +69,7 @@ export default function LogPaymentInstructionsButton() {
             </button>
 
             <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Info color="var(--tier-primary)" /> How to Log Payments
+              <Info color="var(--tier-primary)" /> How to Log your Seed
             </h2>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -88,8 +88,8 @@ export default function LogPaymentInstructionsButton() {
                   <Upload size={20} />
                 </div>
                 <div>
-                  <h4 style={{ fontWeight: 'bold', marginBottom: '4px' }}>2. Log Your Offering</h4>
-                  <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>Scroll down to the "Log a New Payment Claim" section. Faithfully enter the exact amount and date of your transfer so we can accurately account for your giving.</p>
+                  <h4 style={{ fontWeight: 'bold', marginBottom: '4px' }}>2. Log Your Seed</h4>
+                  <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>Scroll down to the "Log your Seed" section. Faithfully enter the exact amount and date of your transfer so we can accurately account for your giving.</p>
                 </div>
               </div>
 

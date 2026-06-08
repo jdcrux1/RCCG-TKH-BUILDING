@@ -65,8 +65,8 @@ export default async function DonorLayout({ children }: { children: React.ReactN
       }} className="mobile-only">
         {[
           { name: 'Home', icon: Home, href: '/dashboard' },
-          { name: 'Profile', icon: User, href: '/dashboard/profile' },
-          { name: 'History', icon: CreditCard, href: '/dashboard/history' },
+          { name: 'Profile', icon: User, href: '/dashboard#profile' },
+          { name: 'History', icon: CreditCard, href: '/dashboard#history' },
         ].map((item) => {
           const Icon = item.icon;
           return (
