@@ -635,8 +635,37 @@ export default function SudoDashboard({ data }: { data: Data }) {
             <tbody>
               {csvData.map((donor, idx) => {
                 const domain = typeof window !== 'undefined' ? window.location.origin : '';
-                const message = `Welcome to Kingdom Builders, ${donor.name.split(' ')[0]}! Thank you for your pledge. Please click this secure, one-time link to claim your dashboard and set up your private password: ${domain}/claim?token=${donor.claimToken}`;
-                const waLink = `https://wa.me/${donor.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+                const tierMinAmounts: Record<string, string> = {
+                  'Cornerstone Partner': '₦1,000,000',
+                  'Pillar Builder': '₦500,000',
+                  'Foundation Stone': '₦200,000',
+                  'Nehemiah Builder': '₦100,000',
+                  'Covenant Partner': '₦50,000',
+                  'Covenant Partners': '₦50,000',
+                  'Faithful Hand': '₦20,000',
+                  'Open-Heart': '₦10,000',
+                  'Willing Heart': '₦5,000'
+                };
+                const donorTier = donor.tier || 'Supporter';
+                const amountStr = tierMinAmounts[donorTier] || '';
+                const tierDetails = amountStr ? `under the *${donorTier}* tier (${amountStr} / month)` : donorTier && donorTier !== 'Supporter' && donorTier !== 'SUPPORTER' ? `as a monthly Kingdom Builder (${donorTier})` : 'as a monthly Kingdom Builder';
+                
+                const rawMsg = 
+                  `🕊️ *Grace and Peace to you, Bro/Sis!* 🕊️\n\n` +
+                  `We want to say a massive *THANK YOU* for stepping out in faith to partner with us as a monthly Kingdom Builder ${tierDetails} for the RCCG TKH Building Project.\n\n` +
+                  `Your builder account has been successfully created. Please use the secure invitation link below to activate your account, set up your secure login PIN/password, and access your dashboard where you can log contributions and track progress:\n\n` +
+                  `👉 *Activate Account:* ${domain}/claim?token=${donor.claimToken}\n\n` +
+                  `*Please note: This activation link is unique to you and will expire in 7 days.*\n\n` +
+                  `• *Donor Reference ID:* ${donor.donorRefId || 'N/A'}\n\n` +
+                  `Once activated, you can always log back in at any time here:\n` +
+                  `👉 *Login Portal:* ${domain}/login\n\n` +
+                  `"Let us rise up and build." (Nehemiah 2:18). Thank you for your incredible sacrifice. God bless you abundantly! 🙏🏽⛪`;
+                
+                let phone = donor.phone.replace(/[^0-9]/g, '');
+                if (phone.startsWith('0')) {
+                  phone = '234' + phone.substring(1);
+                }
+                const waLink = `https://wa.me/${phone}?text=${encodeURIComponent(rawMsg)}`;
                 
                 return (
                   <tr key={idx} style={{ borderBottom: '1px solid #222' }}>
@@ -703,14 +732,37 @@ export default function SudoDashboard({ data }: { data: Data }) {
                           setPledgeRequests(pledgeRequests.filter((p: any) => p.id !== pledge.id));
                           // Show credentials temporarily
                           const domain = window.location.origin;
-                          const msg = encodeURIComponent(
-                            `🕊️ *Grace and Peace to you, Church Family!* 🕊️\n\n` +
-                            `Thank you for pledging to become a Kingdom Builder! Your account has been successfully created.\n\n` +
-                            `1️⃣ Your unique *Donor ID*: ${data.donorInfo.donorRefId}\n` +
-                            `2️⃣ Click this secure, one-time link to claim your dashboard and set up your private password: ${domain}/claim?token=${data.donorInfo.claimToken}\n\n` +
-                            `"Let us rise up and build." (Nehemiah 2:18). God bless you abundantly! 🙌🏽⛪`
-                          );
-                          const waUrl = `https://wa.me/${pledge.phone.replace('+', '')}?text=${msg}`;
+                          const tierMinAmounts: Record<string, string> = {
+                            'Cornerstone Partner': '₦1,000,000',
+                            'Pillar Builder': '₦500,000',
+                            'Foundation Stone': '₦200,000',
+                            'Nehemiah Builder': '₦100,000',
+                            'Covenant Partner': '₦50,000',
+                            'Covenant Partners': '₦50,000',
+                            'Faithful Hand': '₦20,000',
+                            'Open-Heart': '₦10,000',
+                            'Willing Heart': '₦5,000'
+                          };
+                          const pledgeTier = pledge.tier || 'Supporter';
+                          const amountStr = tierMinAmounts[pledgeTier] || '';
+                          const tierDetails = amountStr ? `under the *${pledgeTier}* tier (${amountStr} / month)` : pledgeTier && pledgeTier !== 'Supporter' && pledgeTier !== 'SUPPORTER' ? `as a monthly Kingdom Builder (${pledgeTier})` : 'as a monthly Kingdom Builder';
+                          
+                          const rawMsg = 
+                            `🕊️ *Grace and Peace to you, Bro/Sis!* 🕊️\n\n` +
+                            `We want to say a massive *THANK YOU* for stepping out in faith to partner with us as a monthly Kingdom Builder ${tierDetails} for the RCCG TKH Building Project.\n\n` +
+                            `Your builder account has been successfully created. Please use the secure invitation link below to activate your account, set up your secure login PIN/password, and access your dashboard where you can log contributions and track progress:\n\n` +
+                            `👉 *Activate Account:* ${domain}/claim?token=${data.donorInfo.claimToken}\n\n` +
+                            `*Please note: This activation link is unique to you and will expire in 7 days.*\n\n` +
+                            `• *Donor Reference ID:* ${data.donorInfo.donorRefId || 'N/A'}\n\n` +
+                            `Once activated, you can always log back in at any time here:\n` +
+                            `👉 *Login Portal:* ${domain}/login\n\n` +
+                            `"Let us rise up and build." (Nehemiah 2:18). Thank you for your incredible sacrifice. God bless you abundantly! 🙏🏽⛪`;
+                          
+                          let cleanPhone = pledge.phone.replace(/[^0-9]/g, '');
+                          if (cleanPhone.startsWith('0')) {
+                            cleanPhone = '234' + cleanPhone.substring(1);
+                          }
+                          const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(rawMsg)}`;
                           
                           // We open it in a new tab immediately
                           window.open(waUrl, '_blank');

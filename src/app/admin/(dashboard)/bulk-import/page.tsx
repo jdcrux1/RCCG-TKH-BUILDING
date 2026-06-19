@@ -165,7 +165,31 @@ function BulkImportContent() {
               </thead>
               <tbody>
                 {results.map((r, i) => {
-                  const encodedMessage = encodeURIComponent(`Welcome to Kingdom Builders, ${r.name}! Thank you for your Pledge towards the RCCG The King's House Youth Church Building Project. Please click this secure, one-time link to claim your dashboard and set up your private password: ${domain}/claim?token=${r.claimToken}`);
+                  const tierMinAmounts: Record<string, string> = {
+                    'Cornerstone Partner': '₦1,000,000',
+                    'Pillar Builder': '₦500,000',
+                    'Foundation Stone': '₦200,000',
+                    'Nehemiah Builder': '₦100,000',
+                    'Covenant Partner': '₦50,000',
+                    'Covenant Partners': '₦50,000',
+                    'Faithful Hand': '₦20,000',
+                    'Open-Heart': '₦10,000',
+                    'Willing Heart': '₦5,000'
+                  };
+                  const amountStr = tierMinAmounts[r.tier] || '';
+                  const tierDetails = amountStr ? `under the *${r.tier}* tier (${amountStr} / month)` : r.tier ? `as a monthly Kingdom Builder (${r.tier})` : 'as a monthly Kingdom Builder';
+                  
+                  const rawMsg = 
+                    `🕊️ *Grace and Peace to you, Bro/Sis!* 🕊️\n\n` +
+                    `We want to say a massive *THANK YOU* for stepping out in faith to partner with us as a monthly Kingdom Builder ${tierDetails} for the RCCG TKH Building Project.\n\n` +
+                    `Your builder account has been successfully created. Please use the secure invitation link below to activate your account, set up your secure login PIN/password, and access your dashboard where you can log contributions and track progress:\n\n` +
+                    `👉 *Activate Account:* ${domain}/claim?token=${r.claimToken}\n\n` +
+                    `*Please note: This activation link is unique to you and will expire in 7 days.*\n\n` +
+                    `• *Donor Reference ID:* ${r.donorRefId || 'N/A'}\n\n` +
+                    `Once activated, you can always log back in at any time here:\n` +
+                    `👉 *Login Portal:* ${domain}/login\n\n` +
+                    `"Let us rise up and build." (Nehemiah 2:18). Thank you for your incredible sacrifice. God bless you abundantly! 🙏🏽⛪`;
+                  const encodedMessage = encodeURIComponent(rawMsg);
                   // Strict stripping for wa.me API linking
                   let phone = r.phone.replace(/[^0-9]/g, '');
                   if (phone.startsWith('0')) {

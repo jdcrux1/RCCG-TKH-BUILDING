@@ -76,7 +76,8 @@ export async function POST(request: NextRequest) {
           name: sanitizedName,
           phone: sanitizedPhone,
           donorRefId,
-          claimToken
+          claimToken,
+          tier: 'SUPPORTER'
         });
 
         successCount++;

@@ -108,6 +108,8 @@ export async function importOfflineDonors(donors: any[]) {
     name: d.name,
     phone: d.phone,
     claimToken: d.claimToken,
+    donorRefId: d.donorRefId,
+    tier: d.tier,
     status: 'SUCCESS'
   }));
 
