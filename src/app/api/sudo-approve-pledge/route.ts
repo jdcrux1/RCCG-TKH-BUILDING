@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       const donorRefId = `KB-${(currentCount + 1).toString().padStart(3, '0')}`;
       
       const claimToken = crypto.randomBytes(32).toString('hex');
-      const claimTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      const claimTokenExpires = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); // 90 days
 
       await prisma.$transaction([
         prisma.donor.create({

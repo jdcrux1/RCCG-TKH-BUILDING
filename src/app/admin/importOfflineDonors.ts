@@ -55,7 +55,7 @@ export async function importOfflineDonors(donors: any[]) {
 
     // High Entropy Cryptographic Token
     const token = crypto.randomBytes(32).toString('hex');
-    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const expires = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); // 90 days
     const donorRefId = `KB-${baseId.toString().padStart(3, '0')}`;
     baseId++;
 

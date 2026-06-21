@@ -655,7 +655,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
                   `We want to say a massive *THANK YOU* for stepping out in faith to partner with us as a monthly Kingdom Builder ${tierDetails} for the RCCG TKH Building Project.\n\n` +
                   `Your builder account has been successfully created. Please use the secure invitation link below to activate your account, set up your secure login PIN/password, and access your dashboard where you can log contributions and track progress:\n\n` +
                   `👉 *Activate Account:* ${domain}/claim?token=${donor.claimToken}\n\n` +
-                  `*Please note: This activation link is unique to you and will expire in 7 days.*\n\n` +
+                  `*Please note: This activation link is unique to you and will expire in 90 days.*\n\n` +
                   `• *Donor Reference ID:* ${donor.donorRefId || 'N/A'}\n\n` +
                   `Once activated, you can always log back in at any time here:\n` +
                   `👉 *Login Portal:* ${domain}/login\n\n` +
@@ -752,7 +752,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
                             `We want to say a massive *THANK YOU* for stepping out in faith to partner with us as a monthly Kingdom Builder ${tierDetails} for the RCCG TKH Building Project.\n\n` +
                             `Your builder account has been successfully created. Please use the secure invitation link below to activate your account, set up your secure login PIN/password, and access your dashboard where you can log contributions and track progress:\n\n` +
                             `👉 *Activate Account:* ${domain}/claim?token=${data.donorInfo.claimToken}\n\n` +
-                            `*Please note: This activation link is unique to you and will expire in 7 days.*\n\n` +
+                            `*Please note: This activation link is unique to you and will expire in 90 days.*\n\n` +
                             `• *Donor Reference ID:* ${data.donorInfo.donorRefId || 'N/A'}\n\n` +
                             `Once activated, you can always log back in at any time here:\n` +
                             `👉 *Login Portal:* ${domain}/login\n\n` +
