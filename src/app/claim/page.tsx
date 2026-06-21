@@ -34,10 +34,27 @@ export default async function ClaimPage({ searchParams }: { searchParams: { toke
             </p>
             
             <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', padding: '1.25rem', borderRadius: '8px', marginBottom: '1.5rem', textAlign: 'left' }}>
-              <h3 style={{ fontSize: '0.95rem', color: '#10B981', margin: '0 0 0.5rem 0', fontWeight: 600 }}>Already Set Up Your Password?</h3>
-              <p style={{ margin: 0, fontSize: '0.85rem', color: '#aaa', lineHeight: 1.4 }}>
-                If you have already claimed this link and set up your private login password/PIN, you do not need a new link. Simply click below to go to the login portal and enter your credentials to access your dashboard.
-              </p>
+              <h3 style={{ fontSize: '0.95rem', color: '#10B981', margin: '0 0 0.5rem 0', fontWeight: 600 }}>What should you do next?</h3>
+              <ul style={{ margin: '0 0 1rem 0', paddingLeft: '1.2rem', fontSize: '0.85rem', color: '#aaa', lineHeight: '1.5' }}>
+                <li style={{ marginBottom: '8px' }}>
+                  <strong>If you have already set up your password:</strong> You are ready to log in! Simply click the button below to go to the login portal and sign in with your phone number and password.
+                </li>
+                <li>
+                  <strong>If you have not set up your password:</strong> Your link has expired. Please click the support link below to message our Admin Support on WhatsApp for a new invite.
+                </li>
+              </ul>
+              
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '0.75rem', marginTop: '0.75rem', fontSize: '0.8rem', color: '#888' }}>
+                📞 <strong>Need Help?</strong> Contact Admin Support: {' '}
+                <a 
+                  href="https://wa.me/2348052039445?text=Hello%20RCCG%20TKH%20Building%20Support%2C%20my%20builder%20activation%20link%20has%20expired.%20Kindly%20help%20me%20generate%20a%20new%20one."
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ color: '#10B981', textDecoration: 'underline', fontWeight: 'bold' }}
+                >
+                  Message Support on WhatsApp
+                </a>
+              </div>
             </div>
 
             <a 
