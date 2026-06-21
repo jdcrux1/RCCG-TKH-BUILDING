@@ -232,3 +232,68 @@ export async function killAllSessions() {
     return { success: false, error: 'Failed to terminate all sessions' };
   }
 }
+
+export async function updateDonorTier(donorId: string, newTier: string) {
+  try {
+    await requireSuperAdmin();
+
+    const tierMinAmounts: Record<string, bigint> = {
+      'Cornerstone Partner': 100000000n, // 1M in kobo
+      'Pillar Builder': 50000000n, // 500k in kobo
+      'Foundation Stone': 20000000n, // 200k in kobo
+      'Nehemiah Builder': 10000000n, // 100k in kobo
+      'Covenant Partner': 5000000n, // 50k in kobo
+      'Covenant Partners': 5000000n, // 50k in kobo
+      'Faithful Hand': 2000000n, // 20k in kobo
+      'Open-Heart': 1000000n, // 10k in kobo
+      'Willing Heart': 500000n, // 5k in kobo
+      'Supporter': 0n
+    };
+
+    const monthlyPledge = tierMinAmounts[newTier] || 0n;
+    const totalPledged = monthlyPledge * 24n;
+
+    await prisma.donor.update({
+      where: { id: donorId },
+      data: {
+        tier: newTier,
+        monthlyPledge,
+        totalPledged
+      }
+    });
+
+    await logAction('SUPERADMIN', 'UPDATE_DONOR_TIER', donorId, `Tier updated to ${newTier}`);
+    revalidatePath('/sudo-root');
+    revalidatePath('/admin/donors');
+    return { success: true };
+  } catch (error) {
+    console.error('Update donor tier error:', error);
+    return { success: false, error: 'Failed to update donor tier' };
+  }
+}
+
+export async function regenerateClaimToken(donorId: string) {
+  try {
+    await requireSuperAdmin();
+
+    const token = crypto.randomUUID();
+    const expires = new Date();
+    expires.setDate(expires.getDate() + 90); // 90 days from now
+
+    const updated = await prisma.donor.update({
+      where: { id: donorId },
+      data: {
+        isClaimed: false,
+        claimToken: token,
+        claimTokenExpires: expires
+      }
+    });
+
+    await logAction('SUPERADMIN', 'REGENERATE_CLAIM_TOKEN', donorId);
+    revalidatePath('/sudo-root');
+    return { success: true, token, donorRefId: updated.donorRefId };
+  } catch (error) {
+    console.error('Regenerate claim token error:', error);
+    return { success: false, error: 'Failed to regenerate claim token' };
+  }
+}

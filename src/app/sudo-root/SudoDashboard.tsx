@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Papa from 'papaparse';
-import { approvePaymentClaim, rejectPaymentClaim, generateMasterReport, reverseContribution, updateSystemVariable, revokeSession, killAllSessions } from './actions';
+import { approvePaymentClaim, rejectPaymentClaim, generateMasterReport, reverseContribution, updateSystemVariable, revokeSession, killAllSessions, updateDonorTier, regenerateClaimToken } from './actions';
 import AddDonorModal from '@/components/AddDonorModal';
 import ConciergeLogger from './ConciergeLogger';
 import UnmanagedFundsLogger from './UnmanagedFundsLogger';
@@ -264,7 +264,7 @@ export default function SudoDashboard({ data }: { data: Data }) {
       </div>
 
       <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
-        {['reconciliation', 'concierge', 'unmanaged_funds', 'bulk_donors', 'bulk_contributions', 'watchtower', 'system', 'pledges'].map(tab => (
+        {['reconciliation', 'concierge', 'donors', 'unmanaged_funds', 'bulk_donors', 'bulk_contributions', 'watchtower', 'system', 'pledges'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -357,6 +357,146 @@ export default function SudoDashboard({ data }: { data: Data }) {
       {activeTab === 'concierge' && (
         <div style={{ border: '1px solid #222', padding: '24px' }}>
           <ConciergeLogger />
+        </div>
+      )}
+
+      {activeTab === 'donors' && (
+        <div style={{ border: '1px solid #222' }}>
+          <div style={{ padding: '12px', background: '#111', fontSize: '14px', color: '#888', borderBottom: '1px solid #222' }}>ALL DONORS ({donors.length})</div>
+          <div className="tableResponsive" style={{ maxHeight: '600px', overflowY: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+              <thead style={{ position: 'sticky', top: 0, background: '#222', zIndex: 10 }}>
+                <tr style={{ background: '#050505', color: '#666' }}>
+                  <th style={{ padding: '12px', textAlign: 'left' }}>NAME & PHONE</th>
+                  <th style={{ padding: '12px', textAlign: 'left' }}>REFERENCE ID</th>
+                  <th style={{ padding: '12px', textAlign: 'left' }}>STATUS</th>
+                  <th style={{ padding: '12px', textAlign: 'left' }}>TIER</th>
+                  <th style={{ padding: '12px', textAlign: 'right' }}>CLAIM LINK ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {donors.map((donor) => {
+                  const isClaimed = donor.isClaimed;
+                  const hasToken = !!donor.claimToken;
+                  const isExpired = donor.claimTokenExpires && new Date(donor.claimTokenExpires) < new Date();
+                  
+                  return (
+                    <tr key={donor.id} style={{ borderBottom: '1px solid #111' }}>
+                      <td style={{ padding: '12px' }}>
+                        <div style={{ color: '#fff', fontWeight: 'bold' }}>{donor.name}</div>
+                        <div style={{ color: '#aaa', fontSize: '10px' }}>{donor.phone}</div>
+                      </td>
+                      <td style={{ padding: '12px', color: '#0f0', fontWeight: 'bold' }}>{donor.donorRefId || 'N/A'}</td>
+                      <td style={{ padding: '12px' }}>
+                        <span style={{ 
+                          color: donor.status === 'ACTIVE' ? '#10b981' : '#f59e0b',
+                          background: donor.status === 'ACTIVE' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                          padding: '2px 6px',
+                          borderRadius: '4px'
+                        }}>
+                          {donor.status}
+                        </span>
+                      </td>
+                      <td style={{ padding: '12px' }}>
+                        <select 
+                          defaultValue={donor.tier}
+                          onChange={async (e) => {
+                            if (!confirm(`Are you sure you want to change this donor's tier to ${e.target.value}? This will update their monthly and total pledges.`)) {
+                              e.target.value = donor.tier;
+                              return;
+                            }
+                            const res = await updateDonorTier(donor.id, e.target.value);
+                            if (res.success) {
+                              alert('Tier updated successfully!');
+                            } else {
+                              alert(res.error || 'Failed to update tier');
+                            }
+                          }}
+                          style={{ background: '#000', color: '#fff', border: '1px solid #333', padding: '4px', fontSize: '11px' }}
+                        >
+                          <option value="Cornerstone Partner">Cornerstone Partner (₦1M)</option>
+                          <option value="Pillar Builder">Pillar Builder (₦500k)</option>
+                          <option value="Foundation Stone">Foundation Stone (₦200k)</option>
+                          <option value="Nehemiah Builder">Nehemiah Builder (₦100k)</option>
+                          <option value="Covenant Partner">Covenant Partner (₦50k)</option>
+                          <option value="Faithful Hand">Faithful Hand (₦20k)</option>
+                          <option value="Open-Heart">Open-Heart (₦10k)</option>
+                          <option value="Willing Heart">Willing Heart (₦5k)</option>
+                          <option value="Supporter">Supporter (Custom)</option>
+                        </select>
+                      </td>
+                      <td style={{ padding: '12px', textAlign: 'right' }}>
+                        {isClaimed ? (
+                          <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓ Claimed</span>
+                        ) : (
+                          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                            {hasToken && !isExpired && (
+                              <button
+                                onClick={() => {
+                                  const domain = typeof window !== 'undefined' ? window.location.origin : '';
+                                  const tierMinAmounts: Record<string, string> = {
+                                    'Cornerstone Partner': '₦1,000,000',
+                                    'Pillar Builder': '₦500,000',
+                                    'Foundation Stone': '₦200,000',
+                                    'Nehemiah Builder': '₦100,000',
+                                    'Covenant Partner': '₦50,000',
+                                    'Covenant Partners': '₦50,000',
+                                    'Faithful Hand': '₦20,000',
+                                    'Open-Heart': '₦10,000',
+                                    'Willing Heart': '₦5,000'
+                                  };
+                                  const donorTier = donor.tier || 'Supporter';
+                                  const amountStr = tierMinAmounts[donorTier] || '';
+                                  const tierDetails = amountStr ? `under the *${donorTier}* tier (${amountStr} / month)` : donorTier && donorTier !== 'Supporter' ? `as a monthly Kingdom Builder (${donorTier})` : 'as a monthly Kingdom Builder';
+                                  
+                                  const rawMsg = 
+                                    `🕊️ *Grace and Peace to you, Bro/Sis!* 🕊️\n\n` +
+                                    `We want to say a massive *THANK YOU* for stepping out in faith to partner with us as a monthly Kingdom Builder ${tierDetails} for the RCCG TKH Building Project.\n\n` +
+                                    `Please use the secure invitation link below to activate your account and set up your secure login PIN/password:\n\n` +
+                                    `👉 *Activate Account:* ${domain}/claim?token=${donor.claimToken}\n\n` +
+                                    `*Please note: This activation link is unique to you and will expire in 90 days.*\n\n` +
+                                    `Once activated, you can always log back in at any time here:\n` +
+                                    `👉 *Login Portal:* ${domain}/login\n\n` +
+                                    `God bless you abundantly! 🙏🏽⛪`;
+                                  
+                                  let phone = donor.phone.replace(/[^0-9]/g, '');
+                                  if (phone.startsWith('0')) {
+                                    phone = '234' + phone.substring(1);
+                                  }
+                                  const waLink = `https://wa.me/${phone}?text=${encodeURIComponent(rawMsg)}`;
+                                  window.open(waLink, '_blank');
+                                }}
+                                style={{ background: '#25D366', color: '#fff', border: 'none', padding: '4px 8px', cursor: 'pointer', borderRadius: '4px' }}
+                              >
+                                Send via WA
+                              </button>
+                            )}
+                            {(!hasToken || isExpired) && (
+                              <button
+                                onClick={async () => {
+                                  if (!confirm('Generate a new secure claim token for this user?')) return;
+                                  const res = await regenerateClaimToken(donor.id);
+                                  if (res.success) {
+                                    alert('New claim token generated. You can now send it to them via WhatsApp.');
+                                    window.location.reload(); // Refresh to update the local state with new token
+                                  } else {
+                                    alert(res.error || 'Failed to regenerate link');
+                                  }
+                                }}
+                                style={{ background: '#f59e0b', color: '#000', border: 'none', padding: '4px 8px', cursor: 'pointer', borderRadius: '4px', fontWeight: 'bold' }}
+                              >
+                                Regenerate Link
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
