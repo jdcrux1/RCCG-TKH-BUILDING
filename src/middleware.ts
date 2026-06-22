@@ -26,6 +26,7 @@ const PUBLIC_API_ROUTES = [
   '/api/auth/identify',
   '/api/auth/verify',
   '/api/auth/magic',
+  '/api/auth/donor-magic',
   '/api/auth/logout',
   '/api/cron/maintenance',
   '/api/sudo-refresh',
