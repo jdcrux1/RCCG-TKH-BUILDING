@@ -52,7 +52,7 @@ CRITICAL RULES:
 5. Output EXACTLY these 3 items (Do NOT use complex Markdown syntax like asterisks for bolding, just use plain text and ALL CAPS for emphasis to ensure easy copying on Telegram):
    - DELIVERABLE 1: VISION MONDAY (Instagram Caption). A powerful, faith-stirring caption highlighting our legacy and explicitly listing 3 specific giving tiers. End with a call to click the link in bio. Include relevant hashtags.
    - DELIVERABLE 2: WEDNESDAY BUILDER UPDATE (WhatsApp Broadcast). A highly personalized, emoji-rich message structured for WhatsApp. You MUST state exactly how much we have raised (₦${totalRaisedNaira.toLocaleString()}) and the gap (₦${gapNaira.toLocaleString()}). Include the bank details and WhatsApp support number directly in this message.
-   - DELIVERABLE 3: FRIDAY CLIMAX (60-Second Video Script). A punchy, spoken-word script for the Lead Pastor counting down to the August Convention surge. Include stage directions [in brackets].
+   - DELIVERABLE 3: FRIDAY CLIMAX (60-Second AI Video Blueprint). A highly structured script designed to be fed into an AI video generator. It MUST be under 60 seconds. Format it scene-by-scene. For each scene, provide a "Visual Prompt" (what the video generator should display/animate) and the "Voiceover Script" (the exact words to be spoken). Focus the theme on getting donors to join the building project, using the live funding data.
 
 Do not hallucinate any numbers other than the exact data provided.
 `;
